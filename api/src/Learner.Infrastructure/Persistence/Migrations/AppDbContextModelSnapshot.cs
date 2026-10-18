@@ -23,7 +23,60 @@ namespace Learner.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Learner.Domain.Entities.Assessment", b =>
+            modelBuilder.Entity("Learner.Domain.Common.Job", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("LastError")
+                        .HasColumnType("text")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTimeOffset?>("LockedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("locked_at");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_jobs");
+
+                    b.HasIndex("Status", "CreatedAt")
+                        .HasDatabaseName("ix_jobs_status_created_at");
+
+                    b.ToTable("jobs", "queue");
+                });
+
+            modelBuilder.Entity("Learner.Domain.Learning.Assessment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,10 +111,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("GoalId")
                         .HasDatabaseName("ix_assessments_goal_id");
 
-                    b.ToTable("assessments", (string)null);
+                    b.ToTable("assessments", "learning");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.AssessmentQuestion", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.AssessmentQuestion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,10 +178,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("AssessmentId", "Order")
                         .HasDatabaseName("ix_assessment_questions_assessment_id_order");
 
-                    b.ToTable("assessment_questions", (string)null);
+                    b.ToTable("assessment_questions", "learning");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.ChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,10 +217,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("GoalId", "CreatedAt")
                         .HasDatabaseName("ix_chat_messages_goal_id_created_at");
 
-                    b.ToTable("chat_messages", (string)null);
+                    b.ToTable("chat_messages", "learning");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Goal", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.Goal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -227,63 +280,48 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_goals_user_id")
                         .HasFilter("status <> 'Archived'");
 
-                    b.ToTable("goals", (string)null);
+                    b.ToTable("goals", "learning");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Job", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.SkillRating", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int>("Attempts")
-                        .HasColumnType("integer")
-                        .HasColumnName("attempts");
-
-                    b.Property<DateTimeOffset?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("completed_at");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("LastError")
-                        .HasColumnType("text")
-                        .HasColumnName("last_error");
+                    b.Property<Guid>("GoalId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("goal_id");
 
-                    b.Property<DateTimeOffset?>("LockedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("locked_at");
+                    b.Property<int>("SelfRating")
+                        .HasColumnType("integer")
+                        .HasColumnName("self_rating");
 
-                    b.Property<string>("Payload")
+                    b.Property<string>("Skill")
                         .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("payload");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("status");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("type");
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("skill");
 
                     b.HasKey("Id")
-                        .HasName("pk_jobs");
+                        .HasName("pk_skill_ratings");
 
-                    b.HasIndex("Status", "CreatedAt")
-                        .HasDatabaseName("ix_jobs_status_created_at");
+                    b.HasIndex("GoalId", "Skill")
+                        .IsUnique()
+                        .HasDatabaseName("ix_skill_ratings_goal_id_skill");
 
-                    b.ToTable("jobs", (string)null);
+                    b.ToTable("skill_ratings", "learning", t =>
+                        {
+                            t.HasCheckConstraint("ck_skill_ratings_self_rating", "self_rating BETWEEN 1 AND 5");
+                        });
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Plan", b =>
+            modelBuilder.Entity("Learner.Domain.Plans.Plan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -331,48 +369,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_plans_user_id")
                         .HasFilter("status <> 'Archived'");
 
-                    b.ToTable("plans", (string)null);
+                    b.ToTable("plans", "plans");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.SkillRating", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid>("GoalId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("goal_id");
-
-                    b.Property<int>("SelfRating")
-                        .HasColumnType("integer")
-                        .HasColumnName("self_rating");
-
-                    b.Property<string>("Skill")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("skill");
-
-                    b.HasKey("Id")
-                        .HasName("pk_skill_ratings");
-
-                    b.HasIndex("GoalId", "Skill")
-                        .IsUnique()
-                        .HasDatabaseName("ix_skill_ratings_goal_id_skill");
-
-                    b.ToTable("skill_ratings", null, t =>
-                        {
-                            t.HasCheckConstraint("ck_skill_ratings_self_rating", "self_rating BETWEEN 1 AND 5");
-                        });
-                });
-
-            modelBuilder.Entity("Learner.Domain.Entities.UserProfile", b =>
+            modelBuilder.Entity("Learner.Domain.Profiles.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -457,7 +457,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_user_profiles_user_id");
 
-                    b.ToTable("user_profiles", (string)null);
+                    b.ToTable("user_profiles", "profiles");
                 });
 
             modelBuilder.Entity("Learner.Infrastructure.Identity.ApplicationUser", b =>
@@ -542,7 +542,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users", "identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -574,7 +574,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("roles", (string)null);
+                    b.ToTable("roles", "identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -604,7 +604,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_role_claims_role_id");
 
-                    b.ToTable("role_claims", (string)null);
+                    b.ToTable("role_claims", "identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -634,7 +634,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_user_claims_user_id");
 
-                    b.ToTable("user_claims", (string)null);
+                    b.ToTable("user_claims", "identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -661,7 +661,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_user_logins_user_id");
 
-                    b.ToTable("user_logins", (string)null);
+                    b.ToTable("user_logins", "identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
@@ -680,7 +680,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_user_roles_role_id");
 
-                    b.ToTable("user_roles", (string)null);
+                    b.ToTable("user_roles", "identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -704,12 +704,12 @@ namespace Learner.Infrastructure.Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name")
                         .HasName("pk_user_tokens");
 
-                    b.ToTable("user_tokens", (string)null);
+                    b.ToTable("user_tokens", "identity");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Assessment", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.Assessment", b =>
                 {
-                    b.HasOne("Learner.Domain.Entities.Goal", null)
+                    b.HasOne("Learner.Domain.Learning.Goal", null)
                         .WithMany("Assessments")
                         .HasForeignKey("GoalId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -717,9 +717,9 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_assessments_goals_goal_id");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.AssessmentQuestion", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.AssessmentQuestion", b =>
                 {
-                    b.HasOne("Learner.Domain.Entities.Assessment", null)
+                    b.HasOne("Learner.Domain.Learning.Assessment", null)
                         .WithMany("Questions")
                         .HasForeignKey("AssessmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -727,9 +727,9 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_assessment_questions_assessments_assessment_id");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.ChatMessage", b =>
                 {
-                    b.HasOne("Learner.Domain.Entities.Goal", null)
+                    b.HasOne("Learner.Domain.Learning.Goal", null)
                         .WithMany("Messages")
                         .HasForeignKey("GoalId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -737,51 +737,14 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_chat_messages_goals_goal_id");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Goal", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.SkillRating", b =>
                 {
-                    b.HasOne("Learner.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_goals_asp_net_users_user_id");
-                });
-
-            modelBuilder.Entity("Learner.Domain.Entities.Plan", b =>
-                {
-                    b.HasOne("Learner.Domain.Entities.Goal", null)
-                        .WithMany()
-                        .HasForeignKey("GoalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_plans_goals_goal_id");
-
-                    b.HasOne("Learner.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_plans_asp_net_users_user_id");
-                });
-
-            modelBuilder.Entity("Learner.Domain.Entities.SkillRating", b =>
-                {
-                    b.HasOne("Learner.Domain.Entities.Goal", null)
+                    b.HasOne("Learner.Domain.Learning.Goal", null)
                         .WithMany("SkillRatings")
                         .HasForeignKey("GoalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_skill_ratings_goals_goal_id");
-                });
-
-            modelBuilder.Entity("Learner.Domain.Entities.UserProfile", b =>
-                {
-                    b.HasOne("Learner.Infrastructure.Identity.ApplicationUser", null)
-                        .WithOne()
-                        .HasForeignKey("Learner.Domain.Entities.UserProfile", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_profiles_asp_net_users_user_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -791,7 +754,7 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_role_claims_roles_role_id");
+                        .HasConstraintName("fk_role_claims_asp_net_roles_role_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -841,12 +804,12 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_user_tokens_users_user_id");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Assessment", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.Assessment", b =>
                 {
                     b.Navigation("Questions");
                 });
 
-            modelBuilder.Entity("Learner.Domain.Entities.Goal", b =>
+            modelBuilder.Entity("Learner.Domain.Learning.Goal", b =>
                 {
                     b.Navigation("Assessments");
 

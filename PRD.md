@@ -160,11 +160,13 @@ Landing ─► Sign up / Login (email+password or Google)
 ```
 learner.io/
 ├─ web/          React SPA ─────────── feature-based (features/auth, onboarding, chat, assessment, plan, landing)
-├─ api/          ASP.NET Core ─────── Clean Architecture
-│   ├─ Learner.Domain          entities, enums, domain rules (staleness, state machine)
-│   ├─ Learner.Application     use cases / services, DTOs, validators, interfaces
-│   ├─ Learner.Infrastructure  EF Core DbContext + migrations, Identity, agent-service HTTP client, job enqueue
-│   └─ Learner.Api             controllers, middleware (auth, errors, rate limiting), SSE proxy
+├─ api/          ASP.NET Core ─────── Modular monolith on Clean Architecture (see §8.2.1)
+│   ├─ Learner.Domain          Common/ + one folder per module: Profiles/, Learning/, Plans/
+│   ├─ Learner.Application     Common/, Contracts/<Module>/ (public module APIs), Identity/, Profiles/,
+│   │                          Learning/, Plans/, Dashboard/ (composes modules via contracts only)
+│   ├─ Learner.Infrastructure  EF Core DbContext (one schema per module) + migrations, Identity, agent-service client
+│   ├─ Learner.Api             controllers, middleware (auth, CSRF, errors, rate limiting), SSE proxy
+│   └─ tests/Learner.ArchitectureTests   NetArchTest rules that fail when a module boundary is crossed
 ├─ agents/       Python FastAPI ───── feature-based modules
 │   ├─ asta/          LangGraph chat graph + tools (web_search, finalize_goal)
 │   ├─ assessment/    question generation + grading
@@ -179,21 +181,39 @@ learner.io/
 - **Chat:** Browser ⇄ API (SSE) ⇄ Agents `/asta/stream` (SSE). The API stores user and assistant messages.
 - **Assessment:** API → Agents `/assessment/generate`, `/assessment/grade` (synchronous). The API stores questions and answer keys server-side.
 - **Plan:** API inserts a row into `jobs` → the Python **worker** claims it (`SELECT … FOR UPDATE SKIP LOCKED`) → generates the plan → writes `plans.content` and sets `status = ready` → the SPA polls the API for status.
-- **Schema ownership:** EF Core migrations own the whole schema. Python only reads and writes `jobs` and `plans` using plain SQL.
+- **Schema ownership:** EF Core migrations own the whole schema. Python only reads and writes `queue.jobs` and `plans.plans` using plain SQL.
+
+#### 8.2.1 API modules (modular monolith)
+
+The C# API is one deployable split into four strict feature modules. Any module can later become its own service without a rewrite.
+
+| Module | Owns (Postgres schema) | Public contract |
+|---|---|---|
+| Identity | `identity.*` (users, logins, tokens) | Uses `IIdentityService` internally; consumes `IProfilesModule` |
+| Profiles | `profiles.user_profiles` | `IProfilesModule`: create profile, profile summary |
+| Learning | `learning.*` (goals, chat, ratings, assessments) | `ILearningModule`: active goal |
+| Plans | `plans.plans` (+ enqueues on shared `queue.jobs`) | `IPlansModule`: active plan and its phase |
+
+**Rules (enforced by `Learner.ArchitectureTests`):**
+- A module may use another module only through `Learner.Application.Contracts.<Module>`, never its services, entities or data.
+- Each module reaches the database only through its own interface (`IProfilesDb`, `ILearningDb`, `IPlansDb`).
+- There are no foreign keys across module schemas; modules refer to each other by id only.
+- Contracts expose no module internals (no domain entities or enums).
+- Cross-module read models, such as the Dashboard, compose contracts only.
 
 ### 8.3 Data model (initial)
 
 | Table | Key fields |
 |---|---|
-| `AspNetUsers` (+ Identity tables) | Identity defaults |
-| `user_profiles` | user_id, full_name, country, age_range, current_status, profession, years_experience, education, certifications[], skills[], hobbies[], professional_summary, onboarding_completed |
-| `goals` | id, user_id, type (professional/personal), title, summary (jsonb), time_per_week, timeline, preferences (jsonb), status (chatting/rating/assessing/confirmed/archived), created_at |
-| `chat_messages` | id, goal_id, role, content, tool_payload (jsonb), created_at |
-| `skill_ratings` | goal_id, skill, self_rating |
-| `assessments` | id, goal_id, status, results (jsonb), completed_at |
-| `assessment_questions` | id, assessment_id, skill, kind (mcq/short), prompt, options (jsonb), answer_key (server-only), user_answer, score, feedback |
-| `plans` | id, user_id (unique where active), goal_id, status (queued/generating/ready/failed/archived), content (jsonb), generated_at, error |
-| `jobs` | id, type, payload (jsonb), status, attempts, locked_at, last_error, created_at |
+| `identity.users` (+ Identity tables) | Identity defaults |
+| `profiles.user_profiles` | user_id, full_name, country, age_range, current_status, profession, years_experience, education, certifications[], skills[], hobbies[], professional_summary, onboarding_completed |
+| `learning.goals` | id, user_id, type (professional/personal), title, summary (jsonb), time_per_week, timeline, preferences (jsonb), status (chatting/rating/assessing/confirmed/archived), created_at |
+| `learning.chat_messages` | id, goal_id, role, content, tool_payload (jsonb), created_at |
+| `learning.skill_ratings` | goal_id, skill, self_rating |
+| `learning.assessments` | id, goal_id, status, results (jsonb), completed_at |
+| `learning.assessment_questions` | id, assessment_id, skill, kind (mcq/short), prompt, options (jsonb), answer_key (server-only), user_answer, score, feedback |
+| `plans.plans` | id, user_id (unique where active), goal_id, status (queued/generating/ready/failed/archived), content (jsonb), generated_at, error |
+| `queue.jobs` | id, type, payload (jsonb), status, attempts, locked_at, last_error, created_at |
 
 ### 8.4 LLM models and rate-limit fallback (Groq)
 
@@ -239,6 +259,7 @@ Every LLM call in the agents service goes through **`FallbackChatGroq`** ([agent
 | D-3 | **Web search: start with Groq's built-in browser search, keep Brave as a fallback.** Firecrawl is not needed for the MVP. | Groq's gpt-oss models support built-in tools, including browser search, so this needs no extra API key or vendor. Brave Search is the fallback if quality or limits become a problem. Firecrawl is a scraper; it only matters if we later want to read full pages. [Groq tool use](https://console.groq.com/docs/tool-use) |
 | D-4 | Job queue in Postgres (no Redis or RabbitMQ). | One less moving part for a 2-day build; `SKIP LOCKED` is a proven Postgres queue pattern. |
 | D-5 | Session cookie auth (not JWT in localStorage). | Same-origin SPA (Vite dev proxy). HttpOnly cookies avoid exposing tokens to XSS. |
+| D-6 | **Modular monolith now, not microservices.** Split later with the strangler pattern if needed. | Fowler: "you shouldn't start a new project with microservices" ([MonolithFirst](https://martinfowler.com/bliki/MonolithFirst.html)). Microsoft lists complexity, data-integrity and DevOps costs ([Azure Architecture Center](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/microservices)). Strict modules keep extraction cheap. |
 
 ## 10. Milestones (deadline: Tue 20 Oct 2026 EOD)
 

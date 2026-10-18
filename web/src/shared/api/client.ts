@@ -17,9 +17,13 @@ export class ApiError extends Error {
   }
 }
 
+// The API rejects state-changing requests without this header (CSRF guard).
+const CSRF_HEADER = { name: 'X-Requested-With', value: 'learner-web' }
+
 /** Single fetch wrapper for every API call: same-origin cookies, JSON in/out, typed errors. */
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
+  headers.set(CSRF_HEADER.name, CSRF_HEADER.value)
   if (init.body !== undefined && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
@@ -34,4 +38,12 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 
   const contentType = response.headers.get('Content-Type') ?? ''
   return (contentType.includes('json') ? response.json() : response.text()) as Promise<T>
+}
+
+/** JSON body helpers so call sites stay one line. */
+export const api = {
+  get: <T>(path: string) => apiFetch<T>(path),
+  post: <T>(path: string, body?: unknown) =>
+    apiFetch<T>(path, { method: 'POST', body: body === undefined ? undefined : JSON.stringify(body) }),
+  put: <T>(path: string, body: unknown) => apiFetch<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
 }

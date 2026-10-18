@@ -31,4 +31,25 @@ The web dev server proxies `/api` to the API, so the browser only ever talks to 
 
 ## Tests
 
+- API architecture rules (module boundaries): `dotnet test api/Learner.slnx`
 - Agents: `uv run --directory agents pytest`
+
+## Local test accounts
+
+Dev-only accounts in the local Docker database (fake data; never use these values anywhere real):
+
+| Email | Password | State |
+|---|---|---|
+| `m1test@example.com` | `password123` | Onboarded (basic info only) |
+| `m1-ui@example.com` | `password123` | Onboarded with skills |
+
+## Google sign-in (optional locally)
+
+The Google button only appears once the API has credentials:
+
+1. Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID → Web application.
+2. Authorized redirect URI: `http://localhost:5173/signin-google` (the web dev server proxies it to the API).
+3. Save the values as API user secrets:
+   `dotnet user-secrets set "Authentication:Google:ClientId" "<id>" --project api/src/Learner.Api`
+   `dotnet user-secrets set "Authentication:Google:ClientSecret" "<secret>" --project api/src/Learner.Api`
+4. Restart the API.
