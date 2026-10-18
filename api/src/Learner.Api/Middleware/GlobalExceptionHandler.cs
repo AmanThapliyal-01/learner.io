@@ -19,6 +19,12 @@ public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetails
             NotFoundException e => new ProblemDetails { Title = e.Message, Status = StatusCodes.Status404NotFound },
             ConflictException e => new ProblemDetails { Title = e.Message, Status = StatusCodes.Status409Conflict },
             UnauthorizedException e => new ProblemDetails { Title = e.Message, Status = StatusCodes.Status401Unauthorized },
+            ServiceUnavailableException e => new ProblemDetails
+            {
+                Title = e.Message,
+                Status = StatusCodes.Status503ServiceUnavailable,
+                Extensions = { ["retryAt"] = e.RetryAt },
+            },
             _ => null,
         };
 

@@ -272,6 +272,27 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 - If no reply arrives, the user's message is deleted so resending it doesn't duplicate it.
 - `POST /api/asta/goal/confirm` accepts only the card in Asta's latest message, then moves the goal to `Rating`.
 
+### 8.6 Skill check and planner design
+
+**Skill check (agents `POST /assessment/generate`, `/assessment/grade`; API Learning module):**
+- **Target levels:** one small call sets the level the goal needs for each skill (1-5).
+- **Questions:** each skill the user rated 2 or higher gets its own call, two at a time, producing 3 multiple-choice questions and 1 short-answer question pitched at the self-rating. Skills rated 1 ("never used") aren't tested.
+- **Answer keys** stay on the server and are never sent to the browser.
+- **Grading:** multiple choice is graded exactly. Short answers, strengths and gaps come from one model call. **Assessed levels are computed in code**: 75% or more confirms the self-rating, 40-75% drops it one level, below 40% drops it two.
+- **Measured** (18 Oct): generating 16 questions takes about 9s, and grading about 9s.
+
+**Planner (LangGraph, runs in the agents worker):**
+- **Graph:** `assess` (code: skip / refresh / focus per skill) → `outline` (1 call) → `detail` × phases (in parallel via `Send`, each phase starting on a different model so the per-minute budgets add up) → `assemble` (code).
+- **Budget rule:** with "free only", paid resources are dropped in code.
+- **Rate limits:** each step waits out short limits, up to 90s. Longer limits, such as daily ones, requeue the job without using up one of its 3 attempts.
+- **Queue:** the API queues a job whose payload is a **full snapshot** (goal, profile, assessed skills), so the worker never reads other modules' tables. The worker claims jobs with `FOR UPDATE SKIP LOCKED`; a lock older than 10 minutes counts as abandoned.
+- **Measured:** about 8-12s per plan. It was 209s before parallelising the detail calls and removing schema length caps.
+- **Regeneration (FR-30/31):** a stale or failed plan is archived, and a new job is queued from the same goal and the latest assessment.
+
+**Lesson:** don't put string or list length caps in schemas the LLM fills. Groq rejects the whole tool call (400) when one field breaks the schema. Trim in code instead.
+
+**Known limitation:** model-written multiple-choice keys are occasionally wrong (one in roughly twenty seen in testing). A verification pass is a possible follow-up.
+
 ## 9. Key decisions and corrections
 
 | # | Decision | Rationale and source |

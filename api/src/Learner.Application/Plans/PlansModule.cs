@@ -10,14 +10,14 @@ internal sealed class PlansModule(IPlansDb db, TimeProvider clock) : IPlansModul
     {
         var plan = await db.Plans.AsNoTracking()
             .FirstOrDefaultAsync(p => p.UserId == userId && p.Status != PlanStatus.Archived, ct);
-        return plan is null ? null : new ActivePlan(plan.Id, PhaseOf(plan), plan.GeneratedAt);
+        return plan is null ? null : new ActivePlan(plan.Id, PhaseOf(plan, clock.GetUtcNow()), plan.GeneratedAt);
     }
 
-    private PlanPhase PhaseOf(Plan plan) => plan.Status switch
+    internal static PlanPhase PhaseOf(Plan plan, DateTimeOffset now) => plan.Status switch
     {
         PlanStatus.Failed => PlanPhase.Failed,
         PlanStatus.Queued or PlanStatus.Generating => PlanPhase.Generating,
-        _ when plan.IsStale(clock.GetUtcNow()) => PlanPhase.Stale,
+        _ when plan.IsStale(now) => PlanPhase.Stale,
         _ => PlanPhase.Ready,
     };
 }

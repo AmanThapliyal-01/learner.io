@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     agent_service_token: SecretStr
     database_url: str
     port: int = 8001
+    # The plan worker runs inside the API process; tests turn it off.
+    run_worker: bool = True
+    worker_poll_seconds: float = 2.0
 
     @property
     def model_chain(self) -> list[str]:

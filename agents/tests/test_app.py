@@ -13,6 +13,7 @@ def client() -> TestClient:
         groq_api_key=SecretStr("unused"),
         agent_service_token=SecretStr(TOKEN),
         database_url="postgresql://unused",
+        run_worker=False,
     )
     app = create_app(settings)
 

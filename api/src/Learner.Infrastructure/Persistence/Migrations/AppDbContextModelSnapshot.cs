@@ -290,6 +290,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int?>("AssessedLevel")
+                        .HasColumnType("integer")
+                        .HasColumnName("assessed_level");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -307,6 +311,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)")
                         .HasColumnName("skill");
+
+                    b.Property<int?>("TargetLevel")
+                        .HasColumnType("integer")
+                        .HasColumnName("target_level");
 
                     b.HasKey("Id")
                         .HasName("pk_skill_ratings");

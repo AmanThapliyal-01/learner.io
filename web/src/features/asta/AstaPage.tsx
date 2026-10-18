@@ -120,9 +120,11 @@ export function AstaPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 py-1">
             <p className="text-sm text-ink">
               <span className="font-medium">Goal confirmed.</span>{' '}
-              <span className="text-ink-muted">Next, you'll rate your skills and take a short check.</span>
+              <span className="text-ink-muted">Next, rate your skills and take a short check.</span>
             </p>
-            <ButtonLink to="/dashboard">Back to dashboard</ButtonLink>
+            <ButtonLink to={conversation?.stage === 'rating' ? '/rate' : '/dashboard'}>
+              {conversation?.stage === 'rating' ? 'Rate your skills' : 'Back to dashboard'}
+            </ButtonLink>
           </div>
         )}
       </footer>

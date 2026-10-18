@@ -155,6 +155,12 @@ def test_summary_falls_back_to_outcome_as_title_and_caps_skills():
     assert len(summary.skills) == 6
 
 
+def test_summary_uses_plain_hyphens_and_dedupes_skills():
+    draft = GoalDraft.model_validate({**COMPLETE, "skills": ["Fine‑tuning", "Fine-tuning", "RAG"]})
+
+    assert draft.to_summary().skills == ["Fine-tuning", "RAG"]
+
+
 def test_chat_prompt_names_missing_items_and_search_only_when_available():
     req = AstaRequest(
         profile=ProfileContext(full_name="Asha", profession="Backend developer", skills=["C#", "SQL"]),
@@ -193,7 +199,7 @@ def test_extraction_sees_profile_and_transcript_including_shown_card():
 
 
 def test_stream_endpoint_returns_server_sent_events():
-    settings = Settings(groq_api_key=SecretStr("unused"), agent_service_token=SecretStr("t"), database_url="postgresql://unused")
+    settings = Settings(groq_api_key=SecretStr("unused"), agent_service_token=SecretStr("t"), database_url="postgresql://unused", run_worker=False)
     app = create_app(settings)
     app.dependency_overrides[asta_models] = lambda: models(chat=FakeChat(replies=[["Hello"]]))
 

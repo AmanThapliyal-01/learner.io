@@ -47,11 +47,17 @@ function DashboardBody({ dashboard }: { dashboard: Dashboard }) {
           body="Pick up with Asta where you left off. Once your goal is clear, you'll check your skills and get your plan."
           action={<ButtonLink to="/asta">Continue with Asta</ButtonLink>}
         />
+      ) : dashboard.goal?.stage === 'rating' ? (
+        <StateCard
+          title={`Your goal: ${dashboard.goal.title ?? 'confirmed'}`}
+          body="Next, rate how well you know each skill, then take a short check. Your plan is built from the result."
+          action={<ButtonLink to="/rate">Rate your skills</ButtonLink>}
+        />
       ) : (
         <StateCard
           title={`Your goal: ${dashboard.goal?.title ?? 'confirmed'}`}
-          body="Next, rate how well you know each skill, then take a short check. Your plan is built from the result."
-          action={<ButtonLink to="/asta" variant="secondary">Review your goal</ButtonLink>}
+          body="Pick up your skill check where you left off. Once it's done, our agent builds your plan."
+          action={<ButtonLink to="/assessment">Continue the skill check</ButtonLink>}
         />
       )
     case 'plan_generating':
@@ -59,7 +65,7 @@ function DashboardBody({ dashboard }: { dashboard: Dashboard }) {
         <StateCard
           title="Our agent is creating your plan"
           body="It's working from your goal and assessment. This usually takes a minute or two; this page updates on its own."
-          action={<Spinner className="size-5 text-primary" label="Plan in progress" />}
+          action={<ButtonLink to="/plan" variant="secondary">See progress</ButtonLink>}
         />
       )
     case 'plan_failed':
@@ -67,7 +73,7 @@ function DashboardBody({ dashboard }: { dashboard: Dashboard }) {
         <StateCard
           title="Your plan didn't finish"
           body="Something went wrong while building it. Your goal and assessment are saved, so trying again starts from there."
-          action={<ButtonLink to="/asta">Try again</ButtonLink>}
+          action={<ButtonLink to="/plan">Try again</ButtonLink>}
         />
       )
     case 'plan_stale':

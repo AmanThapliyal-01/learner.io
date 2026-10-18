@@ -1,4 +1,5 @@
 using Learner.Application.Identity;
+using Learner.Application.Learning.SkillCheck;
 using Learner.Application.Learning.Asta;
 using Learner.Infrastructure.Agents;
 using Learner.Application.Learning;
@@ -51,14 +52,18 @@ public static class DependencyInjection
 
         // Internal Python agents service (Asta, assessment, planner).
         services.Configure<AgentServiceOptions>(configuration.GetSection(AgentServiceOptions.Section));
-        services.AddHttpClient<IAstaAgent, AstaAgentClient>((sp, http) =>
-        {
-            var options = sp.GetRequiredService<IOptions<AgentServiceOptions>>().Value;
-            http.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
-            http.DefaultRequestHeaders.Add(AgentServiceOptions.TokenHeader, options.Token);
-            http.Timeout = TimeSpan.FromMinutes(3); // a streamed reply, including a web search, stays well under this
-        });
+        services.AddHttpClient<IAstaAgent, AstaAgentClient>(ConfigureAgentsClient);
+        services.AddHttpClient<IAssessmentAgent, AssessmentAgentClient>(ConfigureAgentsClient);
 
         return services;
+    }
+
+    private static void ConfigureAgentsClient(IServiceProvider sp, HttpClient http)
+    {
+        var options = sp.GetRequiredService<IOptions<AgentServiceOptions>>().Value;
+        http.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+        http.DefaultRequestHeaders.Add(AgentServiceOptions.TokenHeader, options.Token);
+        // Generating a check or a streamed reply with a web search stays well under this.
+        http.Timeout = TimeSpan.FromMinutes(3);
     }
 }
