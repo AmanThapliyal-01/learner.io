@@ -23,7 +23,7 @@ autonomously (the user delegated creative direction).
 
 - ../../../web/public/assets/illustrations/gap-path.svg — brand illustration (solid stones = known, hatched = gap, sprout = goal); opening/closing scene.
 - ../../../web/public/assets/illustrations/sprout-chat.svg — seedling + typing bubble; Asta beat.
-- Landing page captured from the local dev server (http://127.0.0.1:5173).
+- Landing page capture was refused (HTTP 403 on the local dev server); UI is rebuilt from the app code instead.
 
 ## Customizations
 
@@ -31,5 +31,5 @@ autonomously (the user delegated creative direction).
 
 ## Notes
 
-- Silent: no HeyGen sign-in and no local TTS/music engines on this machine. Music can be added later.
+- No narration. Music bed added after HeyGen sign-in: calm, warm acoustic from HeyGen's library, faded in and out, kept low under the on-screen text.
 - No people, no stock footage. Bricolage Grotesque for display, Inter for body.

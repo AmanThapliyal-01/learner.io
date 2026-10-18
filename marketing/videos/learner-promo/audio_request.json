@@ -1,0 +1,11 @@
+{
+  "provider": "auto",
+  "speed": "1.0",
+  "lines": [],
+  "bgm": {
+    "mode": "retrieve",
+    "query": "calm warm gentle uplifting acoustic",
+    "blob": "learner.io checks what you already know, then plans only the gap.",
+    "arc": "Problem → Goal → Check → Gap plan → Promise"
+  }
+}

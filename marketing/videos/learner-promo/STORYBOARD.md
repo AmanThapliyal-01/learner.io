@@ -5,7 +5,7 @@ message: "learner.io checks what you already know, then plans only the gap."
 arc: Problem → Goal → Check → Gap plan → Promise
 audience: Self-directed learners and career-switchers tired of one-size roadmaps
 mode: autonomous
-music: none
+music: "calm warm gentle uplifting acoustic"
 ---
 
 ## Video direction
