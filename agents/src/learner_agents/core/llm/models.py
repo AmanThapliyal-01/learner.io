@@ -8,6 +8,8 @@ class ModelSpec:
     id: str
     # Groq server-side tools such as {"type": "browser_search"}. Only gpt-oss models support them.
     builtin_tools: bool = False
+    # Accepts reasoning_effort ("low" | "medium" | "high"). Lower effort = faster, fewer tokens.
+    reasoning_effort: bool = False
 
 
 # Order matters: the first model is preferred. Groq rate limits (RPD/TPD) are per model,
@@ -15,9 +17,9 @@ class ModelSpec:
 # The Llama models are Enterprise-tier on Groq; they're skipped automatically while the
 # API key can't see them (see FallbackChatGroq.chain) and join the chain after an upgrade.
 DEFAULT_MODEL_CHAIN: tuple[ModelSpec, ...] = (
-    ModelSpec("openai/gpt-oss-120b", builtin_tools=True),
+    ModelSpec("openai/gpt-oss-120b", builtin_tools=True, reasoning_effort=True),
     ModelSpec("qwen/qwen3.8-27b"),
-    ModelSpec("openai/gpt-oss-20b", builtin_tools=True),
+    ModelSpec("openai/gpt-oss-20b", builtin_tools=True, reasoning_effort=True),
     ModelSpec("llama-3.3-70b-versatile"),
     ModelSpec("llama-3.1-8b-instant"),
 )

@@ -4,6 +4,7 @@ import logging
 
 from fastapi import FastAPI
 
+from learner_agents.asta.router import router as asta_router
 from learner_agents.core.auth import ServiceTokenMiddleware
 from learner_agents.core.config import Settings, get_settings
 
@@ -19,5 +20,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    # Feature routers (asta, assessment, planner) are registered here as they land.
+    # Feature routers (assessment and planner are registered here as they land).
+    app.include_router(asta_router)
     return app

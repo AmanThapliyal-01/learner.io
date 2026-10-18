@@ -4,6 +4,7 @@ using Learner.Application.Contracts.Profiles;
 using Learner.Application.Dashboard;
 using Learner.Application.Identity;
 using Learner.Application.Learning;
+using Learner.Application.Learning.Asta;
 using Learner.Application.Plans;
 using Learner.Application.Profiles;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ public static class DependencyInjection
 
         // Learning
         services.AddScoped<ILearningModule, LearningModule>();
+        services.AddScoped<AstaService>();
 
         // Plans
         services.AddScoped<IPlansModule, PlansModule>();

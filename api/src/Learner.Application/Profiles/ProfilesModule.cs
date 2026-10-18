@@ -21,4 +21,12 @@ internal sealed class ProfilesModule(IProfilesDb db) : IProfilesModule
             .Where(p => p.UserId == userId)
             .Select(p => new ProfileSummary(p.FullName, p.OnboardingCompleted))
             .FirstOrDefaultAsync(ct);
+
+    public Task<ProfileSnapshot?> GetSnapshotAsync(Guid userId, CancellationToken ct) =>
+        db.UserProfiles.AsNoTracking()
+            .Where(p => p.UserId == userId)
+            .Select(p => new ProfileSnapshot(
+                p.FullName, p.Country, p.AgeRange, p.CurrentStatus, p.Profession, p.YearsOfExperience, p.Education,
+                p.Certifications, p.Skills, p.Hobbies, p.ProfessionalSummary))
+            .FirstOrDefaultAsync(ct);
 }

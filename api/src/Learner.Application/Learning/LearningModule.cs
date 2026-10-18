@@ -15,7 +15,7 @@ internal sealed class LearningModule(ILearningDb db) : ILearningModule
         return goal is null ? null : new ActiveGoal(goal.Id, goal.Title, ToStage(goal.Status));
     }
 
-    private static GoalStage ToStage(GoalStatus status) => status switch
+    internal static GoalStage ToStage(GoalStatus status) => status switch
     {
         GoalStatus.Chatting => GoalStage.Chatting,
         GoalStatus.Rating => GoalStage.Rating,

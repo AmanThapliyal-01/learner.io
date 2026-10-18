@@ -84,6 +84,8 @@ class FallbackChatGroq(BaseChatModel):
     temperature: float = 0.3
     max_tokens: int | None = None
     request_timeout: float | None = None
+    reasoning_effort: str | None = None
+    """Sent only to models that support it (gpt-oss); "low" keeps chat fast and cheap."""
 
     _clients: dict[str, BaseChatModel] = PrivateAttr(default_factory=dict)
 
@@ -114,6 +116,7 @@ class FallbackChatGroq(BaseChatModel):
             api_key=self.api_key or settings.groq_api_key,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
+            reasoning_effort=self.reasoning_effort if spec.reasoning_effort else None,
             timeout=self.request_timeout or settings.groq_request_timeout_s,
             max_retries=0,  # fail over immediately instead of retrying a rate-limited model
         )

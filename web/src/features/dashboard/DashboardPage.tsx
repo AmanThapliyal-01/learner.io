@@ -41,11 +41,17 @@ function DashboardBody({ dashboard }: { dashboard: Dashboard }) {
     case 'no_goal':
       return <EmptyState />
     case 'goal_in_progress':
-      return (
+      return dashboard.goal?.stage === 'chatting' ? (
         <StateCard
-          title={dashboard.goal?.title ? `Your goal: ${dashboard.goal.title}` : 'Your goal is taking shape'}
-          body="Pick up with Asta where you left off. Once your goal and skill check are done, your plan gets built."
+          title="Your goal is taking shape"
+          body="Pick up with Asta where you left off. Once your goal is clear, you'll check your skills and get your plan."
           action={<ButtonLink to="/asta">Continue with Asta</ButtonLink>}
+        />
+      ) : (
+        <StateCard
+          title={`Your goal: ${dashboard.goal?.title ?? 'confirmed'}`}
+          body="Next, rate how well you know each skill, then take a short check. Your plan is built from the result."
+          action={<ButtonLink to="/asta" variant="secondary">Review your goal</ButtonLink>}
         />
       )
     case 'plan_generating':

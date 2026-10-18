@@ -102,7 +102,7 @@ Landing ─► Sign up / Login (email+password or Google)
   8. The list of concrete skills to assess (Asta proposes; the user can edit)
 - FR-15: **Unclear professional goal:** if the profile has no professional summary, Asta asks for it (inline in chat). It then asks 2–4 targeted questions and uses **web search** to suggest 3–5 in-demand skills or directions that fit the user's background.
 - FR-16: **Unclear personal goal:** Asta asks which area interests them (art, music, fitness, languages…) and narrows it down to concrete skills.
-- FR-17: When the requirements are complete, Asta shows a **goal summary card** (via a structured tool call). The user confirms or edits it before moving on.
+- FR-17: When the requirements are complete, the **goal summary card** appears. The user confirms it, or tells Asta what to change in chat, before moving on. Completeness is decided by code, not by the chat model (see §8.5).
 - FR-18: Chat history is saved per goal, so a page reload resumes the conversation.
 - FR-19: Asta refuses off-topic or unsafe requests politely and steers back to learning.
 
@@ -247,8 +247,30 @@ Every LLM call in the agents service goes through **`FallbackChatGroq`** ([agent
 **Known constraints:**
 - **Only 3 of the 5 slots work with the current key.** The Llama models are Enterprise-tier on Groq. They join the chain automatically if the key is upgraded.
 - **8K tokens per minute per model is tight for plan generation.** The planner will generate phase by phase, in smaller calls, instead of in one large call.
+- **One Groq web search costs about 6.8K tokens** (about 85% of a model's per-minute budget, measured 18 Oct). Asta uses it at most once per conversation, and only when market data would change a suggestion.
 - **gpt-oss models spend output tokens on reasoning.** Don't set small `max_tokens` values; a 40-token cap returned an empty answer in testing.
 - **The bench list lives in memory, per process.** The API's agent calls and the worker each learn about a 429 separately; it costs at most one extra failed request per model per process.
+
+### 8.5 Asta turn design
+
+Each user message runs one Asta turn in the agents service (`POST /asta/stream`, server-sent events):
+
+1. **Extract.** A structured-output call reads the conversation and records only what the user said or agreed to (`GoalDraft`). It prefers `gpt-oss-20b`, whose rate limits are separate from the chat model's.
+2. **Decide in code.** If every required item is known and the user isn't asking a question, the turn returns the summary card with a fixed intro line, and the chat model isn't called.
+3. **Otherwise chat.** Asta streams a reply (`gpt-oss-120b`, low reasoning effort, optional web search). It is told exactly which items are still missing, so it asks only for those.
+
+**Why it works this way:** in live tests, when the chat model owned a "finalize" tool it called it with guessed values, printed the summary as JSON, or said "here's your goal" without producing one. Moving the decision into code removed all three failure modes.
+
+**Safeguards:**
+- An empty reply (gpt-oss occasionally returns only reasoning) is retried once, invisibly to the user.
+- If extraction fails, Asta keeps asking.
+- When every model is rate-limited, the turn returns a `rate_limited` error with the time Asta is back.
+
+**C# side (Learning module):**
+- The user's message is stored before streaming starts.
+- Events are relayed to the browser as SSE, and the reply (and card) is stored when it completes.
+- If no reply arrives, the user's message is deleted so resending it doesn't duplicate it.
+- `POST /api/asta/goal/confirm` accepts only the card in Asta's latest message, then moves the goal to `Rating`.
 
 ## 9. Key decisions and corrections
 

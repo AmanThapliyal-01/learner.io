@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Learner.Application.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,7 @@ namespace Learner.Api.Auth;
 public static class AuthSetup
 {
     public const string AuthRateLimit = "auth";
+    public const string ChatRateLimit = "chat";
 
     /// <summary>
     /// Cookie sessions (+ Google when configured), a global "signed in" requirement, and rate limits.
@@ -55,6 +57,10 @@ public static class AuthSetup
             options.AddPolicy(AuthRateLimit, context => RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                 _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1) }));
+            // Per signed-in user: protects the shared LLM quota from one runaway client.
+            options.AddPolicy(ChatRateLimit, context => RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1) }));
         });
 
         return services;

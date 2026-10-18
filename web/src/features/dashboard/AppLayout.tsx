@@ -8,10 +8,11 @@ import { useLogout, useMe } from '../auth/api'
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard' },
+  { to: '/asta', label: 'Asta' },
   { to: '/profile', label: 'Profile' },
 ]
 
-/** Shell for signed-in pages: one top bar on every width (two destinations don't need a sidebar). */
+/** Shell for signed-in pages: one top bar on every width (three destinations don't need a sidebar). */
 export function AppLayout() {
   const { data: me } = useMe()
   const logout = useLogout()

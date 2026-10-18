@@ -16,3 +16,9 @@
 - Vite dev gotcha: several quick edits to one file can leave the browser on a cached `?t=` module version. Touch the file and reload before trusting a UI test.
 - Browser-pane screenshots can lag behind the DOM. Verify flows with page text and JS; use screenshots only for visuals.
 - On this Windows machine Python defaults to cp1252. Always pass encoding='utf-8' when scripting file edits; a failed write truncated README once.
+
+## 2026-10-18 — M2 session (Asta)
+- Don't let a chat LLM decide when structured data is complete. Extract with structured output, then decide in code. Tool-owned "finalize" calls on gpt-oss guessed values, printed JSON, or claimed to summarise without doing it.
+- Groq built-in browser_search costs about 6.8K tokens per call (85% of the 8K TPM). Use it sparingly.
+- uvicorn --reload can miss newly added modules. Restart the agents server after adding files or routers.
+- Measure live LLM behaviour with a scripted multi-turn probe (in the scratchpad) before wiring the UI; it found 4 prompt and flow bugs that unit tests couldn't.

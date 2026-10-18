@@ -1,4 +1,6 @@
 using Learner.Application.Identity;
+using Learner.Application.Learning.Asta;
+using Learner.Infrastructure.Agents;
 using Learner.Application.Learning;
 using Learner.Application.Plans;
 using Learner.Application.Profiles;
@@ -8,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Learner.Infrastructure;
 
@@ -45,6 +48,16 @@ public static class DependencyInjection
             .AddSignInManager()
             .AddDefaultTokenProviders();
         services.AddScoped<IIdentityService, IdentityService>();
+
+        // Internal Python agents service (Asta, assessment, planner).
+        services.Configure<AgentServiceOptions>(configuration.GetSection(AgentServiceOptions.Section));
+        services.AddHttpClient<IAstaAgent, AstaAgentClient>((sp, http) =>
+        {
+            var options = sp.GetRequiredService<IOptions<AgentServiceOptions>>().Value;
+            http.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+            http.DefaultRequestHeaders.Add(AgentServiceOptions.TokenHeader, options.Token);
+            http.Timeout = TimeSpan.FromMinutes(3); // a streamed reply, including a web search, stays well under this
+        });
 
         return services;
     }
