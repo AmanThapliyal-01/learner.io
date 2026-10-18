@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
 
+import { AgentAvatar } from '../../shared/ui/AgentAvatar'
 import { cn } from '../../shared/ui/cn'
-import { SproutMark } from '../../shared/ui/SproutMark'
 
 /** Renders **bold** inside plain text; everything else stays as typed (line breaks preserved by CSS). */
 function withEmphasis(text: string): ReactNode[] {
@@ -12,11 +12,7 @@ function withEmphasis(text: string): ReactNode[] {
 }
 
 export function AstaAvatar() {
-  return (
-    <span aria-hidden className="mt-0.5 shrink-0">
-      <SproutMark className="size-8" />
-    </span>
-  )
+  return <AgentAvatar agent="asta" className="mt-0.5 size-8" />
 }
 
 interface MessageBubbleProps {

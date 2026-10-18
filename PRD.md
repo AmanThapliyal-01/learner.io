@@ -23,7 +23,7 @@ AI is moving fast and creators keep saying "learn this, learn that", sometimes w
 ## 3. Goals and non-goals
 
 ### Goals (MVP)
-1. A working end-to-end path: landing page, sign-up/login, profile, chat with **Asta**, skill assessment, background plan generation, plan on the dashboard.
+1. A working end-to-end path: landing page, sign-up/login, profile, chat with **Asta**, skill assessment, background plan generation by **Anbu**, plan on the dashboard.
 2. Asta clarifies vague goals, including suggesting what to learn for career growth based on current market trends.
 3. Plans are tailored to the assessed level, available time, and learning preferences.
 4. A plan becomes **stale after 30 days** and can be regenerated.
@@ -112,9 +112,10 @@ Landing ─► Sign up / Login (email+password or Google)
 - FR-22: Answer keys never reach the browser. Grading happens on the server: MCQs are checked deterministically and short answers are graded by the LLM with a rubric.
 - FR-23: **Result per skill:** assessed level (1–5), strengths, gaps, and a one-line explanation. The user sees this summary before plan generation starts.
 
-### 6.7 Plan generation (background agent)
-- FR-24: Confirming the assessment results queues a **plan job** in the database. The UI shows "Our agent is creating your plan; it'll be ready shortly" with an animated state, and checks status every few seconds.
-- FR-25: The planner agent receives: profile, goal summary, self-ratings, assessment results (levels, strengths, gaps), time per week, preferences, and budget.
+### 6.7 Plan generation (background agent: Anbu)
+The planning agent is called **Anbu** (Tamil for "love" or "kindness"). Asta talks with the user; Anbu works in the background, reading the skill check, skipping what the user knows and mapping the gap into phases. Its mark is a seed whose roots trace a dotted route to a leaf (`web/src/shared/ui/AnbuMark.tsx`), a sibling of Asta's sprout.
+- FR-24: Confirming the assessment results queues a **plan job** in the database. The UI shows "Anbu is building your plan" with the steps it has actually finished, and checks status every few seconds.
+- FR-25: Anbu receives: profile, goal summary, self-ratings, assessment results (levels, strengths, gaps), time per week, preferences, and budget.
 - FR-26: **Plan content:**
   - Overview: goal, starting point, target, total estimated duration
   - Phases (ordered), each with: title, duration (weeks), objectives, topics, practice / mini-project, milestone ("you're done with this phase when…")
@@ -281,7 +282,7 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 - **Grading:** multiple choice is graded exactly. Short answers, strengths and gaps come from one model call. **Assessed levels are computed in code**: 75% or more confirms the self-rating, 40-75% drops it one level, below 40% drops it two.
 - **Measured** (18 Oct): generating 16 questions takes about 9s, and grading about 9s.
 
-**Planner (LangGraph, runs in the agents worker):**
+**Planner, Anbu (LangGraph, runs in the agents worker):**
 - **Graph:** `assess` (code: skip / refresh / focus per skill) → `outline` (1 call) → `detail` × phases (in parallel via `Send`, each phase starting on a different model so the per-minute budgets add up) → `assemble` (code).
 - **Budget rule:** with "free only", paid resources are dropped in code.
 - **Rate limits:** each step waits out short limits, up to 90s. Longer limits, such as daily ones, requeue the job without using up one of its 3 attempts.
