@@ -37,3 +37,12 @@
 - In chat UIs, decide "follow the latest message" from scroll position before new content arrives, and jump instantly when history loads. A tall card makes the after-the-fact check fail, and smooth scroll stalls in background tabs.
 - Keep internal labels (SKIP/REFRESH/FOCUS) out of prompts' user-facing text, or tell the model explicitly never to write them.
 - When a heredoc'd Python script writes code, `\n` inside the replacement becomes a real newline. Prefer the Edit tool for small source edits.
+
+## 2026-10-18 — Brand assets session (illustrations, OG card, promo video)
+- OpenArt's Free plan watermarks every output with a large logo, and every video model costs more than the 40 free credits. Check `openart_account_get` first; treat Free-plan images as concept art and don't strip the watermark.
+- Flat illustrations are cheaper and better as hand-written SVG: tiny, sharp, and an inner `@media (prefers-color-scheme: dark)` gives a dark palette. An `<img>` SVG can't see the app's `data-theme` override.
+- `#svgView(viewBox(...))` on an SVG URL re-crops it without a second file (used for the OG card).
+- `hyperframes capture` refuses localhost dev servers (reports an access-protection 403). Use the no-capture path and rebuild UI moments from the app's own components.
+- Headless Chrome follows the OS colour scheme (this machine is dark), and Motion's scroll reveals may not have finished in a `--screenshot`. Don't trust it for light-mode marketing shots.
+- Chrome `--screenshot` needs absolute paths and a `file:///` URL; a relative HTML path is read as a hostname.
+- Inside a HyperFrames frame, a broad selector like `.opt span { position: relative }` beats `.sel { position: absolute }` and silently collapses overlays. Snapshot every frame before rendering.

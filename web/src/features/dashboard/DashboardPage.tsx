@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 
 import { Alert } from '../../shared/ui/Alert'
 import { ButtonLink } from '../../shared/ui/Button'
+import { Illustration } from '../../shared/ui/Illustration'
 import { Spinner } from '../../shared/ui/Spinner'
 import { useMe } from '../auth/api'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
@@ -124,6 +125,7 @@ function EmptyState() {
       aria-labelledby="empty-title"
     >
       <div className="flex flex-col items-start gap-4">
+        <Illustration name="sproutChat" className="-mb-1 w-24 sm:w-28" />
         <h2 id="empty-title" className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
           Let's work out what you'll learn.
         </h2>

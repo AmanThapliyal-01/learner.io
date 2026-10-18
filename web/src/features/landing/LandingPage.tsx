@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 
 import { ButtonLink } from '../../shared/ui/Button'
 import { buttonClass } from '../../shared/ui/buttonStyles'
+import { Illustration } from '../../shared/ui/Illustration'
 import { Logo } from '../../shared/ui/Logo'
 import { SkillGap, SkillGapLegend } from '../../shared/ui/SkillGap'
 import { useMe } from '../auth/api'
@@ -159,6 +160,9 @@ export function LandingPage() {
 
         {/* Final call to action */}
         <section className="mx-auto max-w-6xl px-4 py-24 text-center sm:px-6">
+          <motion.div {...reveal} className="mx-auto mb-12 max-w-4xl overflow-hidden rounded-3xl border border-border">
+            <Illustration name="gapPath" className="w-full" />
+          </motion.div>
           <motion.h2 {...reveal} className="mx-auto max-w-2xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
             Your next skill, minus the parts you already know.
           </motion.h2>

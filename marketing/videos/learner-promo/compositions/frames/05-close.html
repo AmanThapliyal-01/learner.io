@@ -1,0 +1,175 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Bricolage Grotesque';
+      src: url('assets/fonts/bricolage-grotesque-latin-wght.woff2') format('woff2');
+      font-weight: 200 800;
+    }
+    @font-face {
+      font-family: 'Inter';
+      src: url('assets/fonts/inter-latin-wght.woff2') format('woff2');
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      color: #1b2623;
+    }
+    .e05-bg {
+      position: absolute;
+      inset: 0;
+      background: #dcefe8;
+    }
+    .e05-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .e05-art {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    .e05-line {
+      fill: none;
+      stroke: #1b2623;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .e05-known {
+      fill: #2a7360;
+      stroke: #1b2623;
+      stroke-width: 4;
+    }
+    .e05-gapstone {
+      stroke: #1b2623;
+      stroke-width: 4;
+    }
+    .e05-copy {
+      position: absolute;
+      left: 140px;
+      top: 104px;
+    }
+    .e05-h {
+      margin: 0;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 600;
+      font-size: 104px;
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+    .e05-l1,
+    .e05-l2 {
+      display: block;
+    }
+    .e05-l2 {
+      color: #2a7360;
+    }
+    .e05-lockup {
+      position: absolute;
+      left: 1180px;
+      top: 660px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 26px;
+    }
+    .e05-brand {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 600;
+      font-size: 64px;
+      letter-spacing: -0.02em;
+    }
+    .e05-brand svg {
+      width: 76px;
+      height: 76px;
+    }
+    .e05-brand em {
+      font-style: normal;
+      color: #2a7360;
+    }
+    .e05-cta {
+      padding: 20px 34px;
+      border-radius: 20px;
+      background: #2a7360;
+      color: #ffffff;
+      font-size: 30px;
+      font-weight: 600;
+    }
+  </style>
+
+  <div data-hf-id="hf-e6gx" id="root" data-composition-id="05-close" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-5ipf" id="e05-bg" class="clip e05-bg" data-start="0" data-duration="4.5" data-track-index="0"></div>
+    <div data-hf-id="hf-rf8n" class="e05-stage" id="e05-stage" data-layout-allow-overflow>
+      <svg data-hf-id="hf-759p" class="e05-art" viewBox="0 0 1600 900" aria-hidden="true">
+        <defs data-hf-id="hf-mh0t">
+          <pattern data-hf-id="hf-1hso" id="e05-hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+            <line data-hf-id="hf-cqwh" x1="0" y1="0" x2="0" y2="14" stroke="#2a7360" stroke-width="3" />
+          </pattern>
+        </defs>
+        <circle data-hf-id="hf-fzue" id="e05-sun" cx="1150" cy="262" r="124" fill="#fbefd5" />
+        <path data-hf-id="hf-jkvo" id="e05-far" d="M0 300C170 250 340 262 560 372L560 400H0Z" fill="#cfe5dc" />
+        <path data-hf-id="hf-6zfy" d="M0 345C250 300 450 362 620 365S1000 282 1240 245S1500 282 1600 330V900H0Z" fill="#e9eeec" />
+        <path data-hf-id="hf-l33q" class="e05-line" d="M0 345C250 300 450 362 620 365S1000 282 1240 245S1500 282 1600 330" />
+        <g data-hf-id="hf-ed8i" transform="rotate(-6 680 520)">
+          <ellipse data-hf-id="hf-b0yt" class="e05-known e05-stone" cx="170" cy="715" rx="108" ry="46" />
+          <ellipse data-hf-id="hf-a1p9" class="e05-known e05-stone" cx="340" cy="648" rx="104" ry="44" />
+          <ellipse data-hf-id="hf-5ri5" class="e05-known e05-stone" cx="515" cy="585" rx="100" ry="42" />
+          <ellipse data-hf-id="hf-klnh" class="e05-known e05-stone" cx="686" cy="526" rx="94" ry="40" />
+          <ellipse data-hf-id="hf-abe0" class="e05-gapstone e05-stone" fill="url(#e05-hatch)" cx="846" cy="470" rx="84" ry="35" />
+          <ellipse data-hf-id="hf-3aq5" class="e05-gapstone e05-stone" fill="url(#e05-hatch)" fill-opacity="0.75" cx="985" cy="418" rx="74" ry="31" />
+          <ellipse data-hf-id="hf-qyg0" class="e05-gapstone e05-stone" fill="url(#e05-hatch)" fill-opacity="0.5" cx="1104" cy="370" rx="64" ry="26" />
+          <ellipse data-hf-id="hf-lk89" class="e05-gapstone e05-stone" fill="url(#e05-hatch)" fill-opacity="0.3" cx="1205" cy="326" rx="52" ry="21" />
+        </g>
+        <g data-hf-id="hf-u4b9" id="e05-sprout">
+          <ellipse data-hf-id="hf-ae2k" cx="1262" cy="248" rx="34" ry="10" fill="#1b2623" />
+          <path data-hf-id="hf-y174" id="e05-stem" class="e05-line" d="M1262 246C1262 222 1261 204 1262 186" />
+          <path data-hf-id="hf-6brs" id="e05-leaf-l" d="M1261 206C1238 176 1206 170 1188 178C1200 208 1232 220 1261 206Z" fill="#6cc3a8" stroke="#1b2623" stroke-width="4" stroke-linejoin="round" />
+          <path data-hf-id="hf-e5oe" id="e05-leaf-r" d="M1263 196C1282 160 1318 150 1340 158C1330 192 1296 210 1263 196Z" fill="#2a7360" stroke="#1b2623" stroke-width="4" stroke-linejoin="round" />
+        </g>
+      </svg>
+
+      <div data-hf-id="hf-vdya" class="e05-copy">
+        <h1 data-hf-id="hf-bw6x" class="e05-h"><span data-hf-id="hf-ie5y" class="e05-l1" id="e05-l1">Skip what you know.</span><span data-hf-id="hf-xwh4" class="e05-l2" id="e05-l2">Learn what you don't.</span></h1>
+      </div>
+
+      <div data-hf-id="hf-6b6a" class="e05-lockup" id="e05-lockup">
+        <div data-hf-id="hf-o5ns" class="e05-brand">
+          <svg data-hf-id="hf-u53s" viewBox="0 0 28 28" aria-hidden="true">
+            <rect data-hf-id="hf-8moc" width="28" height="28" rx="8" fill="#2a7360" />
+            <path data-hf-id="hf-0zym" d="M8 19h12M14 19v-6" stroke="#fff" stroke-width="2.25" stroke-linecap="round" />
+            <path data-hf-id="hf-z84d" d="M14 13c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" fill="#fff" />
+            <path data-hf-id="hf-4mfk" d="M14 14.5c0-2.2-1.8-4-4-4 0 2.2 1.8 4 4 4Z" fill="#fff" fill-opacity="0.7" />
+          </svg>
+          <span data-hf-id="hf-yrxm">learner<em data-hf-id="hf-hxa3">.io</em></span>
+        </div>
+        <span data-hf-id="hf-dmop" class="e05-cta" id="e05-cta">Build your plan</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const stones = document.querySelectorAll('#root .e05-stone');
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo('#e05-stage', { scale: 1.05 }, { scale: 1, duration: 4.5, ease: 'power1.out', transformOrigin: '30% 70%' }, 0);
+      tl.fromTo('#e05-sun', { y: 70, opacity: 0.4 }, { y: 0, opacity: 1, duration: 1.6, ease: 'power2.out' }, 0);
+      tl.fromTo(stones, { scale: 0, opacity: 0, transformOrigin: '50% 50%' }, { scale: 1, opacity: 1, duration: 0.42, ease: 'back.out(2)', stagger: 0.13 }, 0.15);
+      tl.fromTo('#e05-stem', { scaleY: 0, transformOrigin: '50% 100%' }, { scaleY: 1, duration: 0.35, ease: 'power2.out' }, 1.25);
+      tl.fromTo(['#e05-leaf-l', '#e05-leaf-r'], { scale: 0, transformOrigin: '0% 100%' }, { scale: 1, duration: 0.5, ease: 'back.out(2.4)', stagger: 0.12 }, 1.45);
+      tl.fromTo('#e05-l1', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 1.4);
+      tl.fromTo('#e05-l2', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 2.0);
+      tl.fromTo('#e05-lockup', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'expo.out' }, 2.9);
+      tl.fromTo('#e05-cta', { scale: 0.9 }, { scale: 1, duration: 0.5, ease: 'back.out(2)' }, 3.2);
+      window.__timelines['05-close'] = tl;
+    })();
+  </script>
+</template>

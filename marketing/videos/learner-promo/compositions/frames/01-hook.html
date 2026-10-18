@@ -1,0 +1,142 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Bricolage Grotesque';
+      src: url('assets/fonts/bricolage-grotesque-latin-wght.woff2') format('woff2');
+      font-weight: 200 800;
+    }
+    @font-face {
+      font-family: 'Inter';
+      src: url('assets/fonts/inter-latin-wght.woff2') format('woff2');
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      color: #1b2623;
+    }
+    .h01-bg {
+      position: absolute;
+      inset: 0;
+      background: #f5f7f6;
+    }
+    .h01-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .h01-copy {
+      position: absolute;
+      left: 140px;
+      top: 250px;
+      width: 700px;
+    }
+    .h01-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 600;
+      font-size: 96px;
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      margin: 0;
+    }
+    .h01-word {
+      display: inline-block;
+      margin-right: 0.22em;
+    }
+    .h01-count {
+      position: absolute;
+      left: 140px;
+      top: 640px;
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      padding: 22px 34px;
+      border-radius: 28px;
+      background: #ffffff;
+      border: 1px solid #dde4e1;
+      box-shadow: 0 30px 80px -40px rgba(20, 60, 50, 0.45);
+    }
+    .h01-num {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 600;
+      font-size: 108px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: #b4432f;
+      min-width: 1.2em;
+      text-align: right;
+    }
+    .h01-num-label {
+      font-size: 34px;
+      font-weight: 500;
+      color: #566561;
+    }
+    .h01-grid {
+      position: absolute;
+      left: 960px;
+      top: 170px;
+      display: grid;
+      grid-template-columns: repeat(5, 156px);
+      gap: 16px;
+    }
+    .h01-chip {
+      height: 60px;
+      border-radius: 16px;
+      background: #e9eeec;
+      color: #566561;
+      font-size: 22px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
+  <div data-hf-id="hf-ehh3" id="root" data-composition-id="01-hook" data-width="1920" data-height="1080" data-duration="4.5">
+    <div data-hf-id="hf-q0e7" id="h01-bg" class="clip h01-bg" data-start="0" data-duration="4.5" data-track-index="0"></div>
+    <div data-hf-id="hf-i6gl" class="h01-stage" id="h01-stage" data-layout-allow-overflow>
+      <div data-hf-id="hf-qytx" class="h01-copy">
+        <h1 data-hf-id="hf-wpog" class="h01-title" id="h01-title">
+          <span data-hf-id="hf-lfoi" class="h01-word">Every</span><span data-hf-id="hf-kaex" class="h01-word">roadmap</span><span data-hf-id="hf-4esi" class="h01-word">starts</span><span data-hf-id="hf-fmka" class="h01-word">at</span><span data-hf-id="hf-hgil" class="h01-word">step</span><span data-hf-id="hf-fueh" class="h01-word">one.</span>
+        </h1>
+      </div>
+      <div data-hf-id="hf-bjxo" class="h01-count" id="h01-count">
+        <span data-hf-id="hf-r79m" class="h01-num" id="h01-num">1</span><span data-hf-id="hf-h913" class="h01-num-label">steps, for everyone</span>
+      </div>
+      <div data-hf-id="hf-s4ei" class="h01-grid" id="h01-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const grid = document.getElementById('h01-grid');
+      for (let i = 1; i <= 40; i++) {
+        const chip = document.createElement('div');
+        chip.className = 'h01-chip';
+        chip.textContent = 'Step ' + i;
+        grid.appendChild(chip);
+      }
+      const chips = grid.querySelectorAll('.h01-chip');
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo('#h01-stage', { scale: 1 }, { scale: 1.03, duration: 4, ease: 'none', transformOrigin: '50% 45%' }, 0);
+      tl.fromTo('#h01-title .h01-word', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.12 }, 0.05);
+      tl.fromTo(chips, { y: 28, opacity: 0, scale: 0.92 }, { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'power2.out', stagger: 0.035 }, 0.6);
+      tl.fromTo('#h01-count', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 2.0);
+      const counter = { v: 1 };
+      tl.to(counter, {
+        v: 40,
+        duration: 1.0,
+        ease: 'power2.out',
+        onUpdate: function () {
+          document.getElementById('h01-num').textContent = Math.round(counter.v);
+        },
+      }, 2.2);
+      tl.to(chips, { opacity: 0.45, duration: 0.6, ease: 'power1.out' }, 3.2);
+
+      window.__timelines['01-hook'] = tl;
+    })();
+  </script>
+</template>

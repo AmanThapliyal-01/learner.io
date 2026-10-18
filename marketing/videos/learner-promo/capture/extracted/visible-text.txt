@@ -1,0 +1,9 @@
+learner.io — Skip what you know. Learn what you don't.
+Every roadmap online assumes you're starting from zero. learner.io checks where you actually stand, then builds a plan around the gap, for the role or skill you want.
+The same 40 steps for everyone is why most roadmaps get abandoned.
+How it works: 1 Tell Asta your goal — a role, a skill, a hobby, or "not sure yet". 2 Rate yourself. 3 Take a short assessment — a few questions per skill confirm your real level. 4 Get your plan — phases, milestones and resources for the gap only, sized to your hours and budget.
+Meet Asta. Friendly, never fluffy.
+You: I want to get into AI but I'm a backend dev and don't know where to start.
+Asta: Good starting point. Two questions: how many hours a week can you give this, and do you want to build AI features or train models?
+Goal: Data analyst in 4 months · 6 hrs / week. SQL Skip; Python for data Refresh · 1 wk; Statistics Focus · 3 wks; Dashboards (Power BI) Focus · 2 wks. From an assessment, not a template.
+Your next skill, minus the parts you already know.
