@@ -1,0 +1,94 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. A calm sage/teal palette on warm neutrals, chosen to be easy on the eyes
+ * for long learning sessions. Components use these tokens, never raw hex values.
+ */
+:root {
+  --color-bg: #faf8f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2efe9;
+  --color-border: #e4e0d8;
+  --color-ink: #1f2a2e;
+  --color-ink-muted: #5c6a6e;
+  --color-primary: #2f7a66;
+  --color-primary-hover: #276654;
+  --color-primary-soft: #e3f1ec;
+  --color-on-primary: #ffffff;
+  --color-accent: #d98c5f;
+  --color-success: #2f8a57;
+  --color-danger: #c4513f;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #12171a;
+    --color-surface: #1a2125;
+    --color-surface-muted: #20292e;
+    --color-border: #2c363b;
+    --color-ink: #e6ecea;
+    --color-ink-muted: #9aa8a6;
+    --color-primary: #6fc2aa;
+    --color-primary-hover: #86d0ba;
+    --color-primary-soft: #1d3a33;
+    --color-on-primary: #0f1a17;
+    --color-accent: #e8a77f;
+    --color-success: #5cc48a;
+    --color-danger: #e57a69;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #12171a;
+  --color-surface: #1a2125;
+  --color-surface-muted: #20292e;
+  --color-border: #2c363b;
+  --color-ink: #e6ecea;
+  --color-ink-muted: #9aa8a6;
+  --color-primary: #6fc2aa;
+  --color-primary-hover: #86d0ba;
+  --color-primary-soft: #1d3a33;
+  --color-on-primary: #0f1a17;
+  --color-accent: #e8a77f;
+  --color-success: #5cc48a;
+  --color-danger: #e57a69;
+  color-scheme: dark;
+}
+
+/* Expose tokens as Tailwind utilities: bg-surface, text-ink-muted, border-border, ... */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-border: var(--color-border);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-on-primary: var(--color-on-primary);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
