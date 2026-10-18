@@ -8,6 +8,7 @@ import { Logo } from '../../shared/ui/Logo'
 import { FullPageSpinner } from '../../shared/ui/Spinner'
 import { formErrorFrom } from '../../shared/forms/errors'
 import { useCompleteOnboarding, useProfile } from '../profile/api'
+import { homePath } from '../landing/planDraft'
 import { BasicInfoForm } from '../profile/BasicInfoForm'
 import { ProfileDetailsForm } from '../profile/ProfileDetailsForm'
 
@@ -34,7 +35,7 @@ export function OnboardingPage() {
     setDirection(next > current ? 1 : -1)
     setStep(next)
   }
-  const finish = () => navigate('/dashboard', { replace: true })
+  const finish = () => navigate(homePath(), { replace: true })
 
   return (
     <div className="flex min-h-dvh flex-col px-4 py-6 sm:px-8">
