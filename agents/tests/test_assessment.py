@@ -7,6 +7,9 @@ from learner_agents.assessment.schemas import (
     GenerateRequest,
     GradeRequest,
     McqDraft,
+    McqReplacements,
+    McqVerdict,
+    McqVerification,
     RatedSkill,
     ShortAnswerDraft,
     ShortAnswerGrade,
@@ -39,18 +42,46 @@ def returns(value):
     return RunnableLambda(run)
 
 
+def in_turn(*values):
+    """Returns (or raises) the values one call at a time; `.calls` counts the calls."""
+    remaining = list(values)
+
+    async def run(_):
+        runnable.calls += 1
+        value = remaining.pop(0)
+        if isinstance(value, Exception):
+            raise value
+        return value
+
+    runnable = RunnableLambda(run)
+    runnable.calls = 0
+    return runnable
+
+
+def mcq(prompt: str = "Which option is right about x?", key: int = 2) -> McqDraft:
+    return McqDraft(prompt=prompt, options=["a", "b", "c", "d"], correct_index=key)
+
+
 def questions_draft(skill_hint: str = "x") -> SkillQuestionsDraft:
-    mcq = McqDraft(prompt=f"Which option is right about {skill_hint}?", options=["a", "b", "c", "d"], correct_index=2)
     return SkillQuestionsDraft(
-        multiple_choice=[mcq, mcq, mcq],
+        multiple_choice=[mcq(f"Question {n}: which option is right about {skill_hint}?") for n in (1, 2, 3)],
         short_answer=ShortAnswerDraft(prompt=f"Explain {skill_hint} in your own words.", rubric="Mentions the key idea clearly."),
     )
 
 
-def models(targets=None, questions=None, evaluation=None) -> AssessmentModels:
+def verdicts(*answers: int, ambiguous: tuple[int, ...] = ()) -> McqVerification:
+    """The verifier's answer per question, in order; `ambiguous` lists question numbers it flags."""
+    return McqVerification(
+        verdicts=[McqVerdict(number=n, answer_index=a, flawed=n in ambiguous) for n, a in enumerate(answers, start=1)]
+    )
+
+
+def models(targets=None, questions=None, evaluation=None, verifier=None, replacements=None) -> AssessmentModels:
     return AssessmentModels(
         targets=returns(targets or SkillTargets(targets=[])),
         questions=returns(questions or questions_draft()),
+        verifier=verifier or returns(verdicts(2, 2, 2)),  # agrees with every key
+        replacements=replacements or returns(McqReplacements(multiple_choice=[])),
         evaluation=returns(evaluation or Evaluation(short_answers=[], skills=[])),
     )
 
@@ -85,6 +116,77 @@ async def test_generate_survives_failed_target_call():
     result = await generate(request, models(targets=RuntimeError("bad output")))
 
     assert result.targets[0].target_level == 3
+
+
+PYTHON_ONLY = GenerateRequest(goal=GOAL, skills=[RatedSkill(skill="Python", self_rating=3)])
+
+
+def mcq_prompts(result) -> list[str]:
+    return [q.prompt for q in result.questions if q.kind == "multiple_choice"]
+
+
+async def test_verified_questions_are_kept_as_drafted():
+    replacements = in_turn()
+
+    result = await generate(PYTHON_ONLY, models(verifier=returns(verdicts(2, 2, 2)), replacements=replacements))
+
+    assert mcq_prompts(result) == [q.prompt for q in questions_draft().multiple_choice]
+    assert [q.kind for q in result.questions][-1] == "short_answer"
+    assert replacements.calls == 0
+
+
+async def test_disputed_question_is_regenerated_once_in_place():
+    verifier = in_turn(verdicts(2, 0, 2), verdicts(1))  # disputes question 2, then accepts its replacement
+    replacement = mcq("Replacement: which option is right about x?", key=1)
+    replacements = in_turn(McqReplacements(multiple_choice=[replacement]))
+
+    result = await generate(PYTHON_ONLY, models(verifier=verifier, replacements=replacements))
+
+    prompts = mcq_prompts(result)
+    assert prompts == [questions_draft().multiple_choice[0].prompt, replacement.prompt, questions_draft().multiple_choice[2].prompt]
+    assert result.questions[1].answer_key == "1"
+    assert (replacements.calls, verifier.calls) == (1, 2)
+
+
+async def test_still_disputed_question_is_dropped():
+    verifier = in_turn(verdicts(2, 2, 2, ambiguous=(3,)), verdicts(3))  # question 3 ambiguous; replacement key wrong
+    replacements = in_turn(McqReplacements(multiple_choice=[mcq("Replacement: which option is right about x?", key=1)]))
+
+    result = await generate(PYTHON_ONLY, models(verifier=verifier, replacements=replacements))
+
+    assert mcq_prompts(result) == [q.prompt for q in questions_draft().multiple_choice[:2]]
+    assert len(result.questions) == 3  # 2 MCQs + the short answer
+    assert replacements.calls == 1
+
+
+async def test_dropping_keeps_the_two_least_disputed_questions():
+    # Every question and replacement is disputed; flagged-but-agreeing ones beat outright disagreements.
+    verifier = in_turn(verdicts(0, 2, 0, ambiguous=(2,)), verdicts(0, 0, 2, ambiguous=(3,)))
+    rewrites = [mcq(f"Rewrite {n}: which option is right about x?") for n in (1, 2, 3)]
+    replacements = in_turn(McqReplacements(multiple_choice=rewrites))
+
+    result = await generate(PYTHON_ONLY, models(verifier=verifier, replacements=replacements))
+
+    assert mcq_prompts(result) == [questions_draft().multiple_choice[1].prompt, rewrites[2].prompt]
+
+
+async def test_verifier_failure_keeps_unverified_questions(caplog):
+    replacements = in_turn()
+
+    result = await generate(PYTHON_ONLY, models(verifier=returns(RuntimeError("verifier down")), replacements=replacements))
+
+    assert mcq_prompts(result) == [q.prompt for q in questions_draft().multiple_choice]
+    assert replacements.calls == 0
+    assert "keeping them unverified" in caplog.text
+
+
+async def test_failed_rewrite_still_drops_the_disputed_question():
+    verifier = in_turn(verdicts(1, 2, 2))
+    replacements = in_turn(RuntimeError("rewrite failed"))
+
+    result = await generate(PYTHON_ONLY, models(verifier=verifier, replacements=replacements))
+
+    assert mcq_prompts(result) == [q.prompt for q in questions_draft().multiple_choice[1:]]
 
 
 def answered(id_: str, skill: str, kind: str, answer: str | None, key: str = "1") -> AnsweredQuestion:

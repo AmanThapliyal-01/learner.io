@@ -58,6 +58,25 @@ class SkillQuestionsDraft(BaseModel):
     short_answer: ShortAnswerDraft
 
 
+class McqVerdict(BaseModel):
+    number: int = Field(description="The question's number as given")
+    answer_index: int = Field(description="Index (0-3) of the option you judge correct")
+    flawed: bool = Field(description="True only if the question is ambiguous, has more than one defensible answer or none")
+    reason: str = Field(default="", description="One short sentence on what is wrong, when flawed")
+
+
+class McqVerification(BaseModel):
+    """LLM output: an independent answer to each multiple-choice question, without seeing the key."""
+
+    verdicts: list[McqVerdict]
+
+
+class McqReplacements(BaseModel):
+    """LLM output: new multiple-choice questions to replace disputed ones."""
+
+    multiple_choice: list[McqDraft]
+
+
 class Question(BaseModel):
     skill: str
     kind: QuestionKind

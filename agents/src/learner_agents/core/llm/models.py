@@ -32,3 +32,10 @@ def resolve_chain(model_ids: list[str] | None) -> tuple[ModelSpec, ...]:
     if not model_ids:
         return DEFAULT_MODEL_CHAIN
     return tuple(_KNOWN.get(model_id, ModelSpec(model_id)) for model_id in model_ids)
+
+
+def rotated_chain(offset: int) -> list[str]:
+    """The default chain starting `offset` models in, so parallel callers start on models with separate budgets."""
+    ids = [spec.id for spec in DEFAULT_MODEL_CHAIN]
+    k = offset % len(ids)
+    return ids[k:] + ids[:k]

@@ -17,7 +17,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Send
 
-from learner_agents.core.llm import DEFAULT_MODEL_CHAIN
+from learner_agents.core.llm.models import rotated_chain
 from learner_agents.core.llm.patience import patiently
 from learner_agents.core.llm.structured import structured_model
 from learner_agents.planner.prompts import detail_messages, outline_messages
@@ -43,8 +43,7 @@ class PlannerModels:
 
 
 def _rotations(n: int) -> list[list[str]]:
-    ids = [spec.id for spec in DEFAULT_MODEL_CHAIN]
-    return [ids[k:] + ids[:k] for k in range(n)]
+    return [rotated_chain(k) for k in range(n)]
 
 
 @lru_cache

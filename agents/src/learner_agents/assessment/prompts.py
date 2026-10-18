@@ -4,7 +4,15 @@ import json
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
-from learner_agents.assessment.schemas import LEVEL_NAMES, AnsweredQuestion, GenerateRequest, GradeRequest, RatedSkill
+from learner_agents.assessment.schemas import (
+    LEVEL_NAMES,
+    AnsweredQuestion,
+    GenerateRequest,
+    GradeRequest,
+    McqDraft,
+    McqVerdict,
+    RatedSkill,
+)
 from learner_agents.core.context import GoalSummary
 
 _LEVELS = "; ".join(f"{level} = {name}" for level, name in LEVEL_NAMES.items())
@@ -38,6 +46,48 @@ def questions_messages(goal: GoalSummary, skill: RatedSkill) -> list[BaseMessage
             "technique questions. Keep each question under 60 words. Vary the position of the correct option."
         ),
         HumanMessage(f"Goal: {_goal(goal)}\nSkill to check: {skill.skill}"),
+    ]
+
+
+def _mcq_block(number: int, mcq: McqDraft) -> str:
+    options = "\n".join(f"  {i}) {option}" for i, option in enumerate(mcq.options))
+    return f"{number}. {mcq.prompt}\n{options}"
+
+
+def verification_messages(goal: GoalSummary, skill: RatedSkill, mcqs: list[McqDraft]) -> list[BaseMessage]:
+    """The key is left out on purpose: the verifier answers independently, so it can't just agree with it."""
+    questions = "\n\n".join(_mcq_block(n, q) for n, q in enumerate(mcqs, start=1))
+    return [
+        SystemMessage(
+            "You are a strict subject-matter expert checking a skill-check quiz before learners see it. Answer every "
+            "multiple-choice question yourself: give the index of the single correct option. Mark a question flawed "
+            "only if it is ambiguous, if more than one option is defensible, if no option is correct, or if the "
+            "question states something false. Think carefully about edge cases; do not guess."
+        ),
+        HumanMessage(f"Goal: {_goal(goal)}\nSkill: {skill.skill}\n\nQuestions:\n{questions}"),
+    ]
+
+
+def replacement_messages(
+    goal: GoalSummary, skill: RatedSkill, disputed: list[tuple[McqDraft, McqVerdict]]
+) -> list[BaseMessage]:
+    blocks = []
+    for n, (mcq, verdict) in enumerate(disputed, start=1):
+        note = f"Reviewer chose option {verdict.answer_index}" + (" and called it ambiguous" if verdict.flawed else "")
+        if verdict.reason:
+            note += f": {verdict.reason[:300]}"
+        blocks.append(f"{_mcq_block(n, mcq)}\n  Writer's key: {mcq.correct_index}. {note}")
+    level = skill.self_rating
+    return [
+        SystemMessage(
+            f"A reviewer disputed {len(disputed)} multiple-choice question(s) in a skill check: the answer key "
+            "looked wrong or the question was ambiguous. Write exactly one replacement for each, in the same order. "
+            "Each replacement has exactly 4 options and exactly one option that is correct beyond doubt, including "
+            "edge cases; avoid the disputed point unless you can make it unambiguous. "
+            f"The user rated themselves {level} ({LEVEL_NAMES[level]}): keep the same difficulty. Test applied "
+            "understanding, keep each question under 60 words, and vary the position of the correct option."
+        ),
+        HumanMessage(f"Goal: {_goal(goal)}\nSkill: {skill.skill}\n\nDisputed questions:\n" + "\n\n".join(blocks)),
     ]
 
 

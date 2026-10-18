@@ -276,7 +276,7 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 
 **Skill check (agents `POST /assessment/generate`, `/assessment/grade`; API Learning module):**
 - **Target levels:** one small call sets the level the goal needs for each skill (1-5).
-- **Questions:** each skill the user rated 2 or higher gets its own call, two at a time, producing 3 multiple-choice questions and 1 short-answer question pitched at the self-rating. Skills rated 1 ("never used") aren't tested.
+- **Questions:** each skill the user rated 2 or higher gets its own call, two at a time, producing 3 multiple-choice questions and 1 short-answer question pitched at the self-rating. Skills rated 1 ("never used") aren't tested. The keys are then checked by a second model (see Known limitation below). It also runs two at a time, so checking one skill overlaps drafting the next.
 - **Answer keys** stay on the server and are never sent to the browser.
 - **Grading:** multiple choice is graded exactly. Short answers, strengths and gaps come from one model call. **Assessed levels are computed in code**: 75% or more confirms the self-rating, 40-75% drops it one level, below 40% drops it two.
 - **Measured** (18 Oct): generating 16 questions takes about 9s, and grading about 9s.
@@ -291,7 +291,7 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 
 **Lesson:** don't put string or list length caps in schemas the LLM fills. Groq rejects the whole tool call (400) when one field breaks the schema. Trim in code instead.
 
-**Known limitation:** model-written multiple-choice keys are occasionally wrong (one in roughly twenty seen in testing). A verification pass is a possible follow-up.
+**Known limitation:** model-written multiple-choice keys are occasionally wrong (one in roughly twenty seen in testing). A **verification pass** reduces this. A second model (starting on qwen, not the drafter's gpt-oss-120b) answers each skill's questions without seeing the key, and flags ambiguous ones. A question it disagrees with or flags is rewritten once and re-checked. If it is still disputed it is dropped, but a skill always keeps at least 2 multiple-choice questions (the least-disputed are kept). If the verifier fails or takes more than 12s, the unverified questions are kept and a warning is logged. Measured (18 Oct, 4 skills): about 4-6s with nothing disputed, the same as without verification within run-to-run noise. About 8-9s when one question is rewritten. Both verifier models caught a planted wrong key (`lru_cache` with a dict argument). Two models can still agree on a wrong key, so this lowers the error rate rather than removing it.
 
 ## 9. Key decisions and corrections
 

@@ -8,7 +8,13 @@ from functools import lru_cache
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.runnables import Runnable
 
-from learner_agents.assessment.prompts import evaluation_messages, questions_messages, targets_messages
+from learner_agents.assessment.prompts import (
+    evaluation_messages,
+    questions_messages,
+    replacement_messages,
+    targets_messages,
+    verification_messages,
+)
 from learner_agents.assessment.schemas import (
     Evaluation,
     GenerateRequest,
@@ -16,6 +22,10 @@ from learner_agents.assessment.schemas import (
     GradeRequest,
     GradeResponse,
     Level,
+    McqDraft,
+    McqReplacements,
+    McqVerdict,
+    McqVerification,
     Question,
     QuestionGrade,
     RatedSkill,
@@ -27,21 +37,35 @@ from learner_agents.assessment.schemas import (
 )
 from learner_agents.core.context import GoalSummary
 from learner_agents.core.llm import AllModelsExhaustedError
+from learner_agents.core.llm.models import rotated_chain
 from learner_agents.core.llm.structured import structured_model
 
 logger = logging.getLogger(__name__)
 
 # Skills self-rated 1 ("never used it") aren't tested: there's nothing to check.
 UNTESTED_RATING = 1
-# Two skills at a time keeps a 6-skill check fast without blowing one model's tokens-per-minute budget.
+# Two skills at a time keeps a 6-skill check fast without blowing one model's tokens-per-minute budget. Drafting and
+# verifying start on different models, so each gets its own two slots: verifying one skill overlaps drafting the next.
 GENERATION_CONCURRENCY = 2
 DEFAULT_TARGET_LEVEL = 3
+# Dropping disputed questions never leaves a skill with fewer than this many multiple-choice questions.
+MIN_MCQS_PER_SKILL = 2
+# A slow verifier or rewrite gives up and keeps what we have, so checking keys never stalls the skill check.
+VERIFY_TIMEOUT_S = 12.0
+
+
+@dataclass(frozen=True)
+class _Gates:
+    draft: asyncio.Semaphore
+    verify: asyncio.Semaphore
 
 
 @dataclass(frozen=True)
 class AssessmentModels:
     targets: Runnable[LanguageModelInput, SkillTargets]
     questions: Runnable[LanguageModelInput, SkillQuestionsDraft]
+    verifier: Runnable[LanguageModelInput, McqVerification]
+    replacements: Runnable[LanguageModelInput, McqReplacements]
     evaluation: Runnable[LanguageModelInput, Evaluation]
 
 
@@ -50,6 +74,9 @@ def assessment_models() -> AssessmentModels:
     return AssessmentModels(
         targets=structured_model(SkillTargets, model_ids=["openai/gpt-oss-20b", "qwen/qwen3.8-27b", "openai/gpt-oss-120b"]),
         questions=structured_model(SkillQuestionsDraft, temperature=0.5),
+        # Starts on a different model than the drafter: a second opinion, on its own tokens-per-minute budget.
+        verifier=structured_model(McqVerification, model_ids=rotated_chain(1), temperature=0),
+        replacements=structured_model(McqReplacements, temperature=0.5),
         evaluation=structured_model(Evaluation, temperature=0),
     )
 
@@ -78,12 +105,96 @@ async def _targets(request: GenerateRequest, models: AssessmentModels) -> list[S
     return [SkillTarget(skill=s.skill, target_level=by_skill.get(s.skill.lower(), DEFAULT_TARGET_LEVEL)) for s in request.skills]
 
 
-async def _questions_for(goal: GoalSummary, skill: RatedSkill, models: AssessmentModels, gate: asyncio.Semaphore) -> list[Question]:
-    async with gate:
+async def _verify(
+    goal: GoalSummary, skill: RatedSkill, mcqs: list[McqDraft], models: AssessmentModels, gates: _Gates
+) -> list[McqVerdict | None] | None:
+    """The verifier's verdict per question (None where it gave none), or None if the call failed."""
+    try:
+        async with gates.verify:
+            result = await asyncio.wait_for(models.verifier.ainvoke(verification_messages(goal, skill, mcqs)), VERIFY_TIMEOUT_S)
+    except Exception as error:
+        logger.warning("Verifying %s questions failed (%r); keeping them unverified", skill.skill, error)
+        return None
+    by_number = {v.number: v for v in result.verdicts}
+    return [by_number.get(n) for n in range(1, len(mcqs) + 1)]
+
+
+def _dispute(mcq: McqDraft, verdict: McqVerdict | None) -> int:
+    """0 = no dispute (or unverified), 1 = verifier agrees but calls it ambiguous, 2 = verifier picked another answer."""
+    if verdict is None:
+        return 0
+    if verdict.answer_index != mcq.correct_index:
+        return 2
+    return 1 if verdict.flawed else 0
+
+
+async def _replace(
+    goal: GoalSummary, skill: RatedSkill, disputed: list[tuple[McqDraft, McqVerdict]], models: AssessmentModels, gates: _Gates
+) -> list[McqDraft]:
+    try:
+        async with gates.draft:
+            result = await asyncio.wait_for(models.replacements.ainvoke(replacement_messages(goal, skill, disputed)), VERIFY_TIMEOUT_S)
+    except Exception as error:
+        logger.warning("Replacing disputed %s questions failed (%r)", skill.skill, error)
+        return []
+    return result.multiple_choice[: len(disputed)]
+
+
+async def _checked_mcqs(
+    goal: GoalSummary, skill: RatedSkill, mcqs: list[McqDraft], models: AssessmentModels, gates: _Gates
+) -> list[McqDraft]:
+    """Keys are checked by a second model. A disputed question is rewritten once, then dropped if still disputed,
+    as long as MIN_MCQS_PER_SKILL remain; any failure along the way keeps what we have rather than blocking."""
+    verdicts = await _verify(goal, skill, mcqs, models, gates)
+    if verdicts is None:
+        return mcqs
+    disputes = [_dispute(q, v) for q, v in zip(mcqs, verdicts)]
+    disputed = [i for i, d in enumerate(disputes) if d]
+    if not disputed:
+        return mcqs
+    pairs: list[tuple[McqDraft, McqVerdict]] = []
+    for i in disputed:
+        verdict = verdicts[i]
+        assert verdict is not None  # only a verdict can dispute a question
+        logger.info(
+            "Disputed %s question (key %d, verifier %d): %s",
+            skill.skill, mcqs[i].correct_index, verdict.answer_index, verdict.reason[:200],
+        )
+        pairs.append((mcqs[i], verdict))
+
+    replacements = await _replace(goal, skill, pairs, models, gates)
+    replacement_verdicts = await _verify(goal, skill, replacements, models, gates) if replacements else []
+    if replacement_verdicts is None:
+        # The re-check failed: keep the replacements, fresh questions are as good as any unverified draft.
+        replacement_verdicts = [None] * len(replacements)
+
+    slots: list[McqDraft | None] = [None if d else q for q, d in zip(mcqs, disputes)]
+    fallbacks: list[tuple[int, int, McqDraft]] = [(disputes[i], i, mcqs[i]) for i in disputed]  # (dispute, slot, question)
+    for i, replacement, verdict in zip(disputed, replacements, replacement_verdicts):
+        if (dispute := _dispute(replacement, verdict)) == 0:
+            slots[i] = replacement
+        else:
+            fallbacks.append((dispute, i, replacement))
+
+    # Too few left: put back the least-disputed questions.
+    for dispute, i, mcq in sorted(fallbacks, key=lambda f: f[0]):
+        if sum(s is not None for s in slots) >= MIN_MCQS_PER_SKILL:
+            break
+        if slots[i] is None:
+            slots[i] = mcq
+    kept = [s for s in slots if s is not None]
+    if len(kept) < len(mcqs):
+        logger.warning("Dropped %d disputed %s question(s)", len(mcqs) - len(kept), skill.skill)
+    return kept
+
+
+async def _questions_for(goal: GoalSummary, skill: RatedSkill, models: AssessmentModels, gates: _Gates) -> list[Question]:
+    async with gates.draft:
         draft = await models.questions.ainvoke(questions_messages(goal, skill))
+    mcqs = await _checked_mcqs(goal, skill, draft.multiple_choice, models, gates)
     questions = [
         Question(skill=skill.skill, kind="multiple_choice", prompt=q.prompt, options=q.options, answer_key=str(q.correct_index))
-        for q in draft.multiple_choice
+        for q in mcqs
     ]
     questions.append(
         Question(skill=skill.skill, kind="short_answer", prompt=draft.short_answer.prompt, answer_key=draft.short_answer.rubric)
@@ -92,10 +203,10 @@ async def _questions_for(goal: GoalSummary, skill: RatedSkill, models: Assessmen
 
 
 async def generate(request: GenerateRequest, models: AssessmentModels) -> GenerateResponse:
-    gate = asyncio.Semaphore(GENERATION_CONCURRENCY)
+    gates = _Gates(draft=asyncio.Semaphore(GENERATION_CONCURRENCY), verify=asyncio.Semaphore(GENERATION_CONCURRENCY))
     tested = [s for s in request.skills if s.self_rating > UNTESTED_RATING]
     targets, *per_skill = await asyncio.gather(
-        _targets(request, models), *(_questions_for(request.goal, s, models, gate) for s in tested)
+        _targets(request, models), *(_questions_for(request.goal, s, models, gates) for s in tested)
     )
     return GenerateResponse(targets=targets, questions=[q for group in per_skill for q in group])
 
