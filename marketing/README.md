@@ -46,12 +46,14 @@ stop under `prefers-reduced-motion`.
 | # | Frame | Length |
 |---|---|---|
 | 1 | "Every roadmap starts at step one." A wall of 40 identical step chips, counter to 40 | 4s |
-| 2 | Tell Asta your goal: chat exchange, then the goal summary card | 5.5s |
+| 2 | Tell Asta your goal: chat exchange, the goal summary card, then a handoff chip "Goal handed to Anbu" | 5.5s |
 | 3 | Check what you know: self-rating dots, then a skill-check question answered | 5.5s |
-| 4 | A plan for the gap: the SkillGap card fills, three plan phases stack, SQL skipped | 5.5s |
+| 4 | Anbu builds your plan: the SkillGap card fills, Anbu (the planning agent) appears with its mark, three plan phases stack, SQL skipped | 5.5s |
 | 5 | The stepping-stone illustration builds, "Skip what you know. Learn what you don't." | 4.5s |
 
 The UI is rebuilt from the app's own components and copy (signed-in screens need the backend).
+The two agents keep their app marks: Asta the solid sprout tile (`SproutMark.tsx`), Anbu the soft
+seed-route-leaf tile (`AnbuMark.tsx`), with its paths copied and the token colours inlined.
 Crossfades between frames and a soft music bed (below). `hyperframes check`: 0 errors, 0 warnings,
 78/78 text checks at WCAG AA. There's no narration, so all meaning is on screen and the video works muted.
 

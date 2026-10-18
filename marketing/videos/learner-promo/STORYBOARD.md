@@ -43,8 +43,9 @@ row by row. Scene 3 (2.6–4.0s): a big "40" count-up badge lands; the chips dim
 Scene 1 (0.0–0.6s): label "1 · Tell Asta your goal"; chat panel slides up. Scene 2 (0.5–3.2s):
 bubbles arrive one by one — you: "I want to become a data analyst." Asta (sprout avatar, typing
 dots first): "Nice. Hours per week, and what do you already use?" you: "About 6. I'm solid in SQL."
-Scene 3 (3.4–5.5s): the goal card springs in on the right — "Data analyst in 4 months", chips
-"6 hrs / week", "4 skills to check", button "Confirm goal".
+Scene 3 (3.4–4.8s): the goal card springs in on the right — "Data analyst in 4 months", chips
+"6 hrs / week", "4 skills to check", button "Confirm goal" (pressed at 4.6s). Scene 4 (4.8–5.5s):
+handoff beat — a chip under the card: Asta's sprout mark → Anbu's mark, "Goal handed to Anbu".
 
 ## Frame 3 — Check what you know
 
@@ -61,20 +62,22 @@ Statistics, Power BI; 1–5 dots fill left to right per row (4, 3, 1, 0). Scene 
 HAVING / ORDER BY; a cursor-free highlight selects HAVING, it turns green with a check. Scene 3
 (4.6–5.5s): a small "Level confirmed: 4" chip lands.
 
-## Frame 4 — A plan for the gap only
+## Frame 4 — Anbu builds your plan
 
-- scene: The SkillGap card fills (known solid, gap hatched, goal markers), then three plan phases stack in
+- scene: The SkillGap card fills, then Anbu (the planning agent) appears and stacks three plan phases
 - duration: 5.5s
 - poster: 5s
 - transition_in: crossfade
 - status: animated
 - src: compositions/frames/04-gap.html
 
-Scene 1 (0.0–2.6s): label "3 · Get a plan for the gap"; the hero SkillGap card (as on the landing
+Scene 1 (0.0–2.6s): label "3 · Anbu builds your plan"; the hero SkillGap card (as on the landing
 page): SQL 4/4 "Skip", Python 3/4 "Refresh · 1 wk", Statistics 1/3 "Focus · 3 wks", Power BI 0/3
-"Focus · 2 wks"; solid bars grow, hatched gaps extend, goal ticks drop in. Scene 2 (2.6–5.5s): a
-plan column on the right stacks three phases with week ranges; SQL is shown struck through as
-"Skipped — you know this".
+"Focus · 2 wks"; solid bars grow, hatched gaps extend, goal ticks drop in. Scene 2 (2.2–3.0s): Anbu's
+header slides in on the right: its mark (soft primary-soft tile; the seed pops, the dotted route
+traces, the leaf grows), "Anbu", "Skips what you know, maps the gap". Scene 3 (2.7–5.5s): "Six weeks.
+Only the gap." then three phases with week ranges; SQL is shown struck through as "Skipped · you
+already know it".
 
 ## Frame 5 — Skip what you know
 

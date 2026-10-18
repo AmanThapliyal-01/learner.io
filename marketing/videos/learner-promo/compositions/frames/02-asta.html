@@ -196,6 +196,30 @@
       justify-content: flex-end;
       padding: 22px 36px 30px;
     }
+    .a02-handoff {
+      position: absolute;
+      left: 1120px;
+      top: 700px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 24px 14px 14px;
+      border-radius: 22px;
+      background: #ffffff;
+      border: 1px solid #dde4e1;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .a02-handoff-mark {
+      width: 48px;
+      height: 48px;
+      flex: none;
+    }
+    .a02-handoff-arrow {
+      display: inline-block;
+      color: #566561;
+      font-size: 28px;
+    }
     .a02-btn {
       padding: 18px 30px;
       border-radius: 18px;
@@ -262,6 +286,24 @@
         </div>
         <div data-hf-id="hf-4p80" class="a02-foot"><span data-hf-id="hf-iuk0" class="a02-btn" id="a02-btn">Confirm goal</span></div>
       </div>
+
+      <div class="a02-handoff" id="a02-handoff">
+        <svg class="a02-handoff-mark" viewBox="0 0 28 28" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="#2a7360" />
+          <path d="M8 19h12M14 19v-6" stroke="#fff" stroke-width="2.25" stroke-linecap="round" />
+          <path d="M14 13c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" fill="#fff" />
+          <path d="M14 14.5c0-2.2-1.8-4-4-4 0 2.2 1.8 4 4 4Z" fill="#fff" fill-opacity="0.7" />
+        </svg>
+        <span class="a02-handoff-arrow" id="a02-handoff-arrow">→</span>
+        <svg class="a02-handoff-mark" viewBox="0 0 28 28" aria-hidden="true">
+            <rect width="28" height="28" rx="8" fill="#dcefe8" />
+            <rect x="0.75" y="0.75" width="26.5" height="26.5" rx="7.25" fill="none" stroke="rgba(42, 115, 96, 0.3)" stroke-width="1" />
+            <ellipse cx="8.5" cy="19.5" rx="3.4" ry="2.5" transform="rotate(-32 8.5 19.5)" fill="#2a7360" />
+            <path d="M13.2 16.4c1.9-1 2.6-2.9 4.2-3.9 1.2-.7 2.2-.8 3-.9" fill="none" stroke="#2a7360" stroke-width="1.9" stroke-linecap="round" stroke-dasharray="0.01 3.3" />
+            <path d="M19.5 10.5c0-2.5 2-4.5 4.5-4.5 0 2.5-2 4.5-4.5 4.5Z" fill="#2a7360" />
+          </svg>
+        <span>Goal handed to Anbu</span>
+      </div>
     </div>
   </div>
 
@@ -281,9 +323,12 @@
       tl.fromTo('#a02-m3', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'back.out(1.6)' }, 2.8);
       tl.fromTo('#a02-card', { x: 80, opacity: 0, scale: 0.94 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'expo.out' }, 3.4);
       tl.fromTo('#a02-card .a02-chip', { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, 3.9);
-      tl.fromTo('#a02-btn', { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }, 4.4);
-      tl.to('#a02-btn', { scale: 0.96, duration: 0.12, ease: 'power1.in' }, 5.0);
-      tl.to('#a02-btn', { scale: 1, duration: 0.2, ease: 'power1.out' }, 5.12);
+      tl.fromTo('#a02-btn', { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }, 4.2);
+      tl.to('#a02-btn', { scale: 0.96, duration: 0.12, ease: 'power1.in' }, 4.6);
+      tl.to('#a02-btn', { scale: 1, duration: 0.2, ease: 'power1.out' }, 4.72);
+      // Handoff beat: Asta passes the confirmed goal to Anbu.
+      tl.fromTo('#a02-handoff', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'back.out(1.8)' }, 4.8);
+      tl.fromTo('#a02-handoff-arrow', { x: -10 }, { x: 0, duration: 0.4, ease: 'power2.out' }, 4.95);
       window.__timelines['02-asta'] = tl;
     })();
   </script>

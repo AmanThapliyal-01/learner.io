@@ -177,13 +177,34 @@
       top: 200px;
       width: 680px;
     }
+    .g04-agent {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    .g04-anbu {
+      width: 72px;
+      height: 72px;
+      flex: none;
+    }
+    .g04-agent-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .g04-agent-role {
+      font-size: 22px;
+      color: #566561;
+    }
     .g04-plan-h {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 52px;
+      font-size: 46px;
       font-weight: 600;
       letter-spacing: -0.025em;
       line-height: 1.04;
-      margin: 0 0 26px;
+      margin: 0 0 18px;
     }
     .g04-plan-h em {
       font-style: normal;
@@ -194,8 +215,8 @@
       display: grid;
       grid-template-columns: 64px 1fr;
       gap: 20px;
-      padding: 22px 26px;
-      margin-bottom: 16px;
+      padding: 18px 24px;
+      margin-bottom: 12px;
       border-radius: 24px;
       background: #ffffff;
       border: 1px solid #dde4e1;
@@ -250,7 +271,7 @@
   <div data-hf-id="hf-34hq" id="root" data-composition-id="04-gap" data-width="1920" data-height="1080" data-duration="6">
     <div data-hf-id="hf-5ssu" id="g04-bg" class="clip g04-bg" data-start="0" data-duration="6" data-track-index="0"></div>
     <div data-hf-id="hf-yqf1" class="g04-stage" id="g04-stage" data-layout-allow-overflow>
-      <div data-hf-id="hf-wrdy" class="g04-step" id="g04-step" data-layout-allow-overlap><span data-hf-id="hf-bf83" class="g04-step-n">3</span>Get a plan for the gap</div>
+      <div data-hf-id="hf-wrdy" class="g04-step" id="g04-step" data-layout-allow-overlap><span data-hf-id="hf-bf83" class="g04-step-n">3</span>Anbu builds your plan</div>
 
       <div data-hf-id="hf-fou2" class="g04-halo" id="g04-halo"></div>
       <div data-hf-id="hf-lnk2" class="g04-card" id="g04-card">
@@ -270,7 +291,20 @@
       </div>
 
       <div data-hf-id="hf-tqqm" class="g04-plan" id="g04-plan">
-        <h2 data-hf-id="hf-7mgl" class="g04-plan-h" id="g04-plan-h"><span data-hf-id="hf-tfdt" style="display: block">Six weeks of focus.</span><em data-hf-id="hf-0142" style="display: block">Only the gap.</em></h2>
+        <div class="g04-agent" id="g04-agent">
+          <svg class="g04-anbu" viewBox="0 0 28 28" aria-hidden="true">
+            <rect width="28" height="28" rx="8" fill="#dcefe8" />
+            <rect x="0.75" y="0.75" width="26.5" height="26.5" rx="7.25" fill="none" stroke="rgba(42, 115, 96, 0.3)" stroke-width="1" />
+            <ellipse id="g04-seed" cx="8.5" cy="19.5" rx="3.4" ry="2.5" transform="rotate(-32 8.5 19.5)" fill="#2a7360" />
+            <path id="g04-route" d="M13.2 16.4c1.9-1 2.6-2.9 4.2-3.9 1.2-.7 2.2-.8 3-.9" fill="none" stroke="#2a7360" stroke-width="1.9" stroke-linecap="round" stroke-dasharray="0.01 3.3" />
+            <path id="g04-leaf" d="M19.5 10.5c0-2.5 2-4.5 4.5-4.5 0 2.5-2 4.5-4.5 4.5Z" fill="#2a7360" />
+          </svg>
+          <div>
+            <div class="g04-agent-name">Anbu</div>
+            <div class="g04-agent-role">Skips what you know, maps the gap</div>
+          </div>
+        </div>
+        <h2 class="g04-plan-h" id="g04-plan-h">Six weeks. <em>Only the gap.</em></h2>
         <div data-hf-id="hf-odm2" class="g04-phase" id="g04-p1"><span data-hf-id="hf-7u16" class="g04-pn">1</span><div data-hf-id="hf-y7yw"><div data-hf-id="hf-euhv" class="g04-pt">Statistics for analysts</div><div data-hf-id="hf-qd4c" class="g04-pw">Weeks 1–3 · sampling, A/B tests</div></div></div>
         <div data-hf-id="hf-kfi1" class="g04-phase" id="g04-p2"><span data-hf-id="hf-88c7" class="g04-pn">2</span><div data-hf-id="hf-x11t"><div data-hf-id="hf-fr63" class="g04-pt">Power BI dashboards</div><div data-hf-id="hf-y036" class="g04-pw">Weeks 4–5 · a portfolio dashboard</div></div></div>
         <div data-hf-id="hf-jnu8" class="g04-phase" id="g04-p3"><span data-hf-id="hf-8mn8" class="g04-pn">3</span><div data-hf-id="hf-xfcu"><div data-hf-id="hf-tkod" class="g04-pt">Python refresh</div><div data-hf-id="hf-6agu" class="g04-pw">Week 6 · pandas, plotting</div></div></div>
@@ -317,8 +351,13 @@
         }
       });
 
-      tl.fromTo('#g04-plan-h', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 2.4);
-      tl.fromTo(['#g04-p1', '#g04-p2', '#g04-p3'], { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out', stagger: 0.3 }, 2.9);
+      // Anbu arrives, traces the route from what you know (seed) to the goal (leaf), then lays out the phases.
+      tl.fromTo('#g04-agent', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out' }, 2.2);
+      tl.fromTo('#g04-seed', { scale: 0.4, transformOrigin: '50% 50%' }, { scale: 1, duration: 0.3, ease: 'back.out(2.4)' }, 2.35);
+      tl.fromTo('#g04-route', { strokeDashoffset: 6.6 }, { strokeDashoffset: 0, duration: 0.45, ease: 'none' }, 2.45);
+      tl.fromTo('#g04-leaf', { scale: 0, transformOrigin: '0% 100%' }, { scale: 1, duration: 0.35, ease: 'back.out(2.4)' }, 2.75);
+      tl.fromTo('#g04-plan-h', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 2.7);
+      tl.fromTo(['#g04-p1', '#g04-p2', '#g04-p3'], { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out', stagger: 0.28 }, 3.05);
       tl.fromTo('#g04-p4', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out' }, 4.0);
       tl.fromTo('#g04-strike', { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power2.inOut' }, 4.45);
       window.__timelines['04-gap'] = tl;
