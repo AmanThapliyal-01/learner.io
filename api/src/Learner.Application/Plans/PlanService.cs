@@ -9,7 +9,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learner.Application.Plans;
 
-public sealed record PlanResponse(Guid Id, PlanPhase Phase, DateTimeOffset? GeneratedAt, DateTimeOffset? StaleAt, JsonElement? Content, string? Error);
+public sealed record PlanResponse(
+    Guid Id,
+    PlanPhase Phase,
+    DateTimeOffset? GeneratedAt,
+    DateTimeOffset? StaleAt,
+    JsonElement? Content,
+    string? Error,
+    PlanProgress? Progress);
 
 /// <summary>Queues plan generation for the agents worker and serves the result.</summary>
 public sealed class PlanService(
@@ -59,7 +66,7 @@ public sealed class PlanService(
 
         if (replacing is not null)
         {
-            replacing.Status = PlanStatus.Archived;
+            replacing.Archive();
             await db.SaveChangesAsync(ct); // frees the one-active-plan slot before the new plan is added
         }
 
@@ -85,11 +92,16 @@ public sealed class PlanService(
         return db.Plans.Where(p => p.UserId == userId && p.Status != PlanStatus.Archived);
     }
 
-    private PlanResponse ToResponse(Plan plan) => new(
-        plan.Id,
-        PlansModule.PhaseOf(plan, clock.GetUtcNow()),
-        plan.GeneratedAt,
-        plan.GeneratedAt + Plan.StaleAfter,
-        plan.Content is null ? null : JsonDocument.Parse(plan.Content).RootElement.Clone(),
-        plan.Error);
+    private PlanResponse ToResponse(Plan plan)
+    {
+        var phase = PlansModule.PhaseOf(plan, clock.GetUtcNow());
+        return new(
+            plan.Id,
+            phase,
+            plan.GeneratedAt,
+            plan.GeneratedAt + Plan.StaleAfter,
+            plan.Content is null ? null : JsonDocument.Parse(plan.Content).RootElement.Clone(),
+            plan.Error,
+            phase == PlanPhase.Generating ? plan.Progress : null);
+    }
 }

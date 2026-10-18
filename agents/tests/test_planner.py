@@ -93,14 +93,21 @@ async def test_free_only_budget_drops_paid_resources():
 
 
 class MemoryStore:
-    def __init__(self) -> None:
+    def __init__(self, progress_error: Exception | None = None) -> None:
         self.events: list[tuple[str, Any]] = []
+        self.progress: list[tuple[str, int, int]] = []
+        self._progress_error = progress_error
 
     async def claim(self):
         return None
 
     async def mark_generating(self, plan_id):
         self.events.append(("generating", plan_id))
+
+    async def set_progress(self, plan_id, step, done, total):
+        if self._progress_error:
+            raise self._progress_error
+        self.progress.append((step, done, total))
 
     async def complete(self, job, plan_id, content):
         self.events.append(("complete", content))
@@ -124,6 +131,60 @@ async def test_successful_job_stores_the_plan():
     kinds = [kind for kind, _ in store.events]
     assert kinds == ["generating", "complete"]
     assert store.events[1][1]["total_weeks"] == 9
+
+
+async def test_job_reports_each_finished_step_in_order():
+    store = MemoryStore()
+
+    await process_job(job(), store, build_planner(models()))
+
+    assert store.progress == [
+        ("reading", 0, 0),
+        ("outlining", 0, 2),
+        ("detailing", 1, 2),
+        ("detailing", 2, 2),
+        ("assembling", 2, 2),
+    ]
+
+
+async def test_parallel_details_are_counted_as_they_finish():
+    import asyncio
+
+    # Phase 1 finishes before phase 0: the count still climbs 1, 2 and the phases keep their order.
+    async def run_outline(_):
+        return OUTLINE
+
+    async def slow_detail(_):
+        await asyncio.sleep(0.05)
+        return detail()
+
+    async def fast_detail(_):
+        return detail().model_copy(update={"practice": "fast"})
+
+    planner = build_planner(PlannerModels(outline=RunnableLambda(run_outline), details=(RunnableLambda(slow_detail), RunnableLambda(fast_detail))))
+    store = MemoryStore()
+
+    await process_job(job(), store, planner)
+
+    assert [p for p in store.progress if p[0] == "detailing"] == [("detailing", 1, 2), ("detailing", 2, 2)]
+    assert [p["practice"] for p in store.events[-1][1]["phases"]] == ["Build a small project", "fast"]
+
+
+async def test_a_failed_progress_write_never_fails_the_job():
+    store = MemoryStore(progress_error=RuntimeError("database down"))
+
+    await process_job(job(), store, build_planner(models()))
+
+    assert [kind for kind, _ in store.events] == ["generating", "complete"]
+
+
+async def test_streamed_plan_matches_a_single_invoke():
+    planner = build_planner(models())
+
+    streamed = await generate_plan(planner, REQUEST)
+    invoked = (await planner.ainvoke({"request": REQUEST}))["document"]
+
+    assert streamed == invoked
 
 
 async def test_failed_job_is_retried_until_attempts_run_out():

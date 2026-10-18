@@ -3,19 +3,45 @@
 import asyncio
 import logging
 import time
+from typing import Any
 
 from langgraph.graph.state import CompiledStateGraph
 from pydantic import ValidationError
 
 from learner_agents.core.llm import AllModelsExhaustedError
 from learner_agents.planner.graph import generate_plan
-from learner_agents.planner.jobs import ClaimedJob, JobStore
+from learner_agents.planner.jobs import ClaimedJob, JobStore, ProgressStep
 from learner_agents.planner.schemas import PlanRequest
 
 logger = logging.getLogger(__name__)
 
 MAX_ATTEMPTS = 3
 PLAN_TIMEOUT_S = 300
+PROGRESS_WRITE_TIMEOUT_S = 5
+
+# The step each graph node finishes (PRD FR-24: the UI ticks only what Anbu has actually done).
+NODE_STEPS: dict[str, ProgressStep] = {"assess": "reading", "outline": "outlining", "detail": "detailing", "assemble": "assembling"}
+
+
+class ProgressReporter:
+    """Turns planner node updates into plan progress. Best-effort: a failed write is logged, never fatal or retried."""
+
+    def __init__(self, store: JobStore, plan_id: str) -> None:
+        self._store, self._plan_id = store, plan_id
+        self._done = self._total = 0
+
+    async def __call__(self, node: str, update: dict[str, Any]) -> None:
+        step = NODE_STEPS.get(node)
+        if step is None:
+            return
+        if node == "outline":
+            self._total = len(update["outline"].phases)
+        elif node == "detail":
+            self._done += 1  # details run in parallel, so count completions rather than trust an index
+        try:
+            await asyncio.wait_for(self._store.set_progress(self._plan_id, step, self._done, self._total), PROGRESS_WRITE_TIMEOUT_S)
+        except Exception as error:
+            logger.warning("Couldn't record progress %s for plan %s: %r", step, self._plan_id, error)
 
 
 async def process_job(job: ClaimedJob, store: JobStore, planner: CompiledStateGraph) -> float | None:
@@ -30,7 +56,7 @@ async def process_job(job: ClaimedJob, store: JobStore, planner: CompiledStateGr
     await store.mark_generating(request.plan_id)
     started = time.monotonic()
     try:
-        document = await asyncio.wait_for(generate_plan(planner, request), timeout=PLAN_TIMEOUT_S)
+        document = await asyncio.wait_for(generate_plan(planner, request, ProgressReporter(store, request.plan_id)), timeout=PLAN_TIMEOUT_S)
     except AllModelsExhaustedError as error:
         # Nobody's fault: put it back without using up an attempt, and pause until a model frees up.
         logger.warning("Plan job %s paused: all models rate-limited", job.id)

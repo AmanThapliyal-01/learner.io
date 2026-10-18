@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { formErrorFrom } from '../../shared/forms/errors'
+import { AgentAvatar } from '../../shared/ui/AgentAvatar'
+import { AGENTS } from '../../shared/ui/agents'
 import { Alert } from '../../shared/ui/Alert'
 import { Button, ButtonLink } from '../../shared/ui/Button'
 import { cn } from '../../shared/ui/cn'
@@ -9,6 +11,7 @@ import { SkillGap, SkillGapLegend } from '../../shared/ui/SkillGap'
 import { Spinner } from '../../shared/ui/Spinner'
 import { WorkingCard } from '../../shared/ui/WorkingCard'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
+import { anbuSteps } from './anbuSteps'
 import { useCurrentPlan, useRegeneratePlan, type PlanDocument, type ResourceKind } from './api'
 
 const STATUS_NOTE = { skip: 'Skip', refresh: 'Refresh', focus: 'Focus' } as const
@@ -43,8 +46,11 @@ export function PlanPage() {
   if (plan.phase === 'generating') {
     return (
       <WorkingCard
-        title="Our agent is creating your plan"
-        body="It's working from your goal and skill check. It'll be ready in a short while; this page updates by itself."
+        agent="anbu"
+        title={`${AGENTS.anbu.name} is building your plan`}
+        body={`${AGENTS.anbu.role}.`}
+        steps={anbuSteps(plan.progress)}
+        footnote="Your plan opens here as soon as it's ready."
       />
     )
   }
@@ -93,10 +99,16 @@ function PlanView({ document, generatedAt, stale, regenerating, regenerateError,
           <span className="rounded-lg bg-primary-soft px-2.5 py-1 font-medium text-primary">
             {document.total_weeks} weeks · {document.hours_per_week} hrs a week
           </span>
-          {generatedAt && <span>Built {formatDate(generatedAt)}</span>}
         </div>
         <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Your learning plan</h1>
         <p className="text-lg text-ink-muted">{document.summary}</p>
+        <p className="flex items-center gap-2 text-sm text-ink-muted">
+          <AgentAvatar agent="anbu" className="size-5" />
+          <span>
+            Built by {AGENTS.anbu.name} from your skill check
+            {generatedAt && <> · {formatDate(generatedAt)}</>}
+          </span>
+        </p>
       </header>
 
       {stale && (

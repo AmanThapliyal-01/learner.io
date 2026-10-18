@@ -18,7 +18,9 @@ internal sealed class PlansModule(IPlansDb db, TimeProvider clock) : IPlansModul
         // The worker never writes into an archived plan, so a generation already in flight is harmlessly discarded.
         await db.Plans
             .Where(p => p.UserId == userId && p.Status != PlanStatus.Archived)
-            .ExecuteUpdateAsync(set => set.SetProperty(p => p.Status, PlanStatus.Archived), ct);
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(p => p.Status, PlanStatus.Archived)
+                .SetProperty(p => p.Progress, (PlanProgress?)null), ct);
     }
 
     internal static PlanPhase PhaseOf(Plan plan, DateTimeOffset now) => plan.Status switch

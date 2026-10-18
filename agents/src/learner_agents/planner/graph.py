@@ -7,9 +7,10 @@ per-minute budgets add up. Each step waits out short rate limits (it's a backgro
 
 import logging
 import operator
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Annotated, TypedDict
+from typing import Annotated, Any, TypedDict
 
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.runnables import Runnable
@@ -147,6 +148,21 @@ def build_planner(models: PlannerModels) -> CompiledStateGraph:
     return graph.compile()
 
 
-async def generate_plan(planner: CompiledStateGraph, request: PlanRequest) -> PlanDocument:
-    state = await planner.ainvoke({"request": request})
-    return state["document"]
+NodeUpdateHook = Callable[[str, dict[str, Any]], Awaitable[None]]
+
+
+async def generate_plan(planner: CompiledStateGraph, request: PlanRequest, on_update: NodeUpdateHook | None = None) -> PlanDocument:
+    """Streams the graph so `on_update` hears each node as it finishes; the document is the same one ainvoke returns.
+
+    Parallel detail steps arrive as separate updates, one per phase, in the order they finish.
+    """
+    document: PlanDocument | None = None
+    async for chunk in planner.astream({"request": request}, stream_mode="updates"):
+        for node, update in chunk.items():
+            if node == "assemble":
+                document = update["document"]
+            if on_update is not None:
+                await on_update(node, update)
+    if document is None:
+        raise RuntimeError("The planner finished without assembling a plan")
+    return document
