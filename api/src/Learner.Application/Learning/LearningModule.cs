@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learner.Application.Learning;
 
-internal sealed class LearningModule(ILearningDb db) : ILearningModule
+internal sealed class LearningModule(ILearningDb db, TimeProvider clock) : ILearningModule
 {
     public async Task<ActiveGoal?> GetActiveGoalAsync(Guid userId, CancellationToken ct)
     {
@@ -49,6 +49,18 @@ internal sealed class LearningModule(ILearningDb db) : ILearningModule
         var goal = await db.Goals.FirstAsync(g => g.Id == goalId, ct);
         goal.Status = GoalStatus.Confirmed;
         await db.SaveChangesAsync(ct);
+    }
+
+    public async Task<bool> ArchiveActiveGoalAsync(Guid userId, CancellationToken ct)
+    {
+        var goal = await db.Goals.FirstOrDefaultAsync(g => g.UserId == userId && g.Status != GoalStatus.Archived, ct);
+        if (goal is null)
+        {
+            return false;
+        }
+        goal.Archive(clock.GetUtcNow());
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 
     internal static GoalStage ToStage(GoalStatus status) => status switch

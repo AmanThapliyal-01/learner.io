@@ -6,6 +6,7 @@ public sealed class AgentServiceOptions
     public const string Section = "AgentService";
     public const string TokenHeader = "X-Service-Token";
 
-    public string BaseUrl { get; set; } = "http://localhost:8001";
+    // 127.0.0.1, not localhost: on Windows "localhost" tries IPv6 first and each refused attempt costs ~2s.
+    public string BaseUrl { get; set; } = "http://127.0.0.1:8001";
     public string Token { get; set; } = string.Empty;
 }

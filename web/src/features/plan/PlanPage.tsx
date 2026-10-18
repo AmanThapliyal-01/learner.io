@@ -8,6 +8,7 @@ import { cn } from '../../shared/ui/cn'
 import { SkillGap, SkillGapLegend } from '../../shared/ui/SkillGap'
 import { Spinner } from '../../shared/ui/Spinner'
 import { WorkingCard } from '../../shared/ui/WorkingCard'
+import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { useCurrentPlan, useRegeneratePlan, type PlanDocument, type ResourceKind } from './api'
 
 const STATUS_NOTE = { skip: 'Skip', refresh: 'Refresh', focus: 'Focus' } as const
@@ -132,6 +133,11 @@ function PlanView({ document, generatedAt, stale, regenerating, regenerateError,
           ))}
         </ol>
       </section>
+
+      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-sm text-ink-muted">
+        <span>Want to learn something else instead?</span>
+        <ChangeGoalButton variant="secondary" />
+      </footer>
     </div>
   )
 }

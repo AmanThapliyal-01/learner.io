@@ -14,7 +14,7 @@ const LETTERS = ['A', 'B', 'C', 'D']
 
 export function AssessmentPage() {
   const navigate = useNavigate()
-  const { data: assessment, isPending, error } = useAssessment()
+  const { data: assessment, isPending, error, refetch, isRefetching } = useAssessment()
   const submit = useSubmitAnswers()
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [confirmingBlanks, setConfirmingBlanks] = useState(false)
@@ -37,9 +37,14 @@ export function AssessmentPage() {
     return (
       <div className="mx-auto flex max-w-xl flex-col items-start gap-4">
         <Alert>{formErrorFrom(error) ?? "We couldn't prepare your check."}</Alert>
-        <ButtonLink to="/dashboard" variant="secondary">
-          Back to dashboard
-        </ButtonLink>
+        <div className="flex flex-wrap gap-2">
+          <Button loading={isRefetching} onClick={() => refetch()}>
+            Try again
+          </Button>
+          <ButtonLink to="/dashboard" variant="secondary">
+            Back to dashboard
+          </ButtonLink>
+        </div>
       </div>
     )
   }

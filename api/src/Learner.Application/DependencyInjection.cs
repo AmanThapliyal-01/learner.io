@@ -37,6 +37,7 @@ public static class DependencyInjection
 
         // Composition across modules (contracts only)
         services.AddScoped<DashboardService>();
+        services.AddScoped<GoalChangeService>();
 
         return services;
     }

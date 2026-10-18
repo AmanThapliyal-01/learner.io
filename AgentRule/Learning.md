@@ -30,3 +30,10 @@
 - TanStack Query: `refetchInterval` as a function only re-arms after a fetch. After `setQueryData`, also invalidate to start polling.
 - On Windows, psycopg's async mode can't use the default Proactor event loop. Run sync psycopg in `asyncio.to_thread`.
 - Python on Windows writes cp1252 by default. Set PYTHONIOENCODING=utf-8 for scripts that pass model text (which is full of U+2011 hyphens) around.
+
+## 2026-10-18 — M4 session (polish)
+- On Windows, call local services at 127.0.0.1, not localhost: .NET tries IPv6 ::1 first, and every refused attempt costs about 2s.
+- A component's own `inline-flex` beats a `hidden` class passed in; wrap it in an element that carries the responsive visibility.
+- In chat UIs, decide "follow the latest message" from scroll position before new content arrives, and jump instantly when history loads. A tall card makes the after-the-fact check fail, and smooth scroll stalls in background tabs.
+- Keep internal labels (SKIP/REFRESH/FOCUS) out of prompts' user-facing text, or tell the model explicitly never to write them.
+- When a heredoc'd Python script writes code, `\n` inside the replacement becomes a real newline. Prefer the Edit tool for small source edits.

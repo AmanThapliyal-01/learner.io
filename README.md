@@ -14,7 +14,7 @@ Personalized learning plans built from what you actually know. See [PRD.md](PRD.
 1. Start Postgres: `docker compose up -d`
 2. Agents secrets: copy `agents/.env.example` to `agents/.env` and fill in `GROQ_API_KEY` and `AGENT_SERVICE_TOKEN`.
 3. API secrets (same token as the agents service):
-   `dotnet user-secrets set "AgentService:Token" "<token>" --project api/src/Learner.Api`
+   `dotnet user-secrets set "AgentService:Token" "<token>" --project api/src/Learner.Api` (the agents URL defaults to `http://127.0.0.1:8001`)
 4. Apply database migrations:
    `cd api && dotnet tool restore && dotnet ef database update -p src/Learner.Infrastructure -s src/Learner.Api`
 5. Install web dependencies: `cd web && npm install`
@@ -29,6 +29,10 @@ Run each service in its own terminal:
 
 The web dev server proxies `/api` to the API, so the browser only ever talks to http://localhost:5173.
 
+## User journey
+
+Landing → sign up (email, or Google once configured) → onboarding → chat with Asta → confirm the goal card → rate skills → skill check → results → "Build my plan" (the agents worker builds it in about 10s) → plan. Plans go stale after 30 days and can be regenerated; "Change goal" starts over.
+
 ## Tests
 
 - API architecture rules (module boundaries): `dotnet test api/Learner.slnx`
@@ -40,8 +44,9 @@ Dev-only accounts in the local Docker database (fake data; never use these value
 
 | Email | Password | State |
 |---|---|---|
-| `m1test@example.com` | `password123` | Onboarded (basic info only) |
+| `m1test@example.com` | `password123` | Plan ready (AI engineer goal) |
 | `m1-ui@example.com` | `password123` | Onboarded with skills |
+| `m3-ui@example.com` | `password123` | Full journey: goal, skill check and plan ready |
 
 ## Google sign-in (optional locally)
 

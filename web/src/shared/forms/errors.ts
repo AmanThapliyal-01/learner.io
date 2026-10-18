@@ -14,6 +14,7 @@ export function fieldErrorsFrom(error: unknown): FieldErrors {
 export function formErrorFrom(error: unknown): string | undefined {
   if (!error) return undefined
   if (error instanceof ApiError) {
+    if (error.status === 503) return withRetryTime(error.problem?.title ?? 'Our AI is busy right now.', error.problem?.retryAt)
     if (error.status >= 500) return 'Something went wrong on our side. Please try again.'
     if (error.status === 429) return 'Too many attempts. Wait a minute and try again.'
     // Validation problems are shown next to each field instead.
@@ -23,3 +24,9 @@ export function formErrorFrom(error: unknown): string | undefined {
 }
 
 export const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+
+function withRetryTime(message: string, retryAt?: string | null) {
+  if (!retryAt) return message
+  const at = new Date(retryAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+  return `${message.replace(/ ?Please try again shortly\.?$/, '')} Try again at ${at}.`
+}

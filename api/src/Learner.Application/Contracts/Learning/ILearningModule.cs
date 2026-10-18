@@ -23,4 +23,7 @@ public interface ILearningModule
 
     /// <summary>Marks the goal as handed to the planner.</summary>
     Task MarkGoalPlannedAsync(Guid goalId, CancellationToken ct);
+
+    /// <summary>Archives the active goal with its chat and skill check. False if there was none.</summary>
+    Task<bool> ArchiveActiveGoalAsync(Guid userId, CancellationToken ct);
 }

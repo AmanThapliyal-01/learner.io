@@ -1,8 +1,18 @@
-import { QueryClient } from '@tanstack/react-query'
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
 
+import { authKeys } from '../features/auth/api'
 import { ApiError } from '../shared/api/client'
 
-export const queryClient = new QueryClient({
+/** A 401 anywhere means the session ended: forget the user so the route guards send them to log in. */
+function onSessionExpired(error: unknown) {
+  if (error instanceof ApiError && error.status === 401) {
+    queryClient.setQueryData(authKeys.me, null)
+  }
+}
+
+export const queryClient: QueryClient = new QueryClient({
+  queryCache: new QueryCache({ onError: onSessionExpired }),
+  mutationCache: new MutationCache({ onError: onSessionExpired }),
   defaultOptions: {
     queries: {
       staleTime: 30_000,

@@ -1,6 +1,6 @@
 import { cn } from './cn'
 
-export type Variant = 'primary' | 'secondary' | 'ghost'
+export type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 export type Size = 'md' | 'lg'
 
 const base =
@@ -12,6 +12,7 @@ const variants: Record<Variant, string> = {
   primary: 'bg-primary text-on-primary shadow-sm hover:bg-primary-hover',
   secondary: 'border border-border-strong bg-surface text-ink hover:bg-surface-muted',
   ghost: 'text-ink-muted hover:bg-surface-muted hover:text-ink',
+  danger: 'bg-danger text-on-danger shadow-sm hover:brightness-95',
 }
 
 // 44px minimum hit target on every size.

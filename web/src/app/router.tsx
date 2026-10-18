@@ -5,39 +5,48 @@ import { LoginPage } from '../features/auth/LoginPage'
 import { SignupPage } from '../features/auth/SignupPage'
 import { LandingPage } from '../features/landing/LandingPage'
 import { NotFoundPage } from './NotFoundPage'
+import { RouteErrorPage } from './RouteErrorPage'
 
-// Signed-in pages load on demand so the landing page stays light.
+/** Signed-in pages load on demand so the landing page stays light. */
+const page = <T extends Record<string, React.ComponentType>>(load: () => Promise<T>, name: keyof T) => () =>
+  load().then((module) => ({ Component: module[name] }))
+
 export const router = createBrowserRouter([
-  { path: '/', element: <LandingPage /> },
   {
-    element: <RedirectIfSignedIn />,
+    errorElement: <RouteErrorPage />,
     children: [
-      { path: '/login', element: <LoginPage /> },
-      { path: '/signup', element: <SignupPage /> },
-    ],
-  },
-  {
-    element: <RequireAuth />,
-    children: [
-      { path: '/onboarding', lazy: () => import('../features/onboarding/OnboardingPage').then((m) => ({ Component: m.OnboardingPage })) },
+      { path: '/', element: <LandingPage /> },
       {
-        element: <RequireOnboarded />,
+        element: <RedirectIfSignedIn />,
         children: [
+          { path: '/login', element: <LoginPage /> },
+          { path: '/signup', element: <SignupPage /> },
+        ],
+      },
+      {
+        element: <RequireAuth />,
+        children: [
+          { path: '/onboarding', lazy: page(() => import('../features/onboarding/OnboardingPage'), 'OnboardingPage') },
           {
-            lazy: () => import('../features/dashboard/AppLayout').then((m) => ({ Component: m.AppLayout })),
+            element: <RequireOnboarded />,
             children: [
-              { path: '/dashboard', lazy: () => import('../features/dashboard/DashboardPage').then((m) => ({ Component: m.DashboardPage })) },
-              { path: '/profile', lazy: () => import('../features/profile/ProfilePage').then((m) => ({ Component: m.ProfilePage })) },
-              { path: '/asta', lazy: () => import('../features/asta/AstaPage').then((m) => ({ Component: m.AstaPage })) },
-              { path: '/rate', lazy: () => import('../features/skillcheck/RatePage').then((m) => ({ Component: m.RatePage })) },
-              { path: '/assessment', lazy: () => import('../features/skillcheck/AssessmentPage').then((m) => ({ Component: m.AssessmentPage })) },
-              { path: '/assessment/results', lazy: () => import('../features/skillcheck/ResultsPage').then((m) => ({ Component: m.ResultsPage })) },
-              { path: '/plan', lazy: () => import('../features/plan/PlanPage').then((m) => ({ Component: m.PlanPage })) },
+              {
+                lazy: page(() => import('../features/dashboard/AppLayout'), 'AppLayout'),
+                children: [
+                  { path: '/dashboard', lazy: page(() => import('../features/dashboard/DashboardPage'), 'DashboardPage') },
+                  { path: '/profile', lazy: page(() => import('../features/profile/ProfilePage'), 'ProfilePage') },
+                  { path: '/asta', lazy: page(() => import('../features/asta/AstaPage'), 'AstaPage') },
+                  { path: '/rate', lazy: page(() => import('../features/skillcheck/RatePage'), 'RatePage') },
+                  { path: '/assessment', lazy: page(() => import('../features/skillcheck/AssessmentPage'), 'AssessmentPage') },
+                  { path: '/assessment/results', lazy: page(() => import('../features/skillcheck/ResultsPage'), 'ResultsPage') },
+                  { path: '/plan', lazy: page(() => import('../features/plan/PlanPage'), 'PlanPage') },
+                ],
+              },
             ],
           },
         ],
       },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
-  { path: '*', element: <NotFoundPage /> },
 ])

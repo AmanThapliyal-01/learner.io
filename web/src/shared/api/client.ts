@@ -4,6 +4,8 @@ export interface ProblemDetails {
   status?: number
   detail?: string
   errors?: Record<string, string[]>
+  /** Set on 503s when the AI is rate-limited and we know when it frees up. */
+  retryAt?: string | null
 }
 
 export class ApiError extends Error {

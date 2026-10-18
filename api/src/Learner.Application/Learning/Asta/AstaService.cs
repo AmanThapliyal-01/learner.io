@@ -100,8 +100,12 @@ public sealed class AstaService(
 
         if (failure is not null || (reply.Length == 0 && summary is null))
         {
-            // Nothing usable came back: drop the user's message so resending it doesn't duplicate it.
+            // Nothing usable came back: drop the user's message so resending it doesn't duplicate it,
+            // and if that was the very first message, drop the goal it created too.
             await db.ChatMessages.Where(m => m.Id == turn.UserMessageId).ExecuteDeleteAsync(CancellationToken.None);
+            await db.Goals
+                .Where(g => g.Id == turn.GoalId && g.Status == GoalStatus.Chatting && !db.ChatMessages.Any(m => m.GoalId == g.Id))
+                .ExecuteDeleteAsync(CancellationToken.None);
             yield return new AstaStreamEvent(
                 AstaAgentEvent.Error,
                 Text: failure?.Text ?? "Asta couldn't reply just now. Please try again.",

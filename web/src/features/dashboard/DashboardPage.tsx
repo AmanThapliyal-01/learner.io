@@ -5,6 +5,7 @@ import { Alert } from '../../shared/ui/Alert'
 import { ButtonLink } from '../../shared/ui/Button'
 import { Spinner } from '../../shared/ui/Spinner'
 import { useMe } from '../auth/api'
+import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { useDashboard, type Dashboard } from './api'
 
 function greeting(now = new Date()) {
@@ -37,9 +38,21 @@ export function DashboardPage() {
 }
 
 function DashboardBody({ dashboard }: { dashboard: Dashboard }) {
+  if (dashboard.state === 'no_goal') return <EmptyState />
+  return (
+    <div className="flex flex-col gap-3">
+      <GoalStateCard dashboard={dashboard} />
+      <div className="flex justify-end">
+        <ChangeGoalButton />
+      </div>
+    </div>
+  )
+}
+
+function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
   switch (dashboard.state) {
     case 'no_goal':
-      return <EmptyState />
+      return null
     case 'goal_in_progress':
       return dashboard.goal?.stage === 'chatting' ? (
         <StateCard

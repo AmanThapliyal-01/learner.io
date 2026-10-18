@@ -42,7 +42,9 @@ def outline_messages(request: PlanRequest, statuses: list[SkillStatus]) -> list[
             "- FOCUS skills get most of the time, the biggest gaps first, ordered so each phase builds on the last.\n"
             "- 2 to 6 phases. Weeks across phases must fit the timeline at the given hours per week; with no "
             "timeline, choose a realistic total.\n"
-            "- Address the learner as 'you'. Be concrete and encouraging; no filler."
+            "- Address the learner as 'you'. Be concrete and encouraging; no filler.\n"
+            "- SKIP, REFRESH and FOCUS are internal labels: never write them. Describe skills in plain words, and "
+            "only say a skill is already covered if it is marked SKIP."
         ),
         HumanMessage(_context(request, statuses)),
     ]

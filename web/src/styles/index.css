@@ -20,6 +20,7 @@
   --color-warning-soft: #fbefd5;
   --color-success: #23744a;
   --color-danger: #b4432f;
+  --color-on-danger: #ffffff;
   color-scheme: light;
 }
 
@@ -40,6 +41,7 @@
     --color-warning-soft: #3a2e14;
     --color-success: #5fc78f;
     --color-danger: #ec8574;
+    --color-on-danger: #1a0d0a;
     color-scheme: dark;
   }
 }
@@ -60,6 +62,7 @@
   --color-warning-soft: #3a2e14;
   --color-success: #5fc78f;
   --color-danger: #ec8574;
+  --color-on-danger: #1a0d0a;
   color-scheme: dark;
 }
 
@@ -80,6 +83,7 @@
   --color-warning-soft: var(--color-warning-soft);
   --color-success: var(--color-success);
   --color-danger: var(--color-danger);
+  --color-on-danger: var(--color-on-danger);
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   /* Display face for headlines only: a grotesque with character, used with restraint. */
   --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -116,4 +120,9 @@ body {
     color-mix(in srgb, var(--color-primary) 55%, transparent) 0 3px,
     color-mix(in srgb, var(--color-primary) 18%, transparent) 3px 6px
   );
+}
+
+/* Headings receive focus after navigation (for screen readers); no ring for that programmatic focus. */
+h1[tabindex='-1']:focus {
+  outline: none;
 }

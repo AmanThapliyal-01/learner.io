@@ -9,4 +9,7 @@ public sealed record ActivePlan(Guid Id, PlanPhase Phase, DateTimeOffset? Genera
 public interface IPlansModule
 {
     Task<ActivePlan?> GetActivePlanAsync(Guid userId, CancellationToken ct);
+
+    /// <summary>Archives the active plan, if any. A plan still being generated is never shown afterwards.</summary>
+    Task ArchiveActivePlanAsync(Guid userId, CancellationToken ct);
 }

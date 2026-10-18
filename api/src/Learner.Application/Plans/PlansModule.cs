@@ -13,6 +13,14 @@ internal sealed class PlansModule(IPlansDb db, TimeProvider clock) : IPlansModul
         return plan is null ? null : new ActivePlan(plan.Id, PhaseOf(plan, clock.GetUtcNow()), plan.GeneratedAt);
     }
 
+    public async Task ArchiveActivePlanAsync(Guid userId, CancellationToken ct)
+    {
+        // The worker never writes into an archived plan, so a generation already in flight is harmlessly discarded.
+        await db.Plans
+            .Where(p => p.UserId == userId && p.Status != PlanStatus.Archived)
+            .ExecuteUpdateAsync(set => set.SetProperty(p => p.Status, PlanStatus.Archived), ct);
+    }
+
     internal static PlanPhase PhaseOf(Plan plan, DateTimeOffset now) => plan.Status switch
     {
         PlanStatus.Failed => PlanPhase.Failed,

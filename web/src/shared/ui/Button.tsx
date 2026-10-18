@@ -1,10 +1,11 @@
-import type { ButtonHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { Link, type LinkProps } from 'react-router'
 
 import { buttonClass, type StyleProps } from './buttonStyles'
 import { Spinner } from './Spinner'
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, StyleProps {
+// ComponentProps includes `ref` (React 19 passes it as a normal prop), so dialogs can focus a button.
+interface ButtonProps extends ComponentProps<'button'>, StyleProps {
   loading?: boolean
 }
 

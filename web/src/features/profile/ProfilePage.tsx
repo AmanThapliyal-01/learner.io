@@ -1,13 +1,16 @@
 import { useState } from 'react'
 
 import { Alert } from '../../shared/ui/Alert'
+import { Button } from '../../shared/ui/Button'
 import { Spinner } from '../../shared/ui/Spinner'
+import { useLogout } from '../auth/api'
 import { useProfile } from './api'
 import { BasicInfoForm } from './BasicInfoForm'
 import { ProfileDetailsForm } from './ProfileDetailsForm'
 
 export function ProfilePage() {
   const { data: profile, isPending, error } = useProfile()
+  const logout = useLogout()
   const [saved, setSaved] = useState<string>()
 
   if (isPending) return <Spinner className="size-5 text-primary" label="Loading your profile" />
@@ -37,6 +40,11 @@ export function ProfilePage() {
         </h2>
         <ProfileDetailsForm profile={profile} submitLabel="Save details" onSaved={flash('Details')} />
       </section>
+      <div className="sm:hidden">
+        <Button variant="secondary" className="w-full" loading={logout.isPending} onClick={() => logout.mutate()}>
+          Sign out
+        </Button>
+      </div>
     </div>
   )
 }

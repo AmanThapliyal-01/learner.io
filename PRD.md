@@ -316,9 +316,17 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 
 **Risk:** this is a tight timeline for three services. If we slip, cut in this order: dark mode → web search (rely on model knowledge) → short-answer questions (MCQ only) → landing page animations.
 
+**Status (18 Oct 2026):** M0-M4 are done, ahead of the deadline. Each milestone was verified end to end in the browser, and M4 also at phone width (375px). Commits: M0 `c51f0f1`, M1 `3d3e76b`, M2 `26889e7`, M3 `35fcd0b`.
+
+**M4 also added:**
+- **Change goal** (FR-12/29): a confirmation dialog archives the goal, skill check and plan.
+- **Error states:** the AI-busy message says when to retry, an expired session redirects to login, a route-level error page catches crashes, and the skill check has "Try again".
+- **Phone layout:** a bottom tab bar on phones (HIG `tab-bars.md`), with Sign out on Profile.
+- **Accessibility:** focus moves to the page heading after navigation.
+
 ## 11. Open items / needed from you
 
-1. **Google OAuth client ID and secret.** Create them in Google Cloud Console with redirect URI `https://localhost:<api-port>/signin-google`. I'll give exact steps when we reach M1.
+1. **Google OAuth client ID and secret.** Still needed to turn on the Google button. Steps are in the README; the redirect URI is `http://localhost:5173/signin-google`.
 2. Confirm that **local-only** is acceptable for the 20 Oct deadline (no cloud deployment).
 3. Stretch: email verification / password reset needs an email provider. Out of scope unless requested.
 4. The Groq API key moves from `confidentials.md` into git-ignored `.env` files. *(Done for `agents/.env`.)*
