@@ -287,6 +287,7 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 - **Budget rule:** with "free only", paid resources are dropped in code.
 - **Rate limits:** each step waits out short limits, up to 90s. Longer limits, such as daily ones, requeue the job without using up one of its 3 attempts.
 - **Queue:** the API queues a job whose payload is a **full snapshot** (goal, profile, assessed skills), so the worker never reads other modules' tables. The worker claims jobs with `FOR UPDATE SKIP LOCKED`; a lock older than 10 minutes counts as abandoned.
+- **Progress (FR-24):** the worker streams the graph (`astream`, `stream_mode="updates"`) and, as each node finishes, writes `plans.plans.progress` (jsonb `{step, done, total}`): `assess` → reading, `outline` → outlining, each `detail` → detailing (finished phases counted, since they run in parallel), `assemble` → assembling. It records the last step that finished, so the web app ticks only real work. Writes are best-effort (a failure is logged; it never fails or retries the job) and only land while the plan is Generating. Progress is cleared when a new attempt starts, and when the plan becomes Ready, Failed or Archived. The plan page polls every 1.5s while generating.
 - **Measured:** about 8-12s per plan. It was 209s before parallelising the detail calls and removing schema length caps.
 - **Regeneration (FR-30/31):** a stale or failed plan is archived, and a new job is queued from the same goal and the latest assessment.
 

@@ -5,6 +5,8 @@ import { formErrorFrom } from '../../shared/forms/errors'
 import { Alert } from '../../shared/ui/Alert'
 import { Button } from '../../shared/ui/Button'
 import { SkillGap, SkillGapLegend } from '../../shared/ui/SkillGap'
+import { AgentAvatar } from '../../shared/ui/AgentAvatar'
+import { AGENTS } from '../../shared/ui/agents'
 import { Spinner } from '../../shared/ui/Spinner'
 import { useRequestPlan } from '../plan/api'
 import { LEVELS, gapNote, useResults, type SkillResult } from './api'
@@ -56,7 +58,10 @@ export function ResultsPage() {
         <Button size="lg" loading={requestPlan.isPending} onClick={() => requestPlan.mutate(undefined, { onSuccess: () => navigate('/plan') })}>
           Build my plan
         </Button>
-        <p className="text-sm text-ink-muted">Our planning agent takes about a minute.</p>
+        <p className="flex items-center gap-2 text-sm text-ink-muted">
+          <AgentAvatar agent="anbu" className="size-5" />
+          {AGENTS.anbu.name}, our planning agent, builds it in under a minute.
+        </p>
       </div>
     </div>
   )

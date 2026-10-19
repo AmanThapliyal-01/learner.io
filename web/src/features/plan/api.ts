@@ -23,6 +23,16 @@ export interface PlanDocument {
   }[]
 }
 
+/** Anbu's planner steps, in the order they run. */
+export type PlanStep = 'reading' | 'outlining' | 'detailing' | 'assembling'
+
+/** The last step Anbu finished. `done` and `total` count detailed phases; `total` is 0 until the outline exists. */
+export interface PlanProgress {
+  step: PlanStep
+  done: number
+  total: number
+}
+
 export interface Plan {
   id: string
   phase: 'generating' | 'ready' | 'stale' | 'failed'
@@ -30,16 +40,18 @@ export interface Plan {
   staleAt: string | null
   content: PlanDocument | null
   error: string | null
+  /** Only while generating; null before Anbu finishes its first step. */
+  progress: PlanProgress | null
 }
 
 export const planKeys = { current: ['plan', 'current'] as const }
 
-/** While the agent works, check back every few seconds (PRD FR-24). */
+/** While Anbu works, check back often enough to tick each step as it finishes (PRD FR-24). */
 export const useCurrentPlan = () =>
   useQuery({
     queryKey: planKeys.current,
     queryFn: () => api.get<Plan>('/api/plans/current'),
-    refetchInterval: (query) => (query.state.data?.phase === 'generating' ? 3000 : false),
+    refetchInterval: (query) => (query.state.data?.phase === 'generating' ? 1500 : false),
   })
 
 function usePlanMutation(path: string) {

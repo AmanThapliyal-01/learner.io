@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
 
+import { AgentAvatar } from '../../shared/ui/AgentAvatar'
+import { AGENTS, type AgentName } from '../../shared/ui/agents'
 import { Alert } from '../../shared/ui/Alert'
 import { ButtonLink } from '../../shared/ui/Button'
 import { Illustration } from '../../shared/ui/Illustration'
@@ -8,6 +10,7 @@ import { Spinner } from '../../shared/ui/Spinner'
 import { useMe } from '../auth/api'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { useDashboard, type Dashboard } from './api'
+import { HowItWorksVideo } from './HowItWorksVideo'
 
 function greeting(now = new Date()) {
   const hour = now.getHours()
@@ -70,16 +73,17 @@ function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
       ) : (
         <StateCard
           title={`Your goal: ${dashboard.goal?.title ?? 'confirmed'}`}
-          body="Pick up your skill check where you left off. Once it's done, our agent builds your plan."
+          body={`Pick up your skill check where you left off. Once it's done, ${AGENTS.anbu.name} builds your plan.`}
           action={<ButtonLink to="/assessment">Continue the skill check</ButtonLink>}
         />
       )
     case 'plan_generating':
       return (
         <StateCard
-          title="Our agent is creating your plan"
-          body="It's working from your goal and assessment. This usually takes a minute or two; this page updates on its own."
-          action={<ButtonLink to="/plan" variant="secondary">See progress</ButtonLink>}
+          agent="anbu"
+          title={`${AGENTS.anbu.name} is building your plan`}
+          body="It's working from your goal and skill check. This usually takes under a minute; this page updates on its own."
+          action={<ButtonLink to="/plan" variant="secondary">Watch the steps</ButtonLink>}
         />
       )
     case 'plan_failed':
@@ -101,8 +105,9 @@ function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
     case 'plan_ready':
       return (
         <StateCard
+          agent="anbu"
           title="Your plan is ready"
-          body="Built around the gap between what you know and what your goal needs."
+          body={`${AGENTS.anbu.name} built it around the gap between what you know and what your goal needs.`}
           action={<ButtonLink to="/plan">Open your plan</ButtonLink>}
         />
       )
@@ -130,12 +135,15 @@ function EmptyState() {
           Let's work out what you'll learn.
         </h2>
         <p className="max-w-md text-ink-muted">
-          Asta asks a few sharp questions, checks what you already know, and then our agent builds a plan around the
-          gap, not a generic roadmap.
+          {AGENTS.asta.name} asks a few sharp questions and checks what you already know. Then {AGENTS.anbu.name} builds
+          a plan around the gap, not a generic roadmap.
         </p>
-        <ButtonLink to="/asta" size="lg" className="mt-2">
-          Chat with Asta
-        </ButtonLink>
+        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <ButtonLink to="/asta" size="lg">
+            Chat with {AGENTS.asta.name}
+          </ButtonLink>
+          <HowItWorksVideo />
+        </div>
       </div>
       <ol className="flex flex-col gap-3">
         {FIRST_STEPS.map((step, index) => (
@@ -160,9 +168,10 @@ function EmptyState() {
   )
 }
 
-function StateCard({ title, body, action }: { title: string; body: string; action: ReactNode }) {
+function StateCard({ title, body, action, agent }: { title: string; body: string; action: ReactNode; agent?: AgentName }) {
   return (
     <section className="flex flex-col items-start gap-4 rounded-3xl border border-border bg-surface p-6 sm:p-10">
+      {agent && <AgentAvatar agent={agent} className="size-10" />}
       <h2 className="font-display text-2xl font-semibold tracking-tight">{title}</h2>
       <p className="max-w-xl text-ink-muted">{body}</p>
       {action}

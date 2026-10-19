@@ -47,6 +47,7 @@ Dev-only accounts in the local Docker database (fake data; never use these value
 | `m1test@example.com` | `password123` | Plan ready (AI engineer goal) |
 | `m1-ui@example.com` | `password123` | Onboarded with skills |
 | `m3-ui@example.com` | `password123` | Full journey: goal, skill check and plan ready |
+| `m5-anbu@example.com` | `password123` | Onboarded only (for testing Anbu's live steps) |
 
 ## Google sign-in (optional locally)
 
