@@ -2,6 +2,7 @@ import { useId, useState, type FormEvent, type ReactNode } from 'react'
 
 import { fieldErrorsFrom, formErrorFrom, type FieldErrors } from '../../shared/forms/errors'
 import { Alert } from '../../shared/ui/Alert'
+import { SavedNote } from '../../shared/ui/SavedNote'
 import { Button } from '../../shared/ui/Button'
 import { SelectField, TextField } from '../../shared/ui/Field'
 import { useUpdateBasicInfo, type BasicInfo, type Profile } from './api'
@@ -11,11 +12,13 @@ interface BasicInfoFormProps {
   profile: Pick<Profile, 'fullName' | 'country' | 'ageRange' | 'currentStatus'>
   submitLabel: string
   onSaved?: () => void
+  /** Show "Saved" beside the button after saving (the profile page; onboarding moves on instead). */
+  confirmSaved?: boolean
   actions?: ReactNode
 }
 
 /** Required basic info. Used in onboarding (step 1) and on the profile page. */
-export function BasicInfoForm({ profile, submitLabel, onSaved, actions }: BasicInfoFormProps) {
+export function BasicInfoForm({ profile, submitLabel, onSaved, actions, confirmSaved }: BasicInfoFormProps) {
   const save = useUpdateBasicInfo()
   const countriesId = useId()
   const [form, setForm] = useState<BasicInfo>({
@@ -26,6 +29,7 @@ export function BasicInfoForm({ profile, submitLabel, onSaved, actions }: BasicI
   })
   const [errors, setErrors] = useState<FieldErrors>({})
   const set = (field: keyof BasicInfo) => (value: string) => {
+    if (save.isSuccess) save.reset() // an edit makes "Saved" stale
     setForm((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
@@ -89,6 +93,7 @@ export function BasicInfoForm({ profile, submitLabel, onSaved, actions }: BasicI
         />
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-end gap-3">
+        {confirmSaved && save.isSuccess && <SavedNote />}
         {actions}
         <Button type="submit" loading={save.isPending}>
           {submitLabel}

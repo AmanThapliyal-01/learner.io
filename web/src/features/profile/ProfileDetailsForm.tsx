@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from 'react'
 
 import { fieldErrorsFrom, formErrorFrom } from '../../shared/forms/errors'
 import { Alert } from '../../shared/ui/Alert'
+import { SavedNote } from '../../shared/ui/SavedNote'
 import { Button } from '../../shared/ui/Button'
 import { TextArea, TextField } from '../../shared/ui/Field'
 import { TagInput } from '../../shared/ui/TagInput'
@@ -13,12 +14,14 @@ interface ProfileDetailsFormProps {
   profile: ProfileDetails
   submitLabel: string
   onSaved?: () => void
+  /** Show "Saved" beside the button after saving (the profile page; onboarding moves on instead). */
+  confirmSaved?: boolean
   /** Extra buttons placed before the submit button, e.g. "Skip for now". */
   actions?: ReactNode
 }
 
 /** The optional detailed profile. Used in onboarding (step 2) and on the profile page. */
-export function ProfileDetailsForm({ profile, submitLabel, onSaved, actions }: ProfileDetailsFormProps) {
+export function ProfileDetailsForm({ profile, submitLabel, onSaved, actions, confirmSaved }: ProfileDetailsFormProps) {
   const save = useUpdateDetails()
   const [form, setForm] = useState({
     profession: profile.profession ?? '',
@@ -29,8 +32,10 @@ export function ProfileDetailsForm({ profile, submitLabel, onSaved, actions }: P
     hobbies: profile.hobbies,
     professionalSummary: profile.professionalSummary ?? '',
   })
-  const set = <K extends keyof typeof form>(field: K) => (value: (typeof form)[K]) =>
+  const set = <K extends keyof typeof form>(field: K) => (value: (typeof form)[K]) => {
+    if (save.isSuccess) save.reset() // an edit makes "Saved" stale
     setForm((current) => ({ ...current, [field]: value }))
+  }
 
   const years = form.yearsOfExperience.trim() === '' ? null : Number(form.yearsOfExperience)
   const yearsError = years !== null && (!Number.isInteger(years) || years < 0 || years > 60) ? 'Enter a whole number from 0 to 60.' : undefined
@@ -119,6 +124,7 @@ export function ProfileDetailsForm({ profile, submitLabel, onSaved, actions }: P
         error={serverErrors.professionalSummary}
       />
       <div className="mt-2 flex flex-wrap items-center justify-end gap-3">
+        {confirmSaved && save.isSuccess && <SavedNote />}
         {actions}
         <Button type="submit" loading={save.isPending}>
           {submitLabel}

@@ -81,7 +81,8 @@ export function TagInput({ label, value, onChange, placeholder, hint, error, opt
                     type="button"
                     onClick={() => remove(tag)}
                     aria-label={`Remove ${tag}`}
-                    className="flex size-6 items-center justify-center rounded-md hover:bg-primary/15"
+                    // 28px visible (the HIG minimum), widened to a 44px touch target by the invisible ::after.
+                    className="relative flex size-7 items-center justify-center rounded-md after:absolute after:-inset-2 after:content-[''] hover:bg-primary/15"
                   >
                     <svg aria-hidden viewBox="0 0 16 16" className="size-3.5">
                       <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />

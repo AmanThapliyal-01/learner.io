@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { useLocation, useOutlet } from 'react-router'
 
-/** Route outlet with a short fade-and-rise between pages. MotionConfig handles reduced motion. */
+/**
+ * Route outlet. The new page appears at once and fades in briefly; there is no exit animation to wait for,
+ * because switching sections is the most frequent interaction in the app (HIG motion › avoid motion on
+ * frequent interactions; let people cancel motion). Opacity only, so it is calm under reduced motion too.
+ */
 export function AnimatedOutlet({ className }: { className?: string }) {
   const location = useLocation()
   const outlet = useOutlet()
@@ -14,27 +18,34 @@ export function AnimatedOutlet({ className }: { className?: string }) {
       firstRender.current = false
       return
     }
-    const timer = window.setTimeout(() => {
+    // Once the page has rendered; pages that show their heading after loading data get one more chance.
+    // Timers, not requestAnimationFrame: frames don't run in a tab that isn't painting.
+    const focusHeading = () => {
       const heading = document.querySelector<HTMLElement>('main h1')
-      if (!heading) return
+      if (!heading) return false
       heading.tabIndex = -1
       heading.focus({ preventScroll: true })
-    }, 260) // after the page transition
-    return () => window.clearTimeout(timer)
+      return true
+    }
+    let retry: number | undefined
+    const first = window.setTimeout(() => {
+      if (!focusHeading()) retry = window.setTimeout(focusHeading, 400)
+    }, 50)
+    return () => {
+      window.clearTimeout(first)
+      window.clearTimeout(retry)
+    }
   }, [location.pathname])
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={location.pathname}
-        className={className}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -4 }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
-      >
-        {outlet}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={location.pathname}
+      className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15, ease: 'easeOut' }}
+    >
+      {outlet}
+    </motion.div>
   )
 }

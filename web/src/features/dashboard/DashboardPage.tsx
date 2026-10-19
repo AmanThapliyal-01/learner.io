@@ -1,14 +1,17 @@
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
+import { useNavigate } from 'react-router'
 
+import { formErrorFrom } from '../../shared/forms/errors'
 import { AgentAvatar } from '../../shared/ui/AgentAvatar'
 import { AGENTS, type AgentName } from '../../shared/ui/agents'
 import { Alert } from '../../shared/ui/Alert'
-import { ButtonLink } from '../../shared/ui/Button'
+import { Button, ButtonLink } from '../../shared/ui/Button'
 import { Illustration } from '../../shared/ui/Illustration'
 import { Spinner } from '../../shared/ui/Spinner'
 import { useMe } from '../auth/api'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
+import { useRegeneratePlan } from '../plan/api'
 import { useDashboard, type Dashboard } from './api'
 import { HowItWorksVideo } from './HowItWorksVideo'
 
@@ -54,6 +57,7 @@ function DashboardBody({ dashboard }: { dashboard: Dashboard }) {
 }
 
 function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
+  const goalTitle = dashboard.goal?.title ?? undefined
   switch (dashboard.state) {
     case 'no_goal':
       return null
@@ -81,6 +85,7 @@ function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
       return (
         <StateCard
           agent="anbu"
+          eyebrow={goalTitle}
           title={`${AGENTS.anbu.name} is building your plan`}
           body="It's working from your goal and skill check. This usually takes under a minute; this page updates on its own."
           action={<ButtonLink to="/plan" variant="secondary">Watch the steps</ButtonLink>}
@@ -89,23 +94,26 @@ function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
     case 'plan_failed':
       return (
         <StateCard
+          eyebrow={goalTitle}
           title="Your plan didn't finish"
-          body="Something went wrong while building it. Your goal and assessment are saved, so trying again starts from there."
-          action={<ButtonLink to="/plan">Try again</ButtonLink>}
+          body="Something went wrong while building it. Your goal and skill check are saved, so trying again starts from there."
+          action={<RetryPlanButton />}
         />
       )
     case 'plan_stale':
       return (
         <StateCard
+          eyebrow={goalTitle}
           title="Your plan is a month old"
-          body="Skills and markets move. Regenerate it to reflect where you are now."
-          action={<ButtonLink to="/plan">View plan</ButtonLink>}
+          body="Skills and markets move. Open it to regenerate it from where you are now."
+          action={<ButtonLink to="/plan">Open plan</ButtonLink>}
         />
       )
     case 'plan_ready':
       return (
         <StateCard
           agent="anbu"
+          eyebrow={goalTitle}
           title="Your plan is ready"
           body={`${AGENTS.anbu.name} built it around the gap between what you know and what your goal needs.`}
           action={<ButtonLink to="/plan">Open your plan</ButtonLink>}
@@ -168,13 +176,39 @@ function EmptyState() {
   )
 }
 
-function StateCard({ title, body, action, agent }: { title: string; body: string; action: ReactNode; agent?: AgentName }) {
+interface StateCardProps {
+  title: string
+  body: string
+  action: ReactNode
+  agent?: AgentName
+  /** The goal this card is about, shown above the title. */
+  eyebrow?: string
+}
+
+function StateCard({ title, body, action, agent, eyebrow }: StateCardProps) {
   return (
     <section className="flex flex-col items-start gap-4 rounded-3xl border border-border bg-surface p-6 sm:p-10">
       {agent && <AgentAvatar agent={agent} className="size-10" />}
-      <h2 className="font-display text-2xl font-semibold tracking-tight">{title}</h2>
+      <div>
+        {eyebrow && <p className="text-sm font-medium text-ink-muted">{eyebrow}</p>}
+        <h2 className="font-display text-2xl font-semibold tracking-tight">{title}</h2>
+      </div>
       <p className="max-w-xl text-ink-muted">{body}</p>
       {action}
     </section>
+  )
+}
+
+/** Retries a failed plan right here, then opens the plan page to watch it build. */
+function RetryPlanButton() {
+  const navigate = useNavigate()
+  const retry = useRegeneratePlan()
+  return (
+    <div className="flex w-full flex-col items-start gap-3">
+      <Alert>{formErrorFrom(retry.error)}</Alert>
+      <Button loading={retry.isPending} onClick={() => retry.mutate(undefined, { onSuccess: () => navigate('/plan') })}>
+        Try again
+      </Button>
+    </div>
   )
 }

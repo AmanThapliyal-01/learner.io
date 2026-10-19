@@ -171,6 +171,7 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
         className="absolute top-5 -left-[33px] flex size-4 items-center justify-center rounded-full border-2 border-primary bg-bg"
       />
       <div className="rounded-2xl border border-border bg-surface">
+        <h3>
         <button
           type="button"
           aria-expanded={open}
@@ -189,6 +190,7 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
             <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
+        </h3>
         <AnimatePresence initial={false}>
           {open && (
             <motion.div
