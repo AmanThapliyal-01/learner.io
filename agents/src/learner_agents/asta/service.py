@@ -111,6 +111,11 @@ async def stream_reply(request: AstaRequest, models: AstaModels, *, web_search: 
         yield AstaEvent(type="error", code="agent_error", text="Asta couldn't reply just now. Please try again.")
         return
 
-    if not reply:
+    if summary is not None:
+        # Everything is known but the user asked something: answer it, then show the card in the same turn, so a
+        # message read as a question ("I don't see the card") can't hold the card back.
+        text = f"{reply.strip()}\n\n{CARD_INTRO}" if reply else CARD_INTRO
+        yield AstaEvent(type="goal_summary", goal_summary=summary, text=text)
+    elif not reply:
         yield AstaEvent(type="token", text=LOST_THREAD_REPLY)
     yield AstaEvent(type="done", model=(full.response_metadata.get("model_name") if full is not None else None))
