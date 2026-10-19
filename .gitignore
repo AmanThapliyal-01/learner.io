@@ -1,0 +1,28 @@
+# Secrets — never commit
+confidentials.md
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+
+# Node / Vite
+node_modules/
+dist/
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

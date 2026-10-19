@@ -1,0 +1,128 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Sage greens on cool, green-tinted neutrals: growth, calm, easy on the eyes for long
+ * learning sessions. Every text pairing meets WCAG 4.5:1; border-strong meets 3:1 for inputs. Components use these tokens, never raw hex values.
+ */
+:root {
+  --color-bg: #f5f7f6;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e9eeec;
+  --color-border: #dde4e1;
+  --color-border-strong: #879490;
+  --color-ink: #1b2623;
+  --color-ink-muted: #566561;
+  --color-primary: #2a7360;
+  --color-primary-hover: #225e4f;
+  --color-primary-soft: #dcefe8;
+  --color-on-primary: #ffffff;
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fbefd5;
+  --color-success: #23744a;
+  --color-danger: #b4432f;
+  --color-on-danger: #ffffff;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #111816;
+    --color-surface: #19221f;
+    --color-surface-muted: #1f2a27;
+    --color-border: #2a3632;
+    --color-border-strong: #5f6e69;
+    --color-ink: #e4ebe8;
+    --color-ink-muted: #9cada8;
+    --color-primary: #6cc3a8;
+    --color-primary-hover: #86d0ba;
+    --color-primary-soft: #1b3830;
+    --color-on-primary: #0c1714;
+    --color-warning: #e8b44f;
+    --color-warning-soft: #3a2e14;
+    --color-success: #5fc78f;
+    --color-danger: #ec8574;
+    --color-on-danger: #1a0d0a;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #111816;
+  --color-surface: #19221f;
+  --color-surface-muted: #1f2a27;
+  --color-border: #2a3632;
+  --color-border-strong: #5f6e69;
+  --color-ink: #e4ebe8;
+  --color-ink-muted: #9cada8;
+  --color-primary: #6cc3a8;
+  --color-primary-hover: #86d0ba;
+  --color-primary-soft: #1b3830;
+  --color-on-primary: #0c1714;
+  --color-warning: #e8b44f;
+  --color-warning-soft: #3a2e14;
+  --color-success: #5fc78f;
+  --color-danger: #ec8574;
+  --color-on-danger: #1a0d0a;
+  color-scheme: dark;
+}
+
+/* Expose tokens as Tailwind utilities: bg-surface, text-ink-muted, border-border, ... */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-on-primary: var(--color-on-primary);
+  --color-warning: var(--color-warning);
+  --color-warning-soft: var(--color-warning-soft);
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+  --color-on-danger: var(--color-on-danger);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Display face for headlines only: a grotesque with character, used with restraint. */
+  --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Visible keyboard focus everywhere; mouse clicks stay clean. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The "gap" in the SkillGap signature: diagonal stripes so it reads without color. */
+.gap-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--color-primary) 55%, transparent) 0 3px,
+    color-mix(in srgb, var(--color-primary) 18%, transparent) 3px 6px
+  );
+}
+
+/* Headings receive focus after navigation (for screen readers); no ring for that programmatic focus. */
+h1[tabindex='-1']:focus {
+  outline: none;
+}

@@ -1,0 +1,240 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Bricolage Grotesque';
+      src: url('assets/fonts/bricolage-grotesque-latin-wght.woff2') format('woff2');
+      font-weight: 200 800;
+    }
+    @font-face {
+      font-family: 'Inter';
+      src: url('assets/fonts/inter-latin-wght.woff2') format('woff2');
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      color: #1b2623;
+    }
+    .c03-bg {
+      position: absolute;
+      inset: 0;
+      background: #f5f7f6;
+    }
+    .c03-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .c03-step {
+      position: absolute;
+      left: 140px;
+      top: 92px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 30px;
+      font-weight: 600;
+    }
+    .c03-step-n {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #dcefe8;
+      color: #2a7360;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+    .c03-card {
+      position: absolute;
+      border-radius: 36px;
+      background: #ffffff;
+      border: 1px solid #dde4e1;
+      box-shadow: 0 30px 80px -40px rgba(20, 60, 50, 0.45);
+    }
+    .c03-rate {
+      left: 140px;
+      top: 200px;
+      width: 820px;
+      padding: 40px 44px;
+    }
+    .c03-h {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 8px;
+    }
+    .c03-sub {
+      font-size: 24px;
+      color: #566561;
+      margin-bottom: 26px;
+    }
+    .c03-row {
+      display: grid;
+      grid-template-columns: 250px 1fr 190px;
+      align-items: center;
+      padding: 22px 0;
+      border-top: 1px solid #dde4e1;
+      font-size: 28px;
+      font-weight: 500;
+    }
+    .c03-dots {
+      display: flex;
+      gap: 14px;
+    }
+    .c03-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e9eeec;
+      border: 2px solid #dde4e1;
+      position: relative;
+    }
+    .c03-fill {
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: #2a7360;
+    }
+    .c03-level {
+      font-size: 22px;
+      color: #566561;
+      text-align: right;
+    }
+    .c03-quiz {
+      left: 1040px;
+      top: 200px;
+      width: 740px;
+      padding: 40px 44px;
+    }
+    .c03-kicker {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #2a7360;
+    }
+    .c03-q {
+      margin: 12px 0 28px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+    .c03-opt {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 26px;
+      margin-top: 14px;
+      border-radius: 20px;
+      border: 2px solid #dde4e1;
+      font-size: 28px;
+      font-weight: 500;
+      font-weight: 600;
+    }
+    .c03-sel {
+      position: absolute;
+      inset: -2px;
+      border-radius: 20px;
+      border: 3px solid #23744a;
+      background: rgba(35, 116, 74, 0.1);
+    }
+    .c03-opt > span {
+      position: relative;
+    }
+    .c03-opt > .c03-sel {
+      position: absolute;
+    }
+    .c03-tick {
+      position: relative;
+      font-family: 'Inter', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #23744a;
+    }
+    .c03-result {
+      position: absolute;
+      left: 1040px;
+      top: 800px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 26px;
+      border-radius: 20px;
+      background: #dcefe8;
+      color: #2a7360;
+      font-size: 28px;
+      font-weight: 600;
+    }
+  </style>
+
+  <div data-hf-id="hf-r3yz" id="root" data-composition-id="03-check" data-width="1920" data-height="1080" data-duration="6">
+    <div data-hf-id="hf-zb6q" id="c03-bg" class="clip c03-bg" data-start="0" data-duration="6" data-track-index="0"></div>
+    <div data-hf-id="hf-c0g7" class="c03-stage" id="c03-stage" data-layout-allow-overflow>
+      <div data-hf-id="hf-auhy" class="c03-step" id="c03-step" data-layout-allow-overlap><span data-hf-id="hf-m143" class="c03-step-n">2</span>Check what you know</div>
+
+      <div data-hf-id="hf-jid3" class="c03-card c03-rate" id="c03-rate">
+        <h2 data-hf-id="hf-k8pl" class="c03-h">Rate yourself</h2>
+        <div data-hf-id="hf-zowu" class="c03-sub">Honest is fine; it gets checked.</div>
+        <div data-hf-id="hf-ojq5" class="c03-row" data-level="4"><span data-hf-id="hf-91fv">SQL</span><span data-hf-id="hf-9w18" class="c03-dots"></span><span data-hf-id="hf-hh5k" class="c03-level">Advanced</span></div>
+        <div data-hf-id="hf-7bfu" class="c03-row" data-level="3"><span data-hf-id="hf-o4h0">Python for data</span><span data-hf-id="hf-uqdg" class="c03-dots"></span><span data-hf-id="hf-j62f" class="c03-level">Intermediate</span></div>
+        <div data-hf-id="hf-b9jv" class="c03-row" data-level="2"><span data-hf-id="hf-cqum">Statistics</span><span data-hf-id="hf-tjgd" class="c03-dots"></span><span data-hf-id="hf-27xk" class="c03-level">Beginner</span></div>
+        <div data-hf-id="hf-0e28" class="c03-row" data-level="1"><span data-hf-id="hf-bxdr">Power BI</span><span data-hf-id="hf-txre" class="c03-dots"></span><span data-hf-id="hf-atk9" class="c03-level">Never used</span></div>
+      </div>
+
+      <div data-hf-id="hf-b0pr" class="c03-card c03-quiz" id="c03-quiz">
+        <div data-hf-id="hf-jkzm" class="c03-kicker">Skill check · SQL</div>
+        <div data-hf-id="hf-70nv" class="c03-q">Which clause filters rows after GROUP BY?</div>
+        <div data-hf-id="hf-dhng" class="c03-opt"><span data-hf-id="hf-d6p0">WHERE</span></div>
+        <div data-hf-id="hf-6vev" class="c03-opt" id="c03-right"><span data-hf-id="hf-j145" class="c03-sel" id="c03-sel"></span><span data-hf-id="hf-8a40">HAVING</span><span data-hf-id="hf-j6j2" class="c03-tick" id="c03-tick">✓ Correct</span></div>
+        <div data-hf-id="hf-4adw" class="c03-opt"><span data-hf-id="hf-k9qw">ORDER BY</span></div>
+      </div>
+
+      <div data-hf-id="hf-m7b8" class="c03-result" id="c03-result">SQL · level 4 confirmed</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const rows = document.querySelectorAll('#c03-rate .c03-row');
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo('#c03-stage', { scale: 1 }, { scale: 1.03, duration: 5.5, ease: 'none', transformOrigin: '50% 50%' }, 0);
+      tl.fromTo('#c03-step', { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 0);
+      tl.fromTo('#c03-rate', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0.1);
+
+      rows.forEach(function (row, r) {
+        const level = Number(row.getAttribute('data-level'));
+        const dots = row.querySelector('.c03-dots');
+        const fills = [];
+        for (let i = 0; i < 5; i++) {
+          const dot = document.createElement('span');
+          dot.className = 'c03-dot';
+          if (i < level) {
+            const fill = document.createElement('span');
+            fill.className = 'c03-fill';
+            dot.appendChild(fill);
+            fills.push(fill);
+          }
+          dots.appendChild(dot);
+        }
+        const at = 0.6 + r * 0.38;
+        tl.fromTo(fills, { scale: 0 }, { scale: 1, duration: 0.28, ease: 'back.out(2.2)', stagger: 0.08 }, at);
+        tl.fromTo(row.querySelector('.c03-level'), { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out' }, at + 0.1 + level * 0.08);
+      });
+
+      tl.fromTo('#c03-quiz', { x: 90, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: 'expo.out' }, 2.1);
+      tl.fromTo('#c03-quiz .c03-opt', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out', stagger: 0.1 }, 2.5);
+      tl.fromTo('#c03-sel', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'power2.out' }, 3.5);
+      tl.fromTo('#c03-tick', { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out' }, 3.85);
+      tl.fromTo('#c03-result', { y: 30, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, 4.5);
+      window.__timelines['03-check'] = tl;
+    })();
+  </script>
+</template>

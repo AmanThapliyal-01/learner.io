@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "api/src/Learner.Api", "--launch-profile", "http"],
+      "port": 5080
+    },
+    {
+      "name": "agents",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "--directory", "agents", "learner-agents"],
+      "port": 8001
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "web"],
+      "port": 5173
+    }
+  ]
+}

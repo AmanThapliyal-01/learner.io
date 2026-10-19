@@ -1,0 +1,366 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Bricolage Grotesque';
+      src: url('assets/fonts/bricolage-grotesque-latin-wght.woff2') format('woff2');
+      font-weight: 200 800;
+    }
+    @font-face {
+      font-family: 'Inter';
+      src: url('assets/fonts/inter-latin-wght.woff2') format('woff2');
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      color: #1b2623;
+    }
+    .g04-bg {
+      position: absolute;
+      inset: 0;
+      background: #f5f7f6;
+    }
+    .g04-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .g04-step {
+      position: absolute;
+      left: 140px;
+      top: 92px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 30px;
+      font-weight: 600;
+    }
+    .g04-step-n {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #dcefe8;
+      color: #2a7360;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+    .g04-halo {
+      position: absolute;
+      left: 116px;
+      top: 176px;
+      width: 916px;
+      height: 712px;
+      border-radius: 56px;
+      background: #dcefe8;
+    }
+    .g04-card {
+      position: absolute;
+      left: 140px;
+      top: 200px;
+      width: 868px;
+      height: 664px;
+      box-sizing: border-box;
+      padding: 44px 48px;
+      border-radius: 40px;
+      background: #ffffff;
+      border: 1px solid #dde4e1;
+      box-shadow: 0 30px 80px -40px rgba(20, 60, 50, 0.45);
+    }
+    .g04-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .g04-muted {
+      font-size: 24px;
+      color: #566561;
+    }
+    .g04-goal {
+      margin-top: 4px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 42px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .g04-hours {
+      padding: 8px 16px;
+      border-radius: 14px;
+      background: #e9eeec;
+      color: #566561;
+      font-size: 22px;
+      font-weight: 500;
+    }
+    .g04-rows {
+      margin-top: 40px;
+      display: grid;
+      gap: 34px;
+    }
+    .g04-row-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+      font-size: 28px;
+      font-weight: 500;
+    }
+    .g04-note {
+      padding: 4px 14px;
+      border-radius: 10px;
+      font-size: 22px;
+      font-weight: 500;
+      background: #dcefe8;
+      color: #2a7360;
+    }
+    .g04-note.g04-covered {
+      background: #e9eeec;
+      color: #566561;
+    }
+    .g04-track {
+      position: relative;
+      height: 22px;
+      border-radius: 11px;
+      background: #e9eeec;
+    }
+    .g04-known,
+    .g04-gap {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      border-radius: 11px;
+      transform-origin: 0 50%;
+    }
+    .g04-known {
+      background: #2a7360;
+    }
+    .g04-known.g04-covered {
+      background: rgba(86, 101, 97, 0.45);
+    }
+    .g04-gap {
+      background: repeating-linear-gradient(-45deg, rgba(42, 115, 96, 0.55) 0 6px, rgba(42, 115, 96, 0.18) 6px 12px);
+    }
+    .g04-goalmark {
+      position: absolute;
+      top: -8px;
+      bottom: -8px;
+      width: 4px;
+      margin-left: -2px;
+      border-radius: 2px;
+      background: #1b2623;
+    }
+    .g04-legend {
+      position: absolute;
+      left: 48px;
+      bottom: 40px;
+      display: flex;
+      gap: 30px;
+      font-size: 22px;
+      color: #566561;
+    }
+    .g04-legend span {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .g04-sw {
+      width: 34px;
+      height: 16px;
+      border-radius: 8px;
+    }
+    .g04-plan {
+      position: absolute;
+      left: 1100px;
+      top: 200px;
+      width: 680px;
+    }
+    .g04-agent {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    .g04-anbu {
+      width: 72px;
+      height: 72px;
+      flex: none;
+    }
+    .g04-agent-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .g04-agent-role {
+      font-size: 22px;
+      color: #566561;
+    }
+    .g04-plan-h {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 46px;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.04;
+      margin: 0 0 18px;
+    }
+    .g04-plan-h em {
+      font-style: normal;
+      color: #2a7360;
+    }
+    .g04-phase {
+      position: relative;
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 20px;
+      padding: 18px 24px;
+      margin-bottom: 12px;
+      border-radius: 24px;
+      background: #ffffff;
+      border: 1px solid #dde4e1;
+    }
+    .g04-pn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #2a7360;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .g04-pt {
+      font-size: 29px;
+      font-weight: 600;
+    }
+    .g04-pw {
+      margin-top: 4px;
+      font-size: 22px;
+      color: #566561;
+    }
+    .g04-skip {
+      background: #e9eeec;
+      border-style: dashed;
+      border-color: #879490;
+    }
+    .g04-skip .g04-pn {
+      background: transparent;
+      border: 2px solid #879490;
+      color: #566561;
+    }
+    .g04-skip .g04-pt {
+      color: #566561;
+      position: relative;
+      display: inline-block;
+    }
+    .g04-strike {
+      position: absolute;
+      left: -4px;
+      right: -4px;
+      top: 52%;
+      height: 3px;
+      background: #566561;
+      transform-origin: 0 50%;
+    }
+  </style>
+
+  <div data-hf-id="hf-34hq" id="root" data-composition-id="04-gap" data-width="1920" data-height="1080" data-duration="6">
+    <div data-hf-id="hf-5ssu" id="g04-bg" class="clip g04-bg" data-start="0" data-duration="6" data-track-index="0"></div>
+    <div data-hf-id="hf-yqf1" class="g04-stage" id="g04-stage" data-layout-allow-overflow>
+      <div data-hf-id="hf-wrdy" class="g04-step" id="g04-step" data-layout-allow-overlap><span data-hf-id="hf-bf83" class="g04-step-n">3</span>Anbu builds your plan</div>
+
+      <div data-hf-id="hf-fou2" class="g04-halo" id="g04-halo"></div>
+      <div data-hf-id="hf-lnk2" class="g04-card" id="g04-card">
+        <div data-hf-id="hf-dk3h" class="g04-top">
+          <div data-hf-id="hf-yeow">
+            <div data-hf-id="hf-hhvm" class="g04-muted">Goal</div>
+            <div data-hf-id="hf-ukrd" class="g04-goal">Data analyst in 4 months</div>
+          </div>
+          <span data-hf-id="hf-cl1i" class="g04-hours">6 hrs / week</span>
+        </div>
+        <div data-hf-id="hf-nuc2" class="g04-rows" id="g04-rows"></div>
+        <div data-hf-id="hf-c8r3" class="g04-legend">
+          <span data-hf-id="hf-jq4z"><i data-hf-id="hf-dbnk" class="g04-sw" style="background: #2a7360"></i>You know</span>
+          <span data-hf-id="hf-ml5a"><i data-hf-id="hf-8vdy" class="g04-sw" style="background: repeating-linear-gradient(-45deg, rgba(42, 115, 96, 0.55) 0 4px, rgba(42, 115, 96, 0.18) 4px 8px)"></i>Your gap</span>
+          <span data-hf-id="hf-tzx6"><i data-hf-id="hf-h9b2" class="g04-sw" style="width: 4px; height: 26px; border-radius: 2px; background: #1b2623"></i>Goal</span>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-tqqm" class="g04-plan" id="g04-plan">
+        <div class="g04-agent" id="g04-agent">
+          <svg class="g04-anbu" viewBox="0 0 28 28" aria-hidden="true">
+            <rect width="28" height="28" rx="8" fill="#dcefe8" />
+            <rect x="0.75" y="0.75" width="26.5" height="26.5" rx="7.25" fill="none" stroke="rgba(42, 115, 96, 0.3)" stroke-width="1" />
+            <ellipse id="g04-seed" cx="8.5" cy="19.5" rx="3.4" ry="2.5" transform="rotate(-32 8.5 19.5)" fill="#2a7360" />
+            <path id="g04-route" d="M13.2 16.4c1.9-1 2.6-2.9 4.2-3.9 1.2-.7 2.2-.8 3-.9" fill="none" stroke="#2a7360" stroke-width="1.9" stroke-linecap="round" stroke-dasharray="0.01 3.3" />
+            <path id="g04-leaf" d="M19.5 10.5c0-2.5 2-4.5 4.5-4.5 0 2.5-2 4.5-4.5 4.5Z" fill="#2a7360" />
+          </svg>
+          <div>
+            <div class="g04-agent-name">Anbu</div>
+            <div class="g04-agent-role">Skips what you know, maps the gap</div>
+          </div>
+        </div>
+        <h2 class="g04-plan-h" id="g04-plan-h">Six weeks. <em>Only the gap.</em></h2>
+        <div data-hf-id="hf-odm2" class="g04-phase" id="g04-p1"><span data-hf-id="hf-7u16" class="g04-pn">1</span><div data-hf-id="hf-y7yw"><div data-hf-id="hf-euhv" class="g04-pt">Statistics for analysts</div><div data-hf-id="hf-qd4c" class="g04-pw">Weeks 1–3 · sampling, A/B tests</div></div></div>
+        <div data-hf-id="hf-kfi1" class="g04-phase" id="g04-p2"><span data-hf-id="hf-88c7" class="g04-pn">2</span><div data-hf-id="hf-x11t"><div data-hf-id="hf-fr63" class="g04-pt">Power BI dashboards</div><div data-hf-id="hf-y036" class="g04-pw">Weeks 4–5 · a portfolio dashboard</div></div></div>
+        <div data-hf-id="hf-jnu8" class="g04-phase" id="g04-p3"><span data-hf-id="hf-8mn8" class="g04-pn">3</span><div data-hf-id="hf-xfcu"><div data-hf-id="hf-tkod" class="g04-pt">Python refresh</div><div data-hf-id="hf-6agu" class="g04-pw">Week 6 · pandas, plotting</div></div></div>
+        <div data-hf-id="hf-21eo" class="g04-phase g04-skip" id="g04-p4"><span data-hf-id="hf-uo78" class="g04-pn">–</span><div data-hf-id="hf-w8fr"><div data-hf-id="hf-ooz8" class="g04-pt">SQL<span data-hf-id="hf-f67n" class="g04-strike" id="g04-strike"></span></div><div data-hf-id="hf-xu2j" class="g04-pw">Skipped · you already know it</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ROWS = [
+        { skill: 'SQL', current: 4, target: 4, note: 'Skip' },
+        { skill: 'Python for data', current: 3, target: 4, note: 'Refresh · 1 wk' },
+        { skill: 'Statistics', current: 1, target: 3, note: 'Focus · 3 wks' },
+        { skill: 'Power BI', current: 0, target: 3, note: 'Focus · 2 wks' },
+      ];
+      const TRACK = 772;
+      const px = function (level) { return (level / 5) * TRACK; };
+      const rowsEl = document.getElementById('g04-rows');
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo('#g04-stage', { scale: 1 }, { scale: 1.03, duration: 5.5, ease: 'none', transformOrigin: '50% 50%' }, 0);
+      tl.fromTo('#g04-step', { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 0);
+      tl.fromTo('#g04-halo', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' }, 0.05);
+      tl.fromTo('#g04-card', { y: 50, opacity: 0, rotation: -1 }, { y: 0, opacity: 1, rotation: 0, duration: 0.8, ease: 'expo.out' }, 0.1);
+
+      ROWS.forEach(function (row, i) {
+        const covered = row.current >= row.target;
+        const wrap = document.createElement('div');
+        wrap.innerHTML =
+          '<div class="g04-row-head"><span>' + row.skill + '</span><span class="g04-note' + (covered ? ' g04-covered' : '') + '">' + row.note + '</span></div>' +
+          '<div class="g04-track">' +
+          (covered ? '' : '<div class="g04-gap" style="left:' + px(row.current) + 'px;width:' + (px(row.target) - px(row.current)) + 'px"></div>') +
+          '<div class="g04-known' + (covered ? ' g04-covered' : '') + '" style="width:' + Math.max(px(row.current), 0.001) + 'px"></div>' +
+          '<div class="g04-goalmark" style="left:' + px(row.target) + 'px"></div>' +
+          '</div>';
+        rowsEl.appendChild(wrap);
+        const at = 0.55 + i * 0.32;
+        tl.fromTo(wrap.querySelector('.g04-row-head'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, at);
+        tl.fromTo(wrap.querySelector('.g04-known'), { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: 'power3.out' }, at + 0.1);
+        tl.fromTo(wrap.querySelector('.g04-goalmark'), { opacity: 0, scaleY: 0.4 }, { opacity: 1, scaleY: 1, duration: 0.25, ease: 'power2.out' }, at + 0.4);
+        if (!covered) {
+          tl.fromTo(wrap.querySelector('.g04-gap'), { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power2.out' }, at + 0.55);
+        }
+      });
+
+      // Anbu arrives, traces the route from what you know (seed) to the goal (leaf), then lays out the phases.
+      tl.fromTo('#g04-agent', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out' }, 2.2);
+      tl.fromTo('#g04-seed', { scale: 0.4, transformOrigin: '50% 50%' }, { scale: 1, duration: 0.3, ease: 'back.out(2.4)' }, 2.35);
+      tl.fromTo('#g04-route', { strokeDashoffset: 6.6 }, { strokeDashoffset: 0, duration: 0.45, ease: 'none' }, 2.45);
+      tl.fromTo('#g04-leaf', { scale: 0, transformOrigin: '0% 100%' }, { scale: 1, duration: 0.35, ease: 'back.out(2.4)' }, 2.75);
+      tl.fromTo('#g04-plan-h', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 2.7);
+      tl.fromTo(['#g04-p1', '#g04-p2', '#g04-p3'], { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out', stagger: 0.28 }, 3.05);
+      tl.fromTo('#g04-p4', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'expo.out' }, 4.0);
+      tl.fromTo('#g04-strike', { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power2.inOut' }, 4.45);
+      window.__timelines['04-gap'] = tl;
+    })();
+  </script>
+</template>

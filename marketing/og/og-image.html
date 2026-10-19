@@ -1,0 +1,94 @@
+<!doctype html>
+<!--
+  Source for web/public/og-image.png (1200x630 social share card).
+  Regenerate: see marketing/README.md.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Inter:wght@400..600&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --sky: #dcefe8;
+        --ink: #1b2623;
+        --ink-muted: #3f4f4b;
+        --primary: #2a7360;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--sky);
+        color-scheme: light;
+      }
+      .card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+      }
+      .art {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1200px;
+        height: auto;
+      }
+      .copy {
+        position: absolute;
+        left: 64px;
+        top: 40px;
+        width: 760px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font: 600 28px/1 'Bricolage Grotesque', sans-serif;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+      }
+      .brand svg {
+        width: 40px;
+        height: 40px;
+      }
+      .brand b {
+        font-weight: inherit;
+      }
+      .brand span {
+        color: var(--primary);
+      }
+      h1 {
+        margin: 26px 0 0;
+        font: 600 58px/1.04 'Bricolage Grotesque', sans-serif;
+        letter-spacing: -0.025em;
+        color: var(--ink);
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--primary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <img class="art" src="../../web/public/assets/illustrations/gap-path.svg#svgView(viewBox(0,0,1600,900))" alt="" />
+      <div class="copy">
+        <div class="brand">
+          <svg viewBox="0 0 28 28" aria-hidden="true">
+            <rect width="28" height="28" rx="8" fill="#2a7360" />
+            <path d="M8 19h12M14 19v-6" stroke="#fff" stroke-width="2.25" stroke-linecap="round" />
+            <path d="M14 13c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" fill="#fff" />
+            <path d="M14 14.5c0-2.2-1.8-4-4-4 0 2.2 1.8 4 4 4Z" fill="#fff" fill-opacity="0.7" />
+          </svg>
+          <b>learner<span>.io</span></b>
+        </div>
+        <h1>Skip what you know.<br /><em>Learn what you don't.</em></h1>
+      </div>
+    </div>
+  </body>
+</html>

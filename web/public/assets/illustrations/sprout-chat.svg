@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="250 60 480 520" role="img" aria-labelledby="t">
+  <title id="t">A seedling in a pot with a speech bubble beside it, someone typing.</title>
+  <style>
+    .glow-stop { stop-color: #fbefd5; }
+    .line { fill: none; stroke: #1b2623; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+    .pot { fill: #8fb3a3; stroke: #1b2623; stroke-width: 5; stroke-linejoin: round; }
+    .rim { fill: #a7c5b8; stroke: #1b2623; stroke-width: 5; }
+    .soil { fill: #1b2623; }
+    .leaf { fill: #2a7360; stroke: #1b2623; stroke-width: 5; stroke-linejoin: round; }
+    .vein { fill: none; stroke: #6cc3a8; stroke-width: 3; stroke-linecap: round; }
+    .bubble { fill: #dcefe8; stroke: #1b2623; stroke-width: 5; stroke-linejoin: round; }
+    .bubble-fill { fill: #dcefe8; }
+    .dot { fill: #2a7360; animation: typing 1.4s ease-in-out infinite; }
+    .dot:nth-of-type(2) { animation-delay: 0.2s; }
+    .dot:nth-of-type(3) { animation-delay: 0.4s; }
+    @keyframes typing { 0%, 60%, 100% { opacity: 0.35; } 30% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+    @media (prefers-color-scheme: dark) {
+      .glow-stop { stop-color: #3a2e14; }
+      .line, .pot, .rim, .leaf, .bubble { stroke: #9cada8; }
+      .pot { fill: #2f4a41; }
+      .rim { fill: #3b5a4f; }
+      .soil { fill: #0c1714; }
+      .leaf { fill: #6cc3a8; }
+      .vein { stroke: #2a7360; }
+      .bubble, .bubble-fill { fill: #1b3830; }
+      .dot { fill: #6cc3a8; }
+    }
+  </style>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" class="glow-stop" stop-opacity="0.9" />
+      <stop offset="1" class="glow-stop" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <circle cx="400" cy="340" r="150" fill="url(#glow)" />
+
+  <!-- Speech bubble: tail stroke, bubble, then tail fill over the seam -->
+  <path class="bubble" d="M520 236L486 296L566 246" />
+  <ellipse class="bubble" cx="580" cy="168" rx="124" ry="84" />
+  <path class="bubble-fill" d="M526 230L494 284L560 244Z" />
+  <g>
+    <circle class="dot" cx="538" cy="168" r="11" />
+    <circle class="dot" cx="580" cy="168" r="11" />
+    <circle class="dot" cx="622" cy="168" r="11" />
+  </g>
+
+  <!-- Seedling -->
+  <path class="line" d="M400 352C400 318 398 296 400 266" />
+  <path class="leaf" d="M398 284C372 240 322 230 292 242C308 288 360 304 398 284Z" />
+  <path class="vein" d="M386 280C360 266 336 256 312 250" />
+  <path class="leaf" d="M402 276C426 226 478 212 512 222C500 270 446 294 402 276Z" />
+  <path class="vein" d="M414 270C440 254 466 240 494 230" />
+
+  <!-- Pot -->
+  <path class="soil" d="M312 372C334 336 372 330 400 332C428 330 466 336 488 372Z" />
+  <path class="pot" d="M306 404L326 540Q330 562 352 562H448Q470 562 474 540L494 404Z" />
+  <rect class="rim" x="286" y="364" width="228" height="46" rx="16" />
+</svg>
