@@ -38,6 +38,8 @@ Landing → sign up (email, or Google once configured) → onboarding → chat w
 - API: `dotnet test api/Learner.slnx` runs the module-boundary rules and the integration tests. The integration tests need Postgres from `docker compose up -d`; each test class creates and drops its own `learner_test_*` database, and the AI agents are replaced by fakes, so no Groq key or quota is used.
 - Agents: `uv run --directory agents pytest`
 
+CI (`.github/workflows/ci.yml`) runs all three on every push, in parallel jobs: API (with a Postgres service), agents and web. It needs no secrets. To block merges while CI is red, turn on branch protection for `master` in the GitHub repo settings and require the three checks.
+
 ## Local test accounts
 
 Dev-only accounts in the local Docker database (fake data; never use these values anywhere real):
