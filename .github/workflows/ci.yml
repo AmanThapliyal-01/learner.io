@@ -1,0 +1,88 @@
+# Runs every test suite, build and lint on each push, so a broken change can't land on master unnoticed.
+# Needs no secrets: the agents tests use fake models, and the API tests use the Postgres service below.
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (.NET tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      # Same credentials and host port as docker-compose.yml, which the integration tests connect to.
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: learner
+          POSTGRES_USER: learner
+          POSTGRES_PASSWORD: learner_dev
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U learner -d learner"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        run: dotnet build api/Learner.slnx --configuration Release
+      - name: Test (module boundaries + integration)
+        run: dotnet test api/Learner.slnx --configuration Release --no-build
+
+  agents:
+    name: Agents (pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: agents
+    env:
+      # Placeholders: the tests use fake models and never reach Groq or the database.
+      GROQ_API_KEY: ci-no-network
+      AGENT_SERVICE_TOKEN: ci
+      DATABASE_URL: postgresql://unused
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+          cache-dependency-glob: agents/uv.lock
+      - name: Install
+        run: uv sync --locked
+      - name: Test
+        run: uv run pytest
+
+  web:
+    name: Web (lint + build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build (type-check + bundle)
+        run: npm run build
