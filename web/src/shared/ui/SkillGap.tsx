@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
 
 import { cn } from './cn'
@@ -15,16 +16,28 @@ export interface SkillGapRow {
 const LEVELS = 5
 const pct = (level: number) => `${(Math.min(Math.max(level, 0), LEVELS) / LEVELS) * 100}%`
 
+interface SkillGapProps {
+  rows: SkillGapRow[]
+  className?: string
+  delay?: number
+  /** Rows are being edited live (e.g. by sliders): changes animate at once, without the entrance stagger. */
+  live?: boolean
+  /** An input rendered under each bar, e.g. a slider to change `current`. */
+  renderControl?: (row: SkillGapRow, index: number) => ReactNode
+}
+
 /**
  * The product's signature: what you already know (solid) versus what your goal needs (the gap).
  * Meaning is carried by text too (note + accessible label), never by color alone.
  */
-export function SkillGap({ rows, className, delay = 0 }: { rows: SkillGapRow[]; className?: string; delay?: number }) {
+export function SkillGap({ rows, className, delay = 0, live, renderControl }: SkillGapProps) {
   return (
     <ul className={cn('flex flex-col gap-4', className)}>
       {rows.map((row, index) => {
         const covered = row.current >= row.target
-        const rowDelay = delay + index * 0.12
+        const rowDelay = live ? 0 : delay + index * 0.12
+        const gapDelay = live ? 0 : rowDelay + 0.45
+        const duration = live ? 0.3 : undefined
         return (
           <li
             key={row.skill}
@@ -48,8 +61,8 @@ export function SkillGap({ rows, className, delay = 0 }: { rows: SkillGapRow[]; 
                   className="gap-stripes absolute inset-y-0 rounded-full"
                   style={{ left: pct(row.current) }}
                   initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: `calc(${pct(row.target)} - ${pct(row.current)})`, opacity: 1 }}
-                  transition={{ delay: rowDelay + 0.45, duration: 0.5, ease: 'easeOut' }}
+                  animate={{ left: pct(row.current), width: `calc(${pct(row.target)} - ${pct(row.current)})`, opacity: 1 }}
+                  transition={{ delay: gapDelay, duration: duration ?? 0.5, ease: 'easeOut' }}
                 />
               )}
               {/* What you already know. */}
@@ -57,7 +70,7 @@ export function SkillGap({ rows, className, delay = 0 }: { rows: SkillGapRow[]; 
                 className={cn('absolute inset-y-0 left-0 rounded-full', covered ? 'bg-ink-muted/45' : 'bg-primary')}
                 initial={{ width: 0 }}
                 animate={{ width: pct(row.current) }}
-                transition={{ delay: rowDelay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: rowDelay, duration: duration ?? 0.6, ease: [0.22, 1, 0.36, 1] }}
               />
               {/* The goal marker. */}
               <motion.div
@@ -65,9 +78,10 @@ export function SkillGap({ rows, className, delay = 0 }: { rows: SkillGapRow[]; 
                 style={{ left: `calc(${pct(row.target)} - 1px)` }}
                 initial={{ opacity: 0, scaleY: 0.4 }}
                 animate={{ opacity: 1, scaleY: 1 }}
-                transition={{ delay: rowDelay + 0.3, duration: 0.25 }}
+                transition={{ delay: live ? 0 : rowDelay + 0.3, duration: 0.25 }}
               />
             </div>
+            {renderControl?.(row, index)}
           </li>
         )
       })}

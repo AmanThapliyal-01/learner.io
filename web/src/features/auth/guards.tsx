@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router'
 
 import { FullPageSpinner } from '../../shared/ui/Spinner'
+import { homePath } from '../landing/planDraft'
 import { useMe } from './api'
 
 /** Signed-in users only; others go to login and come back afterwards. */
@@ -30,6 +31,6 @@ export function RedirectIfSignedIn() {
   const from = (location.state as { from?: string } | null)?.from
 
   if (isPending) return <FullPageSpinner />
-  if (me) return <Navigate to={me.onboardingCompleted ? (from ?? '/dashboard') : '/onboarding'} replace />
+  if (me) return <Navigate to={me.onboardingCompleted ? (from ?? homePath()) : '/onboarding'} replace />
   return <Outlet />
 }

@@ -54,3 +54,10 @@
 - Don't rely on the `<dialog>` close event for side effects like pausing a video. Run them in your own close handler (button, backdrop, `onCancel` for Escape).
 - Sibling sessions on other localhost ports share the auth cookie (cookies ignore the port), so one session's login or sign-out can log you out. Re-login and carry on, or use a separate headless profile.
 - `form_input` doesn't trigger React's onChange for radios or controlled inputs here. Click the inputs, or set the value through the native setter and dispatch an `input` event.
+
+## 2026-10-19 — Interactive landing page session
+- Tailwind v4 utilities live in `@layer utilities`, so the unlayered global `:focus-visible` rule in index.css beats `focus-visible:outline-none`. Use the important suffix (`outline-none!`) when a control draws its own focus ring.
+- A native range input laid over a bar works as "drag the bar" if the input is one thumb-width wider than the bar (`-mx-2.5 w-[calc(100%+1.25rem)]` for a 20px thumb); then the thumb centre lands exactly at level / max.
+- When the desktop app's session window is hidden, the browser pane fires no `requestAnimationFrame`, so Motion animations and `useScroll` never update and screenshots time out or crop. For checking only, a temporary inline script in index.html that maps rAF to `setTimeout(16)` makes them run; remove it before committing. A `matchMedia` override behind a query flag fakes prefers-reduced-motion the same way.
+- Looping showcase animations (agent handoff, step previews) need a visible Pause control, not just reduced-motion support: WCAG 2.2.2 covers auto-updating content longer than 5 seconds.
+- Test accounts in the shared browser pane can be in use by another session (the Anbu account gained Asta messages mid-test). Sign up a fresh `@example.test` user for flows that need an empty state.

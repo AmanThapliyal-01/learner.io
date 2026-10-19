@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Alert } from '../../shared/ui/Alert'
 import { ButtonLink } from '../../shared/ui/Button'
 import { Spinner } from '../../shared/ui/Spinner'
 import { formErrorFrom } from '../../shared/forms/errors'
 import { useMe } from '../auth/api'
+import { clearPlanDraft, readPlanDraft } from '../landing/planDraft'
 import { useConfirmGoal, useConversation } from './api'
 import { Composer, type ComposerHandle } from './Composer'
 import { GoalSummaryCard } from './GoalSummaryCard'
@@ -32,6 +33,11 @@ export function AstaPage() {
   const confirm = useConfirmGoal()
   const composer = useRef<ComposerHandle>(null)
   const log = useRef<HTMLDivElement>(null)
+  // A first message drafted by the landing demo: offered once, in an empty conversation, for the user to edit and send.
+  const [draft] = useState(() => readPlanDraft()?.message)
+  useEffect(() => {
+    if (draft && conversation) clearPlanDraft()
+  }, [draft, conversation])
 
   const messages = conversation?.messages ?? []
   const chatting = !conversation?.stage || conversation.stage === 'chatting'
@@ -66,6 +72,7 @@ export function AstaPage() {
   if (loadError) return <Alert>We couldn't load your conversation. Refresh to try again.</Alert>
 
   const firstName = me?.fullName?.split(' ')[0]
+  const prefill = messages.length === 0 && !chat.pending ? draft : undefined
 
   return (
     <section aria-label="Chat with Asta" className="-mx-4 -mt-8 flex h-[calc(100dvh-4rem-3.5rem-env(safe-area-inset-bottom))] min-h-[24rem] flex-col overflow-hidden border-border bg-bg sm:mx-auto sm:mt-0 sm:h-[calc(100dvh-10rem)] sm:max-w-3xl sm:rounded-3xl sm:border">
@@ -134,7 +141,8 @@ export function AstaPage() {
         {chatting ? (
           <div className="flex flex-col gap-3">
             <Alert>{chat.error ?? formErrorFrom(confirm.error)}</Alert>
-            <Composer ref={composer} disabled={chat.isStreaming} onSend={send} />
+            {prefill && <p className="text-sm text-ink-muted">We drafted this from your demo. Edit anything, then send.</p>}
+            <Composer ref={composer} disabled={chat.isStreaming} initialText={prefill} onSend={send} />
           </div>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3 py-1">

@@ -11,12 +11,14 @@ export interface ComposerHandle {
 
 interface ComposerProps {
   disabled?: boolean
+  /** Starting text the user can edit before sending (e.g. a draft carried over from the landing demo). */
+  initialText?: string
   onSend: (text: string) => void
 }
 
 /** Message box: Enter sends, Shift+Enter adds a line, grows up to six lines. */
-export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Composer({ disabled, onSend }, ref) {
-  const [text, setText] = useState('')
+export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Composer({ disabled, initialText = '', onSend }, ref) {
+  const [text, setText] = useState(initialText)
   const [placeholder, setPlaceholder] = useState('Message Asta…')
   const input = useRef<HTMLTextAreaElement>(null)
 
