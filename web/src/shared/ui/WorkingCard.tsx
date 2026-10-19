@@ -39,7 +39,7 @@ export function WorkingCard({ title, body, agent = 'asta', steps, footnote }: Wo
       </motion.div>
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>
-        <p className="mt-2 text-ink-muted">{body}</p>
+        <p className="mt-2 text-balance text-ink-muted">{body}</p>
       </div>
       {steps ? (
         <>
@@ -52,7 +52,7 @@ export function WorkingCard({ title, body, agent = 'asta', steps, footnote }: Wo
         <div className="h-1 w-40 overflow-hidden rounded-full bg-surface-muted" aria-hidden>
           <motion.div
             className="h-full w-1/3 rounded-full bg-primary"
-            animate={{ x: ['-100%', '300%'] }}
+            animate={reduceMotion ? undefined : { x: ['-100%', '300%'] }}
             transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
           />
         </div>
@@ -127,10 +127,10 @@ function StepIcon({ state }: { state: WorkingStep['state'] }) {
         ) : state === 'active' ? (
           <motion.span key="active" className="relative flex size-5 items-center justify-center" exit={{ opacity: 0, scale: 0.6 }}>
             <span className="absolute inset-0 rounded-full border-2 border-primary/25" />
-            <span className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary [animation-duration:1.1s]" />
+            <span className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary [animation-duration:1.1s] motion-reduce:animate-none" />
           </motion.span>
         ) : (
-          <motion.span key="pending" className="size-3.5 rounded-full border-2 border-border-strong/60" exit={{ opacity: 0 }} />
+          <motion.span key="pending" className="size-3.5 rounded-full border-2 border-border-strong" exit={{ opacity: 0 }} />
         )}
       </AnimatePresence>
     </span>

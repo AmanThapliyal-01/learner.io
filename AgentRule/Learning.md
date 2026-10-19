@@ -46,3 +46,11 @@
 - Headless Chrome follows the OS colour scheme (this machine is dark), and Motion's scroll reveals may not have finished in a `--screenshot`. Don't trust it for light-mode marketing shots.
 - Chrome `--screenshot` needs absolute paths and a `file:///` URL; a relative HTML path is read as a hostname.
 - Inside a HyperFrames frame, a broad selector like `.opt span { position: relative }` beats `.sel { position: absolute }` and silently collapses overlays. Snapshot every frame before rendering.
+
+## 2026-10-19 — Anbu live progress session
+- LangGraph `astream(stream_mode="updates")` emits one update per parallel `Send` task as it finishes, so the worker can count finished phases. Keep the final document identical by reading it from the `assemble` update (a test compares it with `ainvoke`).
+- Progress written by a background worker must be best-effort: wrap the write in a timeout and only update rows that are still Generating, so a late write never lands on a Ready or Archived plan.
+- When the Claude window is hidden, the Browser pane stops `requestAnimationFrame` entirely (0 frames). Motion's route transitions never finish, clicks fail with "has not drawn yet", and a native `<dialog>` close event never fires. Drive the flow with full page loads and DOM checks, and take screenshots with headless Chrome over CDP (a small Node script with the built-in WebSocket; nothing to install).
+- Don't rely on the `<dialog>` close event for side effects like pausing a video. Run them in your own close handler (button, backdrop, `onCancel` for Escape).
+- Sibling sessions on other localhost ports share the auth cookie (cookies ignore the port), so one session's login or sign-out can log you out. Re-login and carry on, or use a separate headless profile.
+- `form_input` doesn't trigger React's onChange for radios or controlled inputs here. Click the inputs, or set the value through the native setter and dispatch an `input` event.
