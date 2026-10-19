@@ -44,7 +44,7 @@ export function SignupPage() {
         <>
           Already have an account?{' '}
           <Link to="/login" className="font-medium text-primary hover:underline">
-            Log in
+            Sign in
           </Link>
         </>
       }

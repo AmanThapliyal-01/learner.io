@@ -70,7 +70,7 @@ export function AssessmentPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-primary">Step 2 of 2</p>
+        <p className="text-sm font-medium text-ink-muted">Step 2 of 2</p>
         <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Quick skill check</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           {total} questions. Answer from what you know; guessing only makes your plan less accurate.
@@ -109,11 +109,11 @@ export function AssessmentPage() {
 
       <Alert>{formErrorFrom(submit.error)}</Alert>
       <Alert tone="warning">
-        {confirmingBlanks && `${total - answered} unanswered. They'll count as not known. Submit anyway?`}
+        {confirmingBlanks && `${total - answered} unanswered. They'll count as not known. Finish anyway?`}
       </Alert>
       <div className="flex justify-end">
         <Button size="lg" onClick={onSubmit}>
-          {confirmingBlanks ? 'Submit anyway' : 'Submit answers'}
+          {confirmingBlanks ? 'Finish anyway' : 'Finish skill check'}
         </Button>
       </div>
     </div>

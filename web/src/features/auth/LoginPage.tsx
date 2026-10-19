@@ -73,7 +73,7 @@ export function LoginPage() {
           error={errors.password ?? serverErrors.password}
         />
         <Button type="submit" loading={login.isPending} className="w-full">
-          Log in
+          Sign in
         </Button>
       </form>
     </AuthLayout>

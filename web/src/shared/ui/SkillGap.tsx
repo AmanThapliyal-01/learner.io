@@ -39,10 +39,10 @@ export function SkillGap({ rows, className, delay = 0, live, renderControl }: Sk
         const gapDelay = live ? 0 : rowDelay + 0.45
         const duration = live ? 0.3 : undefined
         return (
-          <li
-            key={row.skill}
-            aria-label={`${row.skill}: you're at level ${row.current} of ${LEVELS}, your goal needs ${row.target}. ${row.note}.`}
-          >
+          <li key={row.skill}>
+            <span className="sr-only">
+              {`${row.skill}: you're at level ${row.current} of ${LEVELS}, your goal needs ${row.target}. ${row.note}.`}
+            </span>
             <div aria-hidden className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
               <span className="font-medium text-ink">{row.skill}</span>
               <span

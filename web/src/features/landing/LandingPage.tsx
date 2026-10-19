@@ -30,7 +30,7 @@ export function LandingPage() {
               <ButtonLink to="/dashboard">Open dashboard</ButtonLink>
             ) : (
               <>
-                <ButtonLink to="/login" variant="ghost">Log in</ButtonLink>
+                <ButtonLink to="/login" variant="ghost">Sign in</ButtonLink>
                 <ButtonLink to="/signup">Get started</ButtonLink>
               </>
             )}

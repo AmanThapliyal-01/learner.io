@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { NavLink } from 'react-router'
+import { Link, NavLink } from 'react-router'
 
 import { AnimatedOutlet } from '../../shared/ui/AnimatedOutlet'
 import { Button } from '../../shared/ui/Button'
@@ -14,7 +14,7 @@ const icon = (path: ReactNode) => (
 )
 
 const NAV = [
-  { to: '/dashboard', label: 'Home', icon: icon(<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />) },
+  { to: '/dashboard', label: 'Dashboard', icon: icon(<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />) },
   { to: '/asta', label: 'Asta', icon: icon(<path d="M5 18l-1 3 4-2a9 8 0 1 0-3-1z" />) },
   {
     to: '/profile',
@@ -54,18 +54,22 @@ export function AppLayout() {
                   )
                 }
               >
-                {item.label === 'Home' ? 'Dashboard' : item.label}
+                {item.label}
               </NavLink>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
-            <span
-              aria-hidden
+            {/* Looks like an account button, so it acts as one: it opens Profile. */}
+            <Link
+              to="/profile"
+              aria-label={`Profile${me?.email ? ` (${me.email})` : ''}`}
               title={me?.email}
-              className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-primary"
+              className="flex size-11 items-center justify-center rounded-full"
             >
-              {initial}
-            </span>
+              <span aria-hidden className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-primary">
+                {initial}
+              </span>
+            </Link>
             {/* Wrapped: the button's own inline-flex would override `hidden`. */}
             <span className="hidden sm:block">
               <Button variant="ghost" loading={logout.isPending} onClick={() => logout.mutate()}>

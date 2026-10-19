@@ -3,6 +3,8 @@ import { motion } from 'motion/react'
 import { useNavigate } from 'react-router'
 
 import { Button } from '../../shared/ui/Button'
+import { ChoiceCheck } from '../../shared/ui/Choice'
+import { choiceClass } from '../../shared/ui/choiceStyles'
 import { cn } from '../../shared/ui/cn'
 import { SkillGap, SkillGapLegend } from '../../shared/ui/SkillGap'
 import {
@@ -71,12 +73,12 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
                 aria-pressed={selected}
                 onClick={() => pickGoal(option)}
                 className={cn(
-                  'min-h-11 rounded-xl border px-3.5 text-sm font-medium transition-colors',
-                  selected
-                    ? 'border-primary bg-primary-soft text-primary'
-                    : 'border-border-strong bg-surface text-ink hover:bg-surface-muted',
+                  'inline-flex min-h-11 items-center gap-1.5 px-3.5 text-sm font-medium',
+                  choiceClass(selected),
+                  selected ? 'text-primary' : 'text-ink',
                 )}
               >
+                {selected && <ChoiceCheck className="-ml-0.5" />}
                 {option.label}
               </button>
             )

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router'
 import { formErrorFrom } from '../../shared/forms/errors'
 import { Alert } from '../../shared/ui/Alert'
 import { Button } from '../../shared/ui/Button'
+import { ChoiceCheck } from '../../shared/ui/Choice'
+import { choiceClass } from '../../shared/ui/choiceStyles'
 import { cn } from '../../shared/ui/cn'
 import { Spinner } from '../../shared/ui/Spinner'
 import { LEVELS, useRatingForm, useSaveRatings } from './api'
@@ -30,7 +32,7 @@ export function RatePage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-primary">Step 1 of 2 · {form.goalTitle}</p>
+        <p className="text-sm font-medium text-ink-muted">Step 1 of 2 · {form.goalTitle}</p>
         <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">How well do you know each skill?</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           Be honest: a short check comes next, pitched at the level you choose. Skills you've never used are skipped.
@@ -55,11 +57,12 @@ export function RatePage() {
                     <label
                       key={level.value}
                       className={cn(
-                        'flex min-h-14 cursor-pointer flex-col justify-center rounded-xl border px-3 py-2 transition-colors',
+                        'relative flex min-h-14 cursor-pointer flex-col justify-center py-2 pr-7 pl-3',
                         'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary',
-                        selected ? 'border-primary bg-primary-soft' : 'border-border-strong hover:bg-surface-muted',
+                        choiceClass(selected),
                       )}
                     >
+                      {selected && <ChoiceCheck className="absolute top-2 right-2" />}
                       <input
                         type="radio"
                         name={`rating-${index}`}

@@ -36,7 +36,7 @@ export function GoalSummaryCard({ summary, actionable, confirming, onConfirm, on
       className="mt-3 w-full max-w-md overflow-hidden rounded-2xl border border-primary/30 bg-surface shadow-sm"
     >
       <header className="border-b border-border bg-primary-soft px-5 py-4">
-        <p className="text-xs font-medium tracking-wide text-primary uppercase">
+        <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">
           {summary.goal_type === 'professional' ? 'Professional goal' : 'Personal goal'}
         </p>
         <h3 className="mt-1 font-display text-lg font-semibold text-ink">{summary.title}</h3>

@@ -33,7 +33,7 @@ export function ResultsPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-primary">{results.goalTitle}</p>
+        <p className="text-sm font-medium text-ink-muted">{results.goalTitle}</p>
         <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Here's where you stand</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           Your plan will skip what you already know and spend your time on the gaps.

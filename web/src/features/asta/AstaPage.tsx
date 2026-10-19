@@ -63,6 +63,20 @@ export function AstaPage() {
     if (element) followLatest.current = element.scrollHeight - element.scrollTop - element.clientHeight < 160
   }
 
+  // Screen readers hear each finished reply (not history, not every streamed token), plus the goal card when shown.
+  // null until the conversation first loads; '' when it loaded empty.
+  const announcedId = useRef<string | null>(null)
+  const [announcement, setAnnouncement] = useState('')
+  useEffect(() => {
+    if (!conversation) return
+    const latestId = lastMessage?.id ?? ''
+    const isNew = announcedId.current !== null && announcedId.current !== latestId
+    announcedId.current = latestId
+    if (isNew && lastMessage?.role === 'assistant') {
+      setAnnouncement(`Asta: ${lastMessage.content}${lastMessage.goalSummary ? ' Your goal card is below.' : ''}`)
+    }
+  }, [conversation, lastMessage])
+
   const send = async (text: string) => {
     const sent = await chat.send(text)
     if (!sent) composer.current?.setText(text) // give the message back so it can be resent
@@ -82,7 +96,7 @@ export function AstaPage() {
           <p className="text-sm text-ink-muted">Your learning guide</p>
         </div>
         <span className="sr-only" aria-live="polite">
-          {chat.isStreaming ? 'Asta is replying' : ''}
+          {chat.isStreaming ? 'Asta is replying' : announcement}
         </span>
       </header>
 
