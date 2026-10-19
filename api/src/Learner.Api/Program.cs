@@ -1,12 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Learner.Api.Auth;
+using Learner.Api.Configuration;
 using Learner.Api.Middleware;
 using Learner.Application;
 using Learner.Infrastructure;
 using Learner.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddRepoDotEnv(builder.Environment);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
