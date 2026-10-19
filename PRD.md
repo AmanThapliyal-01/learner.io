@@ -343,7 +343,7 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 4. ~~The Groq API key moves from `confidentials.md` into git-ignored `.env` files.~~ *Done: `agents/.env`.*
 5. **Model chain slots 4–5:** keep them as Enterprise-only placeholders, or fill them from a second provider? A second provider needs another API key; see §8.4.
 6. **Branch protection on `master`:** turn it on in the GitHub repo settings and require the three CI checks, so a failing change can't be merged.
-7. **Dev only: the agents server's auto-reload hangs on Windows.** After a code change, the old process doesn't exit for minutes (capping uvicorn's graceful shutdown didn't help). Users aren't affected. Workaround: restart the agents server after changing Python code.
+7. ~~Dev only: the agents server's auto-reload hangs on Windows.~~ *Fixed: uvicorn stopped the old process with a Ctrl+C console event, which never arrives without a real console (the desktop preview). The reloader now kills the old process instead, and a reload takes about 3 s.*
 
 ## 12. Success criteria (MVP)
 
