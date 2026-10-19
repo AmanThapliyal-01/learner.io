@@ -318,7 +318,7 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 
 **Risk:** this is a tight timeline for three services. If we slip, cut in this order: dark mode → web search (rely on model knowledge) → short-answer questions (MCQ only) → landing page animations.
 
-**Status (18 Oct 2026):** M0-M4 are done, ahead of the deadline. Each milestone was verified end to end in the browser, and M4 also at phone width (375px). Commits: M0 `c51f0f1`, M1 `3d3e76b`, M2 `26889e7`, M3 `35fcd0b`.
+**Status (19 Oct 2026):** M0-M4 are done, ahead of the deadline. Each milestone was verified end to end in the browser, and M4 also at phone width (375px). Commits: M0 `c51f0f1`, M1 `3d3e76b`, M2 `26889e7`, M3 `35fcd0b`.
 
 **M4 also added:**
 - **Change goal** (FR-12/29): a confirmation dialog archives the goal, skill check and plan.
@@ -326,13 +326,24 @@ Each user message runs one Asta turn in the agents service (`POST /asta/stream`,
 - **Phone layout:** a bottom tab bar on phones (HIG `tab-bars.md`), with Sign out on Profile.
 - **Accessibility:** focus moves to the page heading after navigation.
 
+**Since M4 (19 Oct):**
+- **Tests:** API integration tests (21) run the real API against a throwaway Postgres database with fake agents, alongside the module-boundary tests (12) and the agents tests (66).
+- **CI:** GitHub Actions runs the API tests (with a Postgres service), the agents tests, and the web lint and build on every push. No secrets needed.
+
+**Release check (19 Oct, `master` with real Groq models):** a new user went from the landing page to a ready plan, then changed goal. The plan was specific to them: their 16 weeks at 8 hours a week, free resources only, Focus and Refresh skills taken from the skill check, and a concrete project and milestone per phase. Changing the goal archived the goal and plan and opened a fresh Asta chat.
+- **Bug found and fixed:** Asta never showed the goal card for "I want to become a data engineer". The extractor left `target_outcome` and `goal_type` empty because its prompt never explained them. Then, once everything was known, any message read as a question ("I don't see a card yet") held the card back. Meanwhile the chat model told the user to "just confirm", which left them stuck. Fix: the prompt now explains both fields. When everything is known, Asta answers the question and shows the card in the same turn, and it never invites a confirmation while something is still missing. It was checked on the failing transcript (3 of 3 runs) and on three opening messages, including "not sure what to learn", which still asks rather than guessing.
+- **Timing (§12, 15 minutes or less):** 12 min 52 s by the clock, including about 7 minutes spent fixing the bug above. Waits on the models are short: about 2-5 s per Asta reply, about 25 s to build and verify the skill check, and 7.9 s for Anbu's plan. A person's own time is mostly reading and the 16-question check (4 short answers), so a typical user should finish in about 10-14 minutes. That passes, but the skill check is where the time goes.
+- **Content quality:** the verifier replaced one cloud-platforms question whose answer key it disputed. A couple of the remaining questions still have more than one defensible answer (for example the Airflow "two upstream tasks" one), and a Beginner was asked to design a full S3 → Spark → Redshift pipeline. Acceptable for the MVP; worth tuning.
+
 ## 11. Open items / needed from you
 
 1. **Google OAuth client ID and secret.** Still needed to turn on the Google button. Steps are in the README; the redirect URI is `http://localhost:5173/signin-google`.
-2. Confirm that **local-only** is acceptable for the 20 Oct deadline (no cloud deployment).
+2. ~~Confirm that local-only is acceptable for the 20 Oct deadline.~~ *Confirmed: local-only.*
 3. Stretch: email verification / password reset needs an email provider. Out of scope unless requested.
-4. The Groq API key moves from `confidentials.md` into git-ignored `.env` files. *(Done for `agents/.env`.)*
+4. ~~The Groq API key moves from `confidentials.md` into git-ignored `.env` files.~~ *Done: `agents/.env`.*
 5. **Model chain slots 4–5:** keep them as Enterprise-only placeholders, or fill them from a second provider? A second provider needs another API key; see §8.4.
+6. **Branch protection on `master`:** turn it on in the GitHub repo settings and require the three CI checks, so a failing change can't be merged.
+7. **Dev only: the agents server's auto-reload hangs on Windows.** After a code change, the old process doesn't exit for minutes (capping uvicorn's graceful shutdown didn't help). Users aren't affected. Workaround: restart the agents server after changing Python code.
 
 ## 12. Success criteria (MVP)
 

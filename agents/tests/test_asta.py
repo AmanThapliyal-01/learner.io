@@ -97,11 +97,19 @@ async def test_complete_goal_shows_card_without_calling_chat():
     assert chat.calls == 0
 
 
-async def test_question_from_user_is_answered_before_the_card():
+async def test_question_from_user_is_answered_then_the_card_shows():
     draft = GoalDraft.model_validate({**COMPLETE, "user_asked_question": True})
-    events = await collect(models(draft, FakeChat(replies=[["MLOps means running models in production."]])))
+    events = await collect(models(draft, FakeChat(replies=[["MLOps means running ", "models in production."]])))
 
-    assert all(e.type != "goal_summary" for e in events)
+    assert [e.type for e in events] == ["token", "token", "goal_summary", "done"]
+    assert events[2].text == f"MLOps means running models in production.\n\n{CARD_INTRO}"
+    assert events[2].goal_summary is not None
+
+
+def test_extraction_prompt_explains_outcome_and_type():
+    system = extraction_messages(request("hi"))[0].content
+
+    assert "target_outcome:" in system and "goal_type:" in system
 
 
 async def test_empty_reply_is_retried_invisibly():

@@ -12,6 +12,10 @@ _EXTRACT = """You read a conversation between a user and Asta, a learning guide,
 Rules:
 - Record a value if the user stated it, clearly implied it, or agreed to it. Never invent; leave it null when unknown.
 - title: write a short title from the user's goal, e.g. "Become an AI engineer".
+- target_outcome: what success looks like, in the user's words. Always name the role or skill itself, then add any \
+detail they gave: "I want to become a data engineer ... job-ready in 4 months" gives "Work as a data engineer, \
+job-ready in 4 months". A stated role or skill is enough; if you can write a title, you can write this too.
+- goal_type: professional for a job, role, career or work goal; personal for a hobby or interest.
 - motivation: the reason the user gave, even in passing (e.g. "my company is starting AI features").
 - skills: the skills this goal needs that should be assessed, at most 6. Use only skills named in the \
 conversation for this goal: listed by the user, or proposed by Asta and not rejected in the user's later replies. \
@@ -43,7 +47,8 @@ Then ask one or two targeted questions and suggest 3 to 5 concrete, in-demand di
 {search}
 - Personal interest: ask which area draws them (art, music, fitness, languages, cooking and so on) and narrow it down.
 
-Never write a goal summary yourself: the app shows a summary card automatically once everything is known. You don't \
+Never write a goal summary yourself: the app shows a summary card automatically once everything is known. While \
+anything is on the list above, ask about it; never tell the user to confirm or that you're ready to summarise. You don't \
 build the plan either; after the user confirms the card, they rate their skills, take a short check, and the planning \
 agent builds it.
 
@@ -104,7 +109,7 @@ def chat_messages(
 ) -> list[BaseMessage]:
     missing = draft.missing()
     system = _CHAT.format(
-        missing="; ".join(missing) if missing else "nothing; answer the user's question, then say you'll summarise.",
+        missing="; ".join(missing) if missing else "nothing; answer the user's question briefly. The summary card appears right after your reply, so don't summarise.",
         search=_SEARCH_HINT if web_search else "",
         today=(today or date.today()).isoformat(),
         profile=_profile_lines(request.profile),
