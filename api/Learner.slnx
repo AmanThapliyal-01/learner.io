@@ -6,6 +6,7 @@
     <Project Path="src/Learner.Infrastructure/Learner.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Learner.Api.Tests/Learner.Api.Tests.csproj" />
     <Project Path="tests/Learner.ArchitectureTests/Learner.ArchitectureTests.csproj" />
   </Folder>
 </Solution>

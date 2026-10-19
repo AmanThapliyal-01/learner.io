@@ -35,7 +35,7 @@ Landing → sign up (email, or Google once configured) → onboarding → chat w
 
 ## Tests
 
-- API architecture rules (module boundaries): `dotnet test api/Learner.slnx`
+- API: `dotnet test api/Learner.slnx` runs the module-boundary rules and the integration tests. The integration tests need Postgres from `docker compose up -d`; each test class creates and drops its own `learner_test_*` database, and the AI agents are replaced by fakes, so no Groq key or quota is used.
 - Agents: `uv run --directory agents pytest`
 
 ## Local test accounts
