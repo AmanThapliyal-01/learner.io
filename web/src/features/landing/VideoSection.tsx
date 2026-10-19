@@ -5,6 +5,7 @@ import { reveal } from './reveal'
 
 const VIDEO = '/assets/video/learner-promo.mp4'
 const POSTER = '/assets/video/learner-promo-poster.jpg'
+const CAPTIONS = '/assets/video/learner-promo.en.vtt'
 
 /** Runs once the poster's play button has swapped the video in, so it's always the user's click that starts it. */
 function startPlayback(video: HTMLVideoElement | null) {
@@ -16,8 +17,9 @@ function startPlayback(video: HTMLVideoElement | null) {
 }
 
 /**
- * The 25-second promo. Only the poster loads with the page; the video element (and its 2.4 MB) appears when the
- * user asks for it, starts muted, and never plays on its own.
+ * The 25-second narrated promo. Only the poster loads with the page; the video element appears when the user
+ * asks for it, plays with sound because that click started it, and never plays on its own. Captions are on by
+ * default so the narration is there for people who can't hear it (HIG accessibility › Hearing).
  */
 export function VideoSection() {
   const [playing, setPlaying] = useState(false)
@@ -36,13 +38,14 @@ export function VideoSection() {
             src={VIDEO}
             poster={POSTER}
             controls
-            muted
             playsInline
             preload="none"
             ref={startPlayback}
             aria-describedby="video-summary"
             className="size-full"
-          />
+          >
+            <track kind="captions" src={CAPTIONS} srcLang="en" label="English" default />
+          </video>
         ) : (
           <button
             type="button"
@@ -65,8 +68,8 @@ export function VideoSection() {
         )}
       </motion.div>
       <p id="video-summary" className="mx-auto mt-4 max-w-2xl text-center text-sm text-ink-muted text-pretty">
-        No narration. It shows a goal set with Asta, a quick self-rating and skill check, and a plan that skips SQL and
-        focuses on the gap.
+        Narrated, with captions. It shows a goal set with Asta, a quick self-rating and skill check, and a plan that
+        skips SQL and focuses on the gap.
       </p>
     </section>
   )

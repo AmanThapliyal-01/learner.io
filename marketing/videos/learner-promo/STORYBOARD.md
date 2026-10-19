@@ -16,7 +16,7 @@ UI. UI moments are rebuilt from the app's own components at ~2x scale: rounded-3
 #dde4e1 borders, soft green-tinted shadow. Motion: expo/power3 eases, 0.5–0.8s entrances, reveals
 paced across each frame, one slow camera drift per frame (scale 1 → 1.03). Every frame carries a
 small step label top-left ("1 · Tell Asta your goal") as the system spine. Content stays above
-y = 900. Silent: no narration, no music.
+y = 900. Narrated (one line per frame, see BRIEF.md) over a carved music bed.
 
 ## Frame 1 — Same steps for everyone
 

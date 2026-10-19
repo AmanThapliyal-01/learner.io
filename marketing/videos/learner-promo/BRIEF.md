@@ -31,5 +31,9 @@ autonomously (the user delegated creative direction).
 
 ## Notes
 
-- No narration. Music bed added after HeyGen sign-in: calm, warm acoustic from HeyGen's library, faded in and out, kept low under the on-screen text.
+- Narration (19 Oct): one calm, confident ElevenLabs take (voice "Graham"), five lines, one per frame, in
+  `assets/voice/voiceover.mp3`; each frame plays its slice (`data-media-start`). Script and captions:
+  `web/public/assets/video/learner-promo.en.vtt`.
+- Music bed: calm, warm acoustic from HeyGen's library, faded in and out, carved under the narration
+  (`data-fx-carve`, strength 0.8, against the `voiceover` group).
 - No people, no stock footage. Bricolage Grotesque for display, Inter for body.

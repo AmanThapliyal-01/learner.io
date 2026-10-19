@@ -1,6 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react'
 
-const VIDEO = { src: '/assets/video/learner-promo.mp4', poster: '/assets/video/learner-promo-poster.jpg', seconds: 25 }
+const VIDEO = {
+  src: '/assets/video/learner-promo.mp4',
+  poster: '/assets/video/learner-promo-poster.jpg',
+  captions: '/assets/video/learner-promo.en.vtt',
+  seconds: 25,
+}
 
 /**
  * "Watch how it works": a native modal with a native video. Nothing loads until it opens (preload="none"),
@@ -77,7 +82,8 @@ export function HowItWorksVideo() {
           height={1080}
           className="block aspect-video h-auto w-full rounded-xl bg-black"
         >
-          A 25-second tour: tell Asta your goal, check what you know, and Anbu builds your plan.
+          <track kind="captions" src={VIDEO.captions} srcLang="en" label="English" default />
+          A 25-second narrated tour: tell Asta your goal, check what you know, and Anbu builds your plan.
         </video>
       </dialog>
     </>
