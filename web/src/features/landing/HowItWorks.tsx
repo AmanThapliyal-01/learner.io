@@ -95,7 +95,8 @@ function RailStone({ progress, index }: { progress: MotionValue<number>; index: 
   const fill = useTransform(progress, reachedAt(index), [0, 1])
   return (
     <svg viewBox="0 0 40 26" className="relative size-10 overflow-visible">
-      <HatchPattern id={`rail-hatch-${index}`} />
+      {/* A lighter hatch than the big path, so the step number on top stays readable. */}
+      <HatchPattern id={`rail-hatch-${index}`} lineClassName="stroke-primary/30" />
       <ellipse cx="20" cy="13" rx="18" ry="11" fill={`url(#rail-hatch-${index})`} className="stroke-ink" strokeWidth="1.5" />
       <motion.ellipse cx="20" cy="13" rx="18" ry="11" style={{ opacity: fill }} className="fill-primary stroke-ink" strokeWidth="1.5" />
       <text x="20" y="17.5" textAnchor="middle" className="fill-ink text-[12px] font-semibold">
@@ -150,12 +151,12 @@ function Stone({ stone, progress, index }: { stone: (typeof STONES)[number]; pro
   )
 }
 
-function HatchPattern({ id }: { id: string }) {
+function HatchPattern({ id, lineClassName = 'stroke-primary' }: { id: string; lineClassName?: string }) {
   return (
     <defs>
       <pattern id={id} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
         <rect width="8" height="8" className="fill-surface" />
-        <line x1="0" y1="0" x2="0" y2="8" className="stroke-primary" strokeWidth="2.5" />
+        <line x1="0" y1="0" x2="0" y2="8" className={lineClassName} strokeWidth="2.5" />
       </pattern>
     </defs>
   )

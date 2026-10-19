@@ -12,6 +12,11 @@ const STEP_MS = 1800
 
 /** "Meet Asta & Anbu": who you talk to, who plans in the background, and the handoff between them. */
 export function TeamSection() {
+  const reduceMotion = useReducedMotion()
+  // The two loops run on their own, so people get a way to stop them (WCAG 2.2.2 Pause, Stop, Hide).
+  const [paused, setPaused] = useState(false)
+  const still = Boolean(reduceMotion) || paused
+
   return (
     <section id="agents" aria-labelledby="agents-title" className="scroll-mt-20 bg-primary-soft">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
@@ -25,8 +30,21 @@ export function TeamSection() {
           </p>
         </motion.div>
 
-        <motion.div {...reveal}>
-          <Handoff />
+        <motion.div {...reveal} className="mt-10 flex items-center gap-3">
+          <Handoff still={still} />
+          {!reduceMotion && (
+            <button
+              type="button"
+              onClick={() => setPaused((value) => !value)}
+              className="flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+            >
+              <svg aria-hidden viewBox="0 0 16 16" className="size-4">
+                {paused ? <path d="M5 3.5v9l7-4.5-7-4.5Z" fill="currentColor" /> : <path d="M5 3.5v9M11 3.5v9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+              </svg>
+              {paused ? 'Play' : 'Pause'}
+              <span className="sr-only"> animations</span>
+            </button>
+          )}
         </motion.div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -39,7 +57,7 @@ export function TeamSection() {
             </div>
           </AgentCard>
           <AgentCard agent="anbu">
-            <AnbuPreview />
+            <AnbuPreview still={still} />
           </AgentCard>
         </div>
       </div>
@@ -84,8 +102,7 @@ function Bubble({ from, children }: { from: 'you' | 'asta'; children: ReactNode 
 }
 
 /** A goal card drifting from Asta to Anbu, on a slow loop. Decorative; the paragraph above says the same thing. */
-function Handoff() {
-  const reduceMotion = useReducedMotion()
+function Handoff({ still }: { still: boolean }) {
   const chip = (
     <span className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm whitespace-nowrap text-ink shadow-sm">
       <span className="gap-stripes h-2 w-5 rounded-full" />
@@ -94,14 +111,14 @@ function Handoff() {
   )
 
   return (
-    <div aria-hidden className="mt-10 flex items-center gap-3 sm:gap-4">
+    <div aria-hidden className="flex flex-1 items-center gap-3 sm:gap-4">
       <span className="flex shrink-0 items-center gap-2 text-sm font-medium text-ink">
         <AgentAvatar agent="asta" className="size-8" />
         <span className="hidden sm:inline">{AGENTS.asta.name}</span>
       </span>
       <div className="relative flex h-12 flex-1 items-center">
         <span className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded-full border-t-2 border-dotted border-primary/40" />
-        {reduceMotion ? (
+        {still ? (
           <span className="relative mx-auto">{chip}</span>
         ) : (
           <motion.span
@@ -122,15 +139,14 @@ function Handoff() {
   )
 }
 
-/** Anbu's working steps on a gentle loop, paused off-screen. With reduced motion it shows the finished list. */
-function AnbuPreview() {
-  const reduceMotion = useReducedMotion()
+/** Anbu's working steps on a gentle loop, paused off-screen. When still (paused or reduced motion) it shows the finished list. */
+function AnbuPreview({ still }: { still: boolean }) {
   const box = useRef<HTMLOListElement>(null)
   const inView = useInView(box, { margin: '-80px' })
   // One extra beat past the last step shows everything done before the loop restarts.
   const [tick, setTick] = useState(0)
-  const animate = inView && !reduceMotion
-  const current = reduceMotion ? ANBU_STEPS.length : tick % (ANBU_STEPS.length + 1)
+  const animate = inView && !still
+  const current = still ? ANBU_STEPS.length : tick % (ANBU_STEPS.length + 1)
 
   useEffect(() => {
     if (!animate) return

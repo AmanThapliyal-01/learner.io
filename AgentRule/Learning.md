@@ -46,3 +46,10 @@
 - Headless Chrome follows the OS colour scheme (this machine is dark), and Motion's scroll reveals may not have finished in a `--screenshot`. Don't trust it for light-mode marketing shots.
 - Chrome `--screenshot` needs absolute paths and a `file:///` URL; a relative HTML path is read as a hostname.
 - Inside a HyperFrames frame, a broad selector like `.opt span { position: relative }` beats `.sel { position: absolute }` and silently collapses overlays. Snapshot every frame before rendering.
+
+## 2026-10-19 — Interactive landing page session
+- Tailwind v4 utilities live in `@layer utilities`, so the unlayered global `:focus-visible` rule in index.css beats `focus-visible:outline-none`. Use the important suffix (`outline-none!`) when a control draws its own focus ring.
+- A native range input laid over a bar works as "drag the bar" if the input is one thumb-width wider than the bar (`-mx-2.5 w-[calc(100%+1.25rem)]` for a 20px thumb); then the thumb centre lands exactly at level / max.
+- When the desktop app's session window is hidden, the browser pane fires no `requestAnimationFrame`, so Motion animations and `useScroll` never update and screenshots time out or crop. For checking only, a temporary inline script in index.html that maps rAF to `setTimeout(16)` makes them run; remove it before committing. A `matchMedia` override behind a query flag fakes prefers-reduced-motion the same way.
+- Looping showcase animations (agent handoff, step previews) need a visible Pause control, not just reduced-motion support: WCAG 2.2.2 covers auto-updating content longer than 5 seconds.
+- Test accounts in the shared browser pane can be in use by another session (the Anbu account gained Asta messages mid-test). Sign up a fresh `@example.test` user for flows that need an empty state.

@@ -189,7 +189,7 @@ function RangeInput({ id, label, min, max, value, valueText, onChange, overlay }
       value={value}
       aria-valuetext={valueText}
       onChange={(event) => onChange(Number(event.target.value))}
-      className={overlay ? overlayClass : 'mt-1 block h-7 w-full cursor-pointer accent-primary'}
+      className={overlay ? overlayClass : 'mt-1 block h-9 w-full cursor-pointer accent-primary'}
     />
   )
 }
