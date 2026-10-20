@@ -31,7 +31,8 @@ public sealed class AstaService(
             .Where(m => m.GoalId == goal.Id && m.Role != ChatRole.Tool)
             .OrderBy(m => m.CreatedAt)
             .ToListAsync(ct);
-        return new ConversationResponse(goal.Id, LearningModule.ToStage(goal.Status), messages.Select(ToResponse).ToList());
+        var progress = messages.LastOrDefault(m => m.Role == ChatRole.Assistant && m.Progress is not null)?.Progress;
+        return new ConversationResponse(goal.Id, LearningModule.ToStage(goal.Status), messages.Select(ToResponse).ToList(), ParseJson(progress));
     }
 
     /// <summary>
@@ -76,6 +77,7 @@ public sealed class AstaService(
     {
         var reply = new StringBuilder();
         JsonElement? summary = null;
+        JsonElement? progress = null;
         string? finalText = null;
         AstaAgentEvent? failure = null;
 
@@ -83,6 +85,10 @@ public sealed class AstaService(
         {
             switch (evt.Type)
             {
+                case AstaAgentEvent.ProgressType when evt.Progress is not null:
+                    progress = evt.Progress;
+                    yield return new AstaStreamEvent(AstaAgentEvent.ProgressType, Progress: evt.Progress);
+                    break;
                 case AstaAgentEvent.Token when evt.Text is not null:
                     reply.Append(evt.Text);
                     yield return new AstaStreamEvent(AstaAgentEvent.Token, Text: evt.Text);
@@ -120,6 +126,7 @@ public sealed class AstaService(
             Role = ChatRole.Assistant,
             Content = finalText ?? reply.ToString(),
             ToolPayload = summary?.GetRawText(),
+            Progress = progress?.GetRawText(),
         };
         db.ChatMessages.Add(assistantMessage);
         // Store the reply even if the browser disconnected while it streamed.

@@ -13,6 +13,7 @@ import { WorkingCard } from '../../shared/ui/WorkingCard'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { anbuSteps } from './anbuSteps'
 import { useCurrentPlan, useRegeneratePlan, type PlanDocument, type ResourceKind } from './api'
+import { EASE_OUT, EXIT } from '../../shared/ui/motion'
 
 const STATUS_NOTE = { skip: 'Skip', refresh: 'Refresh', focus: 'Focus' } as const
 const KIND_LABEL: Record<ResourceKind, string> = {
@@ -161,9 +162,9 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
 
   return (
     <motion.li
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.25 }}
+      initial={{ opacity: 0, transform: 'translateX(-8px)' }}
+      animate={{ opacity: 1, transform: 'translateX(0px)' }}
+      transition={{ delay: index * 0.06, duration: 0.25, ease: EASE_OUT }}
       className="relative"
     >
       <span
@@ -197,8 +198,8 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
               id={panelId}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22 }}
+              exit={{ height: 0, opacity: 0, transition: EXIT }}
+              transition={{ duration: 0.22, ease: EASE_OUT }}
               className="overflow-hidden"
             >
               <div className="grid gap-5 border-t border-border p-5 text-[15px]">

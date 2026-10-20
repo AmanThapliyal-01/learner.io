@@ -10,6 +10,7 @@ import { choiceClass } from '../../shared/ui/choiceStyles'
 import { cn } from '../../shared/ui/cn'
 import { Spinner } from '../../shared/ui/Spinner'
 import { LEVELS, useRatingForm, useSaveRatings } from './api'
+import { EASE_OUT } from '../../shared/ui/motion'
 
 export function RatePage() {
   const navigate = useNavigate()
@@ -43,9 +44,9 @@ export function RatePage() {
         {form.skills.map((skill, index) => (
           <motion.li
             key={skill.skill}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.25 }}
+            initial={{ opacity: 0, transform: 'translateY(8px)' }}
+            animate={{ opacity: 1, transform: 'translateY(0px)' }}
+            transition={{ delay: index * 0.05, duration: 0.25, ease: EASE_OUT }}
             className="rounded-2xl border border-border bg-surface p-5"
           >
             <fieldset>

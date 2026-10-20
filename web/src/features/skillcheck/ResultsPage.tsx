@@ -10,6 +10,7 @@ import { AGENTS } from '../../shared/ui/agents'
 import { Spinner } from '../../shared/ui/Spinner'
 import { useRequestPlan } from '../plan/api'
 import { LEVELS, gapNote, useResults, type SkillResult } from './api'
+import { EASE_OUT } from '../../shared/ui/motion'
 
 const levelName = (level: number) => LEVELS.find((l) => l.value === level)?.label ?? `Level ${level}`
 // What the check found reads better as a starting point than "Never used" for someone who has tried it.
@@ -71,9 +72,9 @@ function SkillCard({ skill, index }: { skill: SkillResult; index: number }) {
   const changed = skill.assessedLevel !== skill.selfRating
   return (
     <motion.article
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 + index * 0.05, duration: 0.25 }}
+      initial={{ opacity: 0, transform: 'translateY(8px)' }}
+      animate={{ opacity: 1, transform: 'translateY(0px)' }}
+      transition={{ delay: 0.2 + index * 0.05, duration: 0.25, ease: EASE_OUT }}
       className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5"
     >
       <h2 className="font-medium text-ink">{skill.skill}</h2>

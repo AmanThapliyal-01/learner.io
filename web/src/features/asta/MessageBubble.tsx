@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 
 import { AgentAvatar } from '../../shared/ui/AgentAvatar'
 import { cn } from '../../shared/ui/cn'
+import { EASE_OUT } from '../../shared/ui/motion'
 
 /** Renders **bold** inside plain text; everything else stays as typed (line breaks preserved by CSS). */
 function withEmphasis(text: string): ReactNode[] {
@@ -27,9 +28,9 @@ export function MessageBubble({ role, text, children, animate }: MessageBubblePr
   const isAsta = role === 'assistant'
   return (
     <motion.li
-      initial={animate ? { opacity: 0, y: 6 } : false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      initial={animate ? { opacity: 0, transform: 'translateY(6px)' } : false}
+      animate={{ opacity: 1, transform: 'translateY(0px)' }}
+      transition={{ duration: 0.2, ease: EASE_OUT }}
       className={cn('flex gap-3', isAsta ? 'justify-start' : 'justify-end')}
     >
       {isAsta && <AstaAvatar />}

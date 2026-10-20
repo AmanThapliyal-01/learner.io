@@ -10,4 +10,7 @@ public class ChatMessage : Entity
 
     /// <summary>Structured tool call or result attached to the message, e.g. the goal summary card (JSON).</summary>
     public string? ToolPayload { get; set; }
+
+    /// <summary>Asta's reply only: what the goal card still needed when it answered, as a JSON checklist.</summary>
+    public string? Progress { get; set; }
 }

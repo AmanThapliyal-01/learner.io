@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { FieldShell, inputClass } from './Field'
 import { cn } from './cn'
+import { EASE_OUT, EXIT } from './motion'
 
 interface TagInputProps {
   label: string
@@ -72,8 +73,8 @@ export function TagInput({ label, value, onChange, placeholder, hint, error, opt
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.15 }}
+                  exit={{ opacity: 0, scale: 0.9, transition: EXIT }}
+                  transition={{ duration: 0.15, ease: EASE_OUT }}
                   className="flex items-center gap-1 rounded-lg bg-primary-soft py-1 pr-1 pl-2.5 text-sm text-primary"
                 >
                   {tag}

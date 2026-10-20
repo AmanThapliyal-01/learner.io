@@ -201,6 +201,10 @@ namespace Learner.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("goal_id");
 
+                    b.Property<string>("Progress")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("progress");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(32)

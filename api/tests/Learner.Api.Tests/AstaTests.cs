@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Learner.Api.Tests.Infrastructure;
 using Learner.Application.Learning.Asta;
 using Learner.Domain.Learning;
@@ -22,6 +23,21 @@ public class AstaTests(LearnerApiFactory factory) : IClassFixture<LearnerApiFact
         Assert.Equal(["user", "assistant"], messages.Select(m => m.GetProperty("role").GetString()));
         Assert.Equal("Great goal. How many hours a week?", messages[1].GetProperty("content").GetString());
         Assert.Equal("chatting", conversation.GetProperty("stage").GetString());
+    }
+
+    [Fact]
+    public async Task Goal_checklist_streams_live_and_survives_a_reload()
+    {
+        var journey = await new Journey(factory).OnboardedAsync();
+        var checklist = JsonSerializer.SerializeToElement(new[] { new { label = "Goal", done = true }, new { label = "Why now", done = false } });
+        factory.Asta.Reply = _ => [new AstaAgentEvent(AstaAgentEvent.ProgressType, Progress: checklist), .. FakeAstaAgent.Says("Why now?")];
+
+        var events = await journey.SendToAstaAsync("I want to become an AI engineer");
+
+        Assert.Equal(["progress", "token", "done"], events.Select(e => e.GetProperty("type").GetString()));
+        Assert.Equal("Goal", events[0].GetProperty("progress")[0].GetProperty("label").GetString());
+        var conversation = await journey.GetJsonAsync("/api/asta/conversation");
+        Assert.False(conversation.GetProperty("progress")[1].GetProperty("done").GetBoolean());
     }
 
     [Fact]

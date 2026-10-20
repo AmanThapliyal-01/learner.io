@@ -87,6 +87,8 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   /* Display face for headlines only: a grotesque with character, used with restraint. */
   --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* One strong ease-out for everything that enters or responds (replaces Tailwind's weaker default). */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 body {
@@ -125,4 +127,38 @@ body {
 /* Headings receive focus after navigation (for screen readers); no ring for that programmatic focus. */
 h1[tabindex='-1']:focus {
   outline: none;
+}
+
+/*
+ * Native dialogs settle in from 96% (centred, like any modal) and leave faster than they arrive: 200ms in,
+ * 120ms out. The backdrop fades with them. Reduced motion collapses both to the global near-zero duration.
+ */
+dialog.motion-dialog,
+dialog.motion-dialog::backdrop {
+  opacity: 0;
+  transition:
+    opacity 120ms var(--ease-out),
+    transform 120ms var(--ease-out),
+    overlay 120ms allow-discrete,
+    display 120ms allow-discrete;
+}
+dialog.motion-dialog {
+  transform: scale(0.96);
+}
+dialog.motion-dialog[open],
+dialog.motion-dialog[open]::backdrop {
+  opacity: 1;
+  transition-duration: 200ms;
+}
+dialog.motion-dialog[open] {
+  transform: scale(1);
+}
+@starting-style {
+  dialog.motion-dialog[open],
+  dialog.motion-dialog[open]::backdrop {
+    opacity: 0;
+  }
+  dialog.motion-dialog[open] {
+    transform: scale(0.96);
+  }
 }

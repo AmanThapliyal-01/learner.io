@@ -34,16 +34,20 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
   const [hours, setHours] = useState(goal.hoursPerWeek)
   // The entrance plays once; after the first edit, bars follow the sliders without the stagger.
   const [live, setLive] = useState(false)
+  // While a bar is being dragged (or nudged with arrow keys) it follows the input with no lag.
+  const [tracking, setTracking] = useState(false)
 
   const pickGoal = (next: DemoGoal) => {
     setGoal(next)
     setLevels(next.skills.map((skill) => skill.start))
     setHours(next.hoursPerWeek)
     setLive(true)
+    setTracking(false)
   }
   const rate = (index: number, level: number) => {
     setLevels((current) => current.map((value, i) => (i === index ? level : value)))
     setLive(true)
+    setTracking(true)
   }
 
   const rows = goal.skills.map((skill, index) => ({
@@ -92,6 +96,7 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
         className="mt-4"
         delay={0.5}
         live={live}
+        tracking={tracking}
         renderControl={(row, index) => (
           <RangeInput
             overlay

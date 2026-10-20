@@ -8,6 +8,7 @@ import { useMe } from '../auth/api'
 import { clearPlanDraft, readPlanDraft } from '../landing/planDraft'
 import { useConfirmGoal, useConversation } from './api'
 import { Composer, type ComposerHandle } from './Composer'
+import { GoalChecklist } from './GoalChecklist'
 import { GoalSummaryCard } from './GoalSummaryCard'
 import { MessageBubble, TypingIndicator } from './MessageBubble'
 import { useAstaChat } from './useAstaChat'
@@ -86,6 +87,7 @@ export function AstaPage() {
   if (loadError) return <Alert>We couldn't load your conversation. Refresh to try again.</Alert>
 
   const firstName = me?.fullName?.split(' ')[0]
+  const progress = chat.pending?.progress ?? conversation?.progress
   const prefill = messages.length === 0 && !chat.pending ? draft : undefined
 
   return (
@@ -99,6 +101,7 @@ export function AstaPage() {
           {chat.isStreaming ? 'Asta is replying' : announcement}
         </span>
       </header>
+      {chatting && progress && progress.length > 0 && <GoalChecklist items={progress} />}
 
       <div ref={log} onScroll={onLogScroll} className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
         <ol className="flex flex-col gap-5">

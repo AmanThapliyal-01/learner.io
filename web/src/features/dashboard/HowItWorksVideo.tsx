@@ -54,7 +54,7 @@ export function HowItWorksVideo() {
         onClick={(event) => {
           if (event.target === event.currentTarget) close() // a click on the backdrop
         }}
-        className="m-auto w-[min(56rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-3 text-ink shadow-xl backdrop:bg-black/60 backdrop:backdrop-blur-[2px] sm:p-4"
+        className="motion-dialog m-auto w-[min(56rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-3 text-ink shadow-xl backdrop:bg-black/60 backdrop:backdrop-blur-[2px] sm:p-4"
       >
         <div className="flex items-center justify-between gap-3 px-1 pb-3">
           <h2 id={titleId} className="font-display text-lg font-semibold">

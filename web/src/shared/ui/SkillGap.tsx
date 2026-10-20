@@ -22,6 +22,8 @@ interface SkillGapProps {
   delay?: number
   /** Rows are being edited live (e.g. by sliders): changes animate at once, without the entrance stagger. */
   live?: boolean
+  /** The user is dragging a value: bars follow it instantly instead of easing behind the pointer. */
+  tracking?: boolean
   /** An input rendered under each bar, e.g. a slider to change `current`. */
   renderControl?: (row: SkillGapRow, index: number) => ReactNode
 }
@@ -30,14 +32,14 @@ interface SkillGapProps {
  * The product's signature: what you already know (solid) versus what your goal needs (the gap).
  * Meaning is carried by text too (note + accessible label), never by color alone.
  */
-export function SkillGap({ rows, className, delay = 0, live, renderControl }: SkillGapProps) {
+export function SkillGap({ rows, className, delay = 0, live, tracking, renderControl }: SkillGapProps) {
   return (
     <ul className={cn('flex flex-col gap-4', className)}>
       {rows.map((row, index) => {
         const covered = row.current >= row.target
         const rowDelay = live ? 0 : delay + index * 0.12
         const gapDelay = live ? 0 : rowDelay + 0.45
-        const duration = live ? 0.3 : undefined
+        const duration = live ? (tracking ? 0 : 0.3) : undefined
         return (
           <li key={row.skill}>
             <span className="sr-only">

@@ -8,15 +8,17 @@ public sealed record AstaTurn(string Role, string Content, JsonElement? GoalSumm
 
 public sealed record AstaAgentRequest(ProfileSnapshot? Profile, IReadOnlyList<AstaTurn> Messages);
 
-/// <summary>An event streamed by the agents service: token, goal_summary, done or error.</summary>
+/// <summary>An event streamed by the agents service: progress, token, goal_summary, done or error.</summary>
 public sealed record AstaAgentEvent(
     string Type,
     string? Text = null,
     JsonElement? GoalSummary = null,
+    JsonElement? Progress = null,
     string? Model = null,
     string? Code = null,
     DateTimeOffset? RetryAt = null)
 {
+    public const string ProgressType = "progress";
     public const string Token = "token";
     public const string GoalSummaryType = "goal_summary";
     public const string Done = "done";

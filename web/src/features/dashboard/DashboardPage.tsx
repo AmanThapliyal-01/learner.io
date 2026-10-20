@@ -14,6 +14,7 @@ import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { useRegeneratePlan } from '../plan/api'
 import { useDashboard, type Dashboard } from './api'
 import { HowItWorksVideo } from './HowItWorksVideo'
+import { EASE_OUT } from '../../shared/ui/motion'
 
 function greeting(now = new Date()) {
   const hour = now.getHours()
@@ -131,9 +132,9 @@ const FIRST_STEPS = [
 function EmptyState() {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      initial={{ opacity: 0, transform: 'translateY(12px)' }}
+      animate={{ opacity: 1, transform: 'translateY(0px)' }}
+      transition={{ duration: 0.35, ease: EASE_OUT }}
       className="grid gap-8 overflow-hidden rounded-3xl border border-border bg-surface p-6 sm:p-10 md:grid-cols-[1.2fr_1fr]"
       aria-labelledby="empty-title"
     >
@@ -157,9 +158,9 @@ function EmptyState() {
         {FIRST_STEPS.map((step, index) => (
           <motion.li
             key={step.title}
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 + index * 0.08, duration: 0.3 }}
+            initial={{ opacity: 0, transform: 'translateX(12px)' }}
+            animate={{ opacity: 1, transform: 'translateX(0px)' }}
+            transition={{ delay: 0.15 + index * 0.08, duration: 0.3, ease: EASE_OUT }}
             className="flex gap-4 rounded-2xl bg-surface-muted p-4"
           >
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-on-primary">

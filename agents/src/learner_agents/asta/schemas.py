@@ -7,7 +7,12 @@ from pydantic import BaseModel, Field, ValidationError
 from learner_agents.core.context import Budget, GoalSummary, GoalType, LearningStyle, ProfileContext
 from learner_agents.core.text import plain
 
-__all__ = ["AstaRequest", "ChatTurn", "GoalDraft", "GoalSummary", "ProfileContext"]
+__all__ = ["AstaRequest", "ChatTurn", "ChecklistItem", "GoalDraft", "GoalSummary", "ProfileContext"]
+
+
+class ChecklistItem(BaseModel):
+    label: str
+    done: bool
 
 
 class GoalDraft(BaseModel):
@@ -33,18 +38,25 @@ class GoalDraft(BaseModel):
         default=False, description="True if the user's latest message asks Asta something that needs an answer"
     )
 
+    def _checks(self) -> list[tuple[bool, str, str]]:
+        """Each item the card needs: (known, how Asta asks about it, how the user sees it), in asking order."""
+        return [
+            (bool(self.target_outcome and self.goal_type), "what exactly they want to achieve", "Goal"),
+            (bool(self.motivation), "why they want it now", "Why now"),
+            (bool(self.hours_per_week), "hours per week", "Hours a week"),
+            (self.timeline_discussed, "a timeline or deadline (no deadline is fine)", "Timeline"),
+            (bool(self.learning_style), "learning style: video, reading, hands-on or mixed", "Learning style"),
+            (bool(self.budget), "budget: free resources only or paid is OK", "Budget"),
+            (bool(self.skills), "which skills to assess (propose up to 6)", "Skills to check"),
+        ]
+
     def missing(self) -> list[str]:
         """Plain-language names of the items Asta still has to find out, in the order it should ask."""
-        checks = [
-            (self.target_outcome and self.goal_type, "what exactly they want to achieve"),
-            (self.motivation, "why they want it now"),
-            (self.hours_per_week, "hours per week"),
-            (self.timeline_discussed, "a timeline or deadline (no deadline is fine)"),
-            (self.learning_style, "learning style: video, reading, hands-on or mixed"),
-            (self.budget, "budget: free resources only or paid is OK"),
-            (self.skills, "which skills to assess (propose up to 6)"),
-        ]
-        return [label for known, label in checks if not known]
+        return [ask for known, ask, _ in self._checks() if not known]
+
+    def checklist(self) -> list["ChecklistItem"]:
+        """What the user sees beside the chat: the same items, settled or not, so they know how close the card is."""
+        return [ChecklistItem(label=label, done=known) for known, _, label in self._checks()]
 
     def to_summary(self) -> GoalSummary | None:
         """The card, once everything is known."""
