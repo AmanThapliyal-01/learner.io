@@ -10,6 +10,7 @@ import { AGENTS } from '../../shared/ui/agents'
 import { Spinner } from '../../shared/ui/Spinner'
 import { useRequestPlan } from '../plan/api'
 import { LEVELS, gapNote, useResults, type SkillResult } from './api'
+import { EASE_OUT } from '../../shared/ui/motion'
 
 const levelName = (level: number) => LEVELS.find((l) => l.value === level)?.label ?? `Level ${level}`
 // What the check found reads better as a starting point than "Never used" for someone who has tried it.
@@ -33,8 +34,8 @@ export function ResultsPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-ink-muted">{results.goalTitle}</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Here's where you stand</h1>
+        <p className="text-small font-medium text-ink-muted">{results.goalTitle}</p>
+        <h1 className="mt-1 font-display text-heading font-semibold tracking-tight">Here's where you stand</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           Your plan will skip what you already know and spend your time on the gaps.
         </p>
@@ -58,7 +59,7 @@ export function ResultsPage() {
         <Button size="lg" loading={requestPlan.isPending} onClick={() => requestPlan.mutate(undefined, { onSuccess: () => navigate('/plan') })}>
           Build my plan
         </Button>
-        <p className="flex items-center gap-2 text-sm text-ink-muted">
+        <p className="flex items-center gap-2 text-small text-ink-muted">
           <AgentAvatar agent="anbu" className="size-5" />
           {AGENTS.anbu.name}, our planning agent, builds it in under a minute.
         </p>
@@ -71,13 +72,13 @@ function SkillCard({ skill, index }: { skill: SkillResult; index: number }) {
   const changed = skill.assessedLevel !== skill.selfRating
   return (
     <motion.article
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 + index * 0.05, duration: 0.25 }}
+      initial={{ opacity: 0, transform: 'translateY(8px)' }}
+      animate={{ opacity: 1, transform: 'translateY(0px)' }}
+      transition={{ delay: 0.2 + index * 0.05, duration: 0.25, ease: EASE_OUT }}
       className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5"
     >
       <h2 className="font-medium text-ink">{skill.skill}</h2>
-      <p className="text-sm text-ink-muted">
+      <p className="text-small text-ink-muted">
         {skill.score === null ? (
           <>Not tested: you said you haven't used it yet.</>
         ) : (
@@ -103,8 +104,8 @@ function SkillCard({ skill, index }: { skill: SkillResult; index: number }) {
 function List({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <h3 className="text-xs font-medium tracking-wide text-ink-muted uppercase">{title}</h3>
-      <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5 text-sm text-ink">
+      <h3 className="text-small font-medium tracking-wide text-ink-muted uppercase">{title}</h3>
+      <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5 text-small text-ink">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}

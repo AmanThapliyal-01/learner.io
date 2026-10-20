@@ -13,7 +13,9 @@ import { useMe } from '../auth/api'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { useRegeneratePlan } from '../plan/api'
 import { useDashboard, type Dashboard } from './api'
+import { CurrentPhase } from './CurrentPhase'
 import { HowItWorksVideo } from './HowItWorksVideo'
+import { EASE_OUT } from '../../shared/ui/motion'
 
 function greeting(now = new Date()) {
   const hour = now.getHours()
@@ -28,7 +30,7 @@ export function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="font-display text-heading font-semibold tracking-tight">
           {greeting()}
           {firstName ? `, ${firstName}` : ''}.
         </h1>
@@ -110,16 +112,21 @@ function GoalStateCard({ dashboard }: { dashboard: Dashboard }) {
         />
       )
     case 'plan_ready':
-      return (
-        <StateCard
-          agent="anbu"
-          eyebrow={goalTitle}
-          title="Your plan is ready"
-          body={`${AGENTS.anbu.name} built it around the gap between what you know and what your goal needs.`}
-          action={<ButtonLink to="/plan">Open your plan</ButtonLink>}
-        />
-      )
+      return <CurrentPhase goalTitle={goalTitle} fallback={<PlanReadyCard goalTitle={goalTitle} />} />
   }
+}
+
+/** Shown if the plan itself can't be loaded: still points the way to it. */
+function PlanReadyCard({ goalTitle }: { goalTitle?: string }) {
+  return (
+    <StateCard
+      agent="anbu"
+      eyebrow={goalTitle}
+      title="Your plan is ready"
+      body={`${AGENTS.anbu.name} built it around the gap between what you know and what your goal needs.`}
+      action={<ButtonLink to="/plan">Open your plan</ButtonLink>}
+    />
+  )
 }
 
 const FIRST_STEPS = [
@@ -131,15 +138,15 @@ const FIRST_STEPS = [
 function EmptyState() {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      initial={{ opacity: 0, transform: 'translateY(12px)' }}
+      animate={{ opacity: 1, transform: 'translateY(0px)' }}
+      transition={{ duration: 0.35, ease: EASE_OUT }}
       className="grid gap-8 overflow-hidden rounded-3xl border border-border bg-surface p-6 sm:p-10 md:grid-cols-[1.2fr_1fr]"
       aria-labelledby="empty-title"
     >
       <div className="flex flex-col items-start gap-4">
         <Illustration name="sproutChat" className="-mb-1 w-24 sm:w-28" />
-        <h2 id="empty-title" className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h2 id="empty-title" className="font-display text-title font-semibold tracking-tight">
           Let's work out what you'll learn.
         </h2>
         <p className="max-w-md text-ink-muted">
@@ -157,17 +164,17 @@ function EmptyState() {
         {FIRST_STEPS.map((step, index) => (
           <motion.li
             key={step.title}
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 + index * 0.08, duration: 0.3 }}
+            initial={{ opacity: 0, transform: 'translateX(12px)' }}
+            animate={{ opacity: 1, transform: 'translateX(0px)' }}
+            transition={{ delay: 0.15 + index * 0.08, duration: 0.3, ease: EASE_OUT }}
             className="flex gap-4 rounded-2xl bg-surface-muted p-4"
           >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-on-primary">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-small font-semibold text-on-primary">
               {index + 1}
             </span>
             <span>
               <span className="block font-medium">{step.title}</span>
-              <span className="block text-sm text-ink-muted">{step.detail}</span>
+              <span className="block text-small text-ink-muted">{step.detail}</span>
             </span>
           </motion.li>
         ))}
@@ -190,8 +197,8 @@ function StateCard({ title, body, action, agent, eyebrow }: StateCardProps) {
     <section className="flex flex-col items-start gap-4 rounded-3xl border border-border bg-surface p-6 sm:p-10">
       {agent && <AgentAvatar agent={agent} className="size-10" />}
       <div>
-        {eyebrow && <p className="text-sm font-medium text-ink-muted">{eyebrow}</p>}
-        <h2 className="font-display text-2xl font-semibold tracking-tight">{title}</h2>
+        {eyebrow && <p className="text-small font-medium text-ink-muted">{eyebrow}</p>}
+        <h2 className="font-display text-title font-semibold">{title}</h2>
       </div>
       <p className="max-w-xl text-ink-muted">{body}</p>
       {action}

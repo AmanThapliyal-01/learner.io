@@ -9,16 +9,16 @@ const base =
   'active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-primary text-on-primary shadow-sm hover:bg-primary-hover',
+  primary: 'bg-primary text-on-primary hover:bg-primary-hover',
   secondary: 'border border-border-strong bg-surface text-ink hover:bg-surface-muted',
   ghost: 'text-ink-muted hover:bg-surface-muted hover:text-ink',
-  danger: 'bg-danger text-on-danger shadow-sm hover:brightness-95',
+  danger: 'bg-danger text-on-danger hover:brightness-95',
 }
 
 // 44px minimum hit target on every size.
 const sizes: Record<Size, string> = {
-  md: 'min-h-11 px-4 text-[15px]',
-  lg: 'min-h-12 px-6 text-base',
+  md: 'min-h-11 px-4 text-body',
+  lg: 'min-h-12 px-6 text-body',
 }
 
 export interface StyleProps {

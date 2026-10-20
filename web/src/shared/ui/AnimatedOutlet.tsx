@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'motion/react'
 import { useLocation, useOutlet } from 'react-router'
 
+import { EASE_OUT } from './motion'
+
 /**
  * Route outlet. The new page appears at once and fades in briefly; there is no exit animation to wait for,
  * because switching sections is the most frequent interaction in the app (HIG motion › avoid motion on
@@ -43,7 +45,7 @@ export function AnimatedOutlet({ className }: { className?: string }) {
       className={className}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
+      transition={{ duration: 0.15, ease: EASE_OUT }}
     >
       {outlet}
     </motion.div>

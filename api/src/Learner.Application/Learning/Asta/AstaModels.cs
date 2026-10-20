@@ -9,7 +9,8 @@ public sealed record SendMessageRequest([Required, MinLength(1), MaxLength(4000)
 
 public sealed record ChatMessageResponse(Guid Id, string Role, string Content, JsonElement? GoalSummary, DateTimeOffset CreatedAt);
 
-public sealed record ConversationResponse(Guid? GoalId, GoalStage? Stage, IReadOnlyList<ChatMessageResponse> Messages);
+/// <summary>Progress is the latest goal checklist from Asta: what the card has and what it still needs.</summary>
+public sealed record ConversationResponse(Guid? GoalId, GoalStage? Stage, IReadOnlyList<ChatMessageResponse> Messages, JsonElement? Progress = null);
 
 /// <summary>What the browser receives over SSE for one Asta turn.</summary>
 public sealed record AstaStreamEvent(
@@ -18,7 +19,8 @@ public sealed record AstaStreamEvent(
     JsonElement? GoalSummary = null,
     string? Code = null,
     DateTimeOffset? RetryAt = null,
-    Guid? MessageId = null);
+    Guid? MessageId = null,
+    JsonElement? Progress = null);
 
 /// <summary>An accepted user message, ready for Asta to answer.</summary>
 public sealed record AstaTurnContext(Guid GoalId, Guid UserMessageId, AstaAgentRequest AgentRequest);

@@ -17,7 +17,7 @@ export function GoogleButton({ label }: { label: string }) {
         </svg>
         {label}
       </a>
-      <div className="flex items-center gap-3 text-xs text-ink-muted" aria-hidden>
+      <div className="flex items-center gap-3 text-small text-ink-muted" aria-hidden>
         <span className="h-px flex-1 bg-border" />
         or with email
         <span className="h-px flex-1 bg-border" />

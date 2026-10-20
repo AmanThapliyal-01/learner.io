@@ -26,3 +26,7 @@ __pycache__/
 Thumbs.db
 .idea/
 .vscode/
+
+# Local design-review artifacts (impeccable snapshots, taste-skill screenshots)
+.impeccable/
+.taste-skill/

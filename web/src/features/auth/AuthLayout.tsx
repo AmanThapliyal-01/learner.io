@@ -18,10 +18,10 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
         <Logo />
         <div className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-sm">
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">{title}</h1>
+            <h1 className="font-display text-heading font-semibold tracking-tight text-ink">{title}</h1>
             <p className="mt-2 text-ink-muted">{subtitle}</p>
             <div className="mt-8 flex flex-col gap-5">{children}</div>
-            <p className="mt-8 text-center text-sm text-ink-muted">{footer}</p>
+            <p className="mt-8 text-center text-small text-ink-muted">{footer}</p>
           </div>
         </div>
       </main>
@@ -33,8 +33,8 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="w-full max-w-md rounded-3xl border border-border bg-surface p-7 shadow-[0_24px_60px_-28px_rgba(20,60,50,0.35)]"
         >
-          <p className="text-sm font-medium text-ink-muted">Goal · AI engineer</p>
-          <p className="mt-1 font-display text-xl font-semibold text-ink">Your plan skips what you know.</p>
+          <p className="text-small font-medium text-ink-muted">Goal · AI engineer</p>
+          <p className="mt-1 font-display text-title font-semibold text-ink">Your plan skips what you know.</p>
           <SkillGap rows={sampleGap} className="mt-6" delay={0.3} />
           <div className="mt-6 border-t border-border pt-4">
             <SkillGapLegend />

@@ -12,7 +12,7 @@ export function RouteErrorPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-5 px-4 text-center">
       <Logo />
-      <h1 className="font-display text-3xl font-semibold tracking-tight">
+      <h1 className="font-display text-heading font-semibold tracking-tight">
         {notFound ? "This page doesn't exist." : 'Something went wrong on this page.'}
       </h1>
       <p className="max-w-md text-ink-muted">

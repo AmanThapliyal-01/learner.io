@@ -62,7 +62,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
         placeholder={placeholder}
         onChange={(event) => setText(event.target.value)}
         onKeyDown={onKeyDown}
-        className="field-sizing-content max-h-40 min-h-11 flex-1 resize-none bg-transparent px-2.5 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-muted focus:outline-none"
+        className="field-sizing-content max-h-40 min-h-11 flex-1 resize-none bg-transparent px-2.5 py-2.5 text-body leading-relaxed text-ink placeholder:text-ink-muted focus:outline-none"
       />
       <button
         type="submit"

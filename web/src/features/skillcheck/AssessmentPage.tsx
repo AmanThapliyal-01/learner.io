@@ -7,23 +7,14 @@ import { Alert } from '../../shared/ui/Alert'
 import { Button, ButtonLink } from '../../shared/ui/Button'
 import { cn } from '../../shared/ui/cn'
 import { inputClass } from '../../shared/ui/Field'
-import { useAssessment, useSubmitAnswers, type AssessmentQuestion } from './api'
+import { useSavedDraft } from '../../shared/forms/useSavedDraft'
+import { useAssessment, useSubmitAnswers, type Assessment, type AssessmentQuestion } from './api'
 import { WorkingCard } from '../../shared/ui/WorkingCard'
 
 const LETTERS = ['A', 'B', 'C', 'D']
 
 export function AssessmentPage() {
-  const navigate = useNavigate()
   const { data: assessment, isPending, error, refetch, isRefetching } = useAssessment()
-  const submit = useSubmitAnswers()
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [confirmingBlanks, setConfirmingBlanks] = useState(false)
-
-  const bySkill = useMemo(() => {
-    const groups = new Map<string, AssessmentQuestion[]>()
-    for (const question of assessment?.questions ?? []) groups.set(question.skill, [...(groups.get(question.skill) ?? []), question])
-    return [...groups.entries()]
-  }, [assessment])
 
   if (isPending) {
     return (
@@ -49,6 +40,23 @@ export function AssessmentPage() {
     )
   }
   if (assessment.status === 'Completed') return <Navigate to="/assessment/results" replace />
+  return <AssessmentForm assessment={assessment} />
+}
+
+/** The check itself. Answers are saved on this device as they're given, so nothing is lost before submitting. */
+function AssessmentForm({ assessment }: { assessment: Assessment }) {
+  const navigate = useNavigate()
+  const submit = useSubmitAnswers()
+  const draft = useSavedDraft<Record<string, string>>(`skillcheck.${assessment.id}`, {})
+  const answers = draft.value
+  const [confirmingBlanks, setConfirmingBlanks] = useState(false)
+
+  const bySkill = useMemo(() => {
+    const groups = new Map<string, AssessmentQuestion[]>()
+    for (const question of assessment.questions) groups.set(question.skill, [...(groups.get(question.skill) ?? []), question])
+    return [...groups.entries()]
+  }, [assessment])
+
   if (submit.isPending) {
     return <WorkingCard title="Checking your answers" body="Grading short answers and working out your level in each skill." />
   }
@@ -63,15 +71,20 @@ export function AssessmentPage() {
     }
     submit.mutate(
       assessment.questions.map((q) => ({ questionId: q.id, answer: answers[q.id]?.trim() || null })),
-      { onSuccess: () => navigate('/assessment/results', { replace: true }) },
+      {
+        onSuccess: () => {
+          draft.clear()
+          navigate('/assessment/results', { replace: true })
+        },
+      },
     )
   }
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-ink-muted">Step 2 of 2</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Quick skill check</h1>
+        <p className="text-small font-medium text-ink-muted">Step 2 of 2</p>
+        <h1 className="mt-1 font-display text-heading font-semibold tracking-tight">Quick skill check</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           {total} questions. Answer from what you know; guessing only makes your plan less accurate.
           {assessment.skippedSkills.length > 0 && ` Skipped, since you haven't used them yet: ${assessment.skippedSkills.join(', ')}.`}
@@ -79,10 +92,11 @@ export function AssessmentPage() {
       </header>
 
       <div className="sticky top-16 z-[5] -mx-4 border-b border-border bg-bg/90 px-4 py-3 backdrop-blur-md sm:mx-0 sm:rounded-xl sm:border">
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between gap-3 text-small">
           <span className="text-ink-muted" aria-live="polite">
             {answered} of {total} answered
           </span>
+          <span className="text-ink-muted">{draft.restored && answered > 0 ? 'Picked up where you left off' : 'Saved as you go'}</span>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-muted" aria-hidden>
           <motion.div className="h-full rounded-full bg-primary" animate={{ width: `${(answered / total) * 100}%` }} transition={{ duration: 0.3 }} />
@@ -91,7 +105,7 @@ export function AssessmentPage() {
 
       {bySkill.map(([skill, questions]) => (
         <section key={skill} aria-label={skill} className="flex flex-col gap-4">
-          <h2 className="font-display text-xl font-semibold">{skill}</h2>
+          <h2 className="font-display text-title font-semibold">{skill}</h2>
           {questions.map((question) => (
             <QuestionCard
               key={question.id}
@@ -99,7 +113,7 @@ export function AssessmentPage() {
               number={assessment.questions.indexOf(question) + 1}
               answer={answers[question.id] ?? ''}
               onAnswer={(value) => {
-                setAnswers((current) => ({ ...current, [question.id]: value }))
+                draft.setValue((current) => ({ ...current, [question.id]: value }))
                 setConfirmingBlanks(false)
               }}
             />
@@ -152,13 +166,13 @@ function QuestionCard({ question, number, answer, onAnswer }: QuestionCardProps)
                 <span
                   aria-hidden
                   className={cn(
-                    'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold',
+                    'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md text-small font-semibold',
                     selected ? 'bg-primary text-on-primary' : 'bg-surface-muted text-ink-muted',
                   )}
                 >
                   {LETTERS[index]}
                 </span>
-                <span className="text-[15px] text-ink">{option}</span>
+                <span className="text-body text-ink">{option}</span>
               </label>
             )
           })}

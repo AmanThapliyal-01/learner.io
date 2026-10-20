@@ -25,13 +25,22 @@ export interface ChatMessage {
 
 export type GoalStage = 'chatting' | 'rating' | 'assessing' | 'confirmed'
 
+/** One item the goal card needs, and whether the conversation has settled it. */
+export interface ChecklistItem {
+  label: string
+  done: boolean
+}
+
 export interface Conversation {
   goalId: string | null
   stage: GoalStage | null
   messages: ChatMessage[]
+  /** Asta's latest checklist toward the goal card; null before the first reply. */
+  progress?: ChecklistItem[] | null
 }
 
 export type AstaEvent =
+  | { type: 'progress'; progress: ChecklistItem[] }
   | { type: 'token'; text: string }
   | { type: 'goal_summary'; text: string; goalSummary: GoalSummary }
   | { type: 'done'; messageId?: string }

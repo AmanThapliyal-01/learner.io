@@ -17,7 +17,7 @@ from langchain_core.runnables import Runnable
 from pydantic import BaseModel
 
 from learner_agents.asta.prompt import chat_messages, extraction_messages
-from learner_agents.asta.schemas import AstaRequest, GoalDraft, GoalSummary
+from learner_agents.asta.schemas import AstaRequest, ChecklistItem, GoalDraft, GoalSummary
 from learner_agents.core.llm import AllModelsExhaustedError, FallbackChatGroq
 
 logger = logging.getLogger(__name__)
@@ -29,9 +29,11 @@ EMPTY_REPLY_ATTEMPTS = 2
 
 
 class AstaEvent(BaseModel):
-    type: Literal["token", "goal_summary", "done", "error"]
-    # token: a piece of the reply. goal_summary: the turn's whole text, shown above the card.
+    type: Literal["progress", "token", "goal_summary", "done", "error"]
+    # progress: what the goal card still needs, sent first. token: a piece of the reply.
+    # goal_summary: the turn's whole text, shown above the card.
     text: str | None = None
+    progress: list[ChecklistItem] | None = None
     goal_summary: GoalSummary | None = None
     model: str | None = None
     code: Literal["rate_limited", "agent_error"] | None = None
@@ -63,8 +65,8 @@ def _join_segment(reply: str, text: str) -> str:
     return text
 
 
-async def extract_draft(request: AstaRequest, extractor: Runnable[LanguageModelInput, GoalDraft]) -> GoalDraft:
-    """What the conversation has established. If extraction fails, Asta simply keeps asking."""
+async def extract_draft(request: AstaRequest, extractor: Runnable[LanguageModelInput, GoalDraft]) -> GoalDraft | None:
+    """What the conversation has established, or None if extraction failed (Asta then simply keeps asking)."""
     try:
         draft = await extractor.ainvoke(extraction_messages(request))
         return draft if isinstance(draft, GoalDraft) else GoalDraft.model_validate(draft)
@@ -72,14 +74,18 @@ async def extract_draft(request: AstaRequest, extractor: Runnable[LanguageModelI
         raise
     except Exception:
         logger.exception("Goal extraction failed; continuing the conversation without it")
-        return GoalDraft()
+        return None
 
 
 async def stream_reply(request: AstaRequest, models: AstaModels, *, web_search: bool = True) -> AsyncIterator[AstaEvent]:
     full: AIMessageChunk | None = None
     reply = ""
     try:
-        draft = await extract_draft(request, models.extractor)
+        extracted = await extract_draft(request, models.extractor)
+        draft = extracted or GoalDraft()
+        # Skipped when extraction failed, so a hiccup never wipes the checklist the user already sees.
+        if extracted is not None:
+            yield AstaEvent(type="progress", progress=draft.checklist())
         summary = draft.to_summary()
         if summary is not None and not draft.user_asked_question:
             yield AstaEvent(type="goal_summary", goal_summary=summary, text=CARD_INTRO)

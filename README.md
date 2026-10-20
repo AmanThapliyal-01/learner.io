@@ -12,9 +12,9 @@ Personalized learning plans built from what you actually know. See [PRD.md](PRD.
 ## First-time setup
 
 1. Start Postgres: `docker compose up -d`
-2. Agents secrets: copy `agents/.env.example` to `agents/.env` and fill in `GROQ_API_KEY` and `AGENT_SERVICE_TOKEN`.
-3. API secrets (same token as the agents service):
-   `dotnet user-secrets set "AgentService:Token" "<token>" --project api/src/Learner.Api` (the agents URL defaults to `http://127.0.0.1:8001`)
+2. Shared secrets: copy `.env.example` (repo root) to `.env` and set `AGENT_SERVICE_TOKEN` to any long random string. Both the API (in Development) and the agents service read this file, so they always agree on the token, whichever terminal starts them.
+3. Agents secrets: copy `agents/.env.example` to `agents/.env` and fill in `GROQ_API_KEY`.
+   Both `.env` files are gitignored. The agents URL defaults to `http://127.0.0.1:8001`.
 4. Apply database migrations:
    `cd api && dotnet tool restore && dotnet ef database update -p src/Learner.Infrastructure -s src/Learner.Api`
 5. Install web dependencies: `cd web && npm install`
@@ -57,7 +57,11 @@ The Google button only appears once the API has credentials:
 
 1. Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID → Web application.
 2. Authorized redirect URI: `http://localhost:5173/signin-google` (the web dev server proxies it to the API).
-3. Save the values as API user secrets:
-   `dotnet user-secrets set "Authentication:Google:ClientId" "<id>" --project api/src/Learner.Api`
-   `dotnet user-secrets set "Authentication:Google:ClientSecret" "<secret>" --project api/src/Learner.Api`
+3. Add the values to the repo-root `.env`:
+   `Authentication__Google__ClientId=<id>`
+   `Authentication__Google__ClientSecret=<secret>`
 4. Restart the API.
+
+### Why `.env` and not `dotnet user-secrets`
+
+User-secrets live under `%APPDATA%`, and a packaged app such as the Claude desktop app sees its own private copy of that folder. Secrets set from inside it never reached an API started from a normal terminal: the API sent an empty token and the agents service answered 401. The repo-root `.env` is the same file for every process. The API also refuses to start if the token is missing, so a missing token fails at startup with a clear message rather than as a 401 later.

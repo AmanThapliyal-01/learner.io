@@ -13,8 +13,9 @@ import { WorkingCard } from '../../shared/ui/WorkingCard'
 import { ChangeGoalButton } from '../goal/ChangeGoalButton'
 import { anbuSteps } from './anbuSteps'
 import { useCurrentPlan, useRegeneratePlan, type PlanDocument, type ResourceKind } from './api'
+import { EASE_OUT, EXIT } from '../../shared/ui/motion'
+import { phaseWeeks, resourceSearchUrl, skillGapRows } from './planDocument'
 
-const STATUS_NOTE = { skip: 'Skip', refresh: 'Refresh', focus: 'Focus' } as const
 const KIND_LABEL: Record<ResourceKind, string> = {
   course: 'Course',
   docs: 'Docs',
@@ -58,7 +59,7 @@ export function PlanPage() {
   if (plan.phase === 'failed' || !plan.content) {
     return (
       <section className="mx-auto flex max-w-xl flex-col items-start gap-4 rounded-3xl border border-border bg-surface p-8">
-        <h1 className="font-display text-2xl font-semibold">Your plan didn't finish</h1>
+        <h1 className="font-display text-heading font-semibold tracking-tight">Your plan didn't finish</h1>
         <p className="text-ink-muted">Your goal and skill check are saved, so trying again picks up from there.</p>
         <Alert>{formErrorFrom(regenerate.error)}</Alert>
         <Button loading={regenerate.isPending} onClick={() => regenerate.mutate()}>
@@ -90,19 +91,19 @@ interface PlanViewProps {
 }
 
 function PlanView({ document, generatedAt, stale, regenerating, regenerateError, onRegenerate }: PlanViewProps) {
-  const rows = document.skills.map((s) => ({ skill: s.skill, current: s.current_level, target: s.target_level, note: STATUS_NOTE[s.status] }))
+  const rows = skillGapRows(document)
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-ink-muted">
+        <div className="flex flex-wrap items-center gap-2 text-small text-ink-muted">
           <span className="rounded-lg bg-primary-soft px-2.5 py-1 font-medium text-primary">
             {document.total_weeks} weeks · {document.hours_per_week} hrs a week
           </span>
         </div>
-        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Your learning plan</h1>
-        <p className="text-lg text-ink-muted">{document.summary}</p>
-        <p className="flex items-center gap-2 text-sm text-ink-muted">
+        <h1 className="font-display text-heading font-semibold tracking-tight">Your learning plan</h1>
+        <p className="text-title text-ink-muted">{document.summary}</p>
+        <p className="flex items-center gap-2 text-small text-ink-muted">
           <AgentAvatar agent="anbu" className="size-5" />
           <span>
             Built by {AGENTS.anbu.name} from your skill check
@@ -115,7 +116,7 @@ function PlanView({ document, generatedAt, stale, regenerating, regenerateError,
         <section className="flex flex-col gap-3 rounded-2xl border border-warning/30 bg-warning-soft p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-medium text-warning">This plan is over a month old</p>
-            <p className="text-sm text-ink-muted">Regenerate it from your goal and latest skill check to keep it current.</p>
+            <p className="text-small text-ink-muted">Regenerate it from your goal and latest skill check to keep it current.</p>
           </div>
           <Button loading={regenerating} onClick={onRegenerate}>
             Regenerate plan
@@ -125,7 +126,7 @@ function PlanView({ document, generatedAt, stale, regenerating, regenerateError,
       <Alert>{regenerateError}</Alert>
 
       <section aria-labelledby="start-heading" className="rounded-3xl border border-border bg-surface p-6 sm:p-8">
-        <h2 id="start-heading" className="font-display text-xl font-semibold">
+        <h2 id="start-heading" className="font-display text-title font-semibold">
           Where you're starting
         </h2>
         <p className="mt-2 text-ink-muted">{document.starting_point}</p>
@@ -136,17 +137,17 @@ function PlanView({ document, generatedAt, stale, regenerating, regenerateError,
       </section>
 
       <section aria-labelledby="phases-heading">
-        <h2 id="phases-heading" className="font-display text-xl font-semibold">
+        <h2 id="phases-heading" className="font-display text-title font-semibold">
           Phases
         </h2>
         <ol className="relative mt-4 flex flex-col gap-4 border-l-2 border-border pl-6">
           {document.phases.map((phase, index) => (
-            <PhaseCard key={phase.title} phase={phase} index={index} startWeek={1 + document.phases.slice(0, index).reduce((sum, p) => sum + p.weeks, 0)} />
+            <PhaseCard key={phase.title} phase={phase} index={index} weeks={phaseWeeks(document.phases, index)} />
           ))}
         </ol>
       </section>
 
-      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-sm text-ink-muted">
+      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-small text-ink-muted">
         <span>Want to learn something else instead?</span>
         <ChangeGoalButton variant="secondary" />
       </footer>
@@ -154,16 +155,21 @@ function PlanView({ document, generatedAt, stale, regenerating, regenerateError,
   )
 }
 
-function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][number]; index: number; startWeek: number }) {
+interface PhaseCardProps {
+  phase: PlanDocument['phases'][number]
+  index: number
+  weeks: { start: number; end: number }
+}
+
+function PhaseCard({ phase, index, weeks }: PhaseCardProps) {
   const [open, setOpen] = useState(index === 0)
-  const endWeek = startWeek + phase.weeks - 1
   const panelId = `phase-${index}`
 
   return (
     <motion.li
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.25 }}
+      initial={{ opacity: 0, transform: 'translateX(-8px)' }}
+      animate={{ opacity: 1, transform: 'translateX(0px)' }}
+      transition={{ delay: index * 0.06, duration: 0.25, ease: EASE_OUT }}
       className="relative"
     >
       <span
@@ -180,10 +186,10 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
           className="flex w-full items-start justify-between gap-4 rounded-2xl p-5 text-left hover:bg-surface-muted/60"
         >
           <span>
-            <span className="block text-sm text-ink-muted">
-              Phase {index + 1} · Weeks {startWeek}–{endWeek}
+            <span className="block text-small text-ink-muted">
+              Phase {index + 1} · Weeks {weeks.start}–{weeks.end}
             </span>
-            <span className="mt-0.5 block text-lg font-semibold text-ink">{phase.title}</span>
+            <span className="mt-0.5 block text-title font-semibold text-ink">{phase.title}</span>
             <span className="mt-1 block text-ink-muted">{phase.aim}</span>
           </span>
           <svg aria-hidden viewBox="0 0 16 16" className={cn('mt-1 size-5 shrink-0 text-ink-muted transition-transform', open && 'rotate-180')}>
@@ -197,11 +203,11 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
               id={panelId}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22 }}
+              exit={{ height: 0, opacity: 0, transition: EXIT }}
+              transition={{ duration: 0.22, ease: EASE_OUT }}
               className="overflow-hidden"
             >
-              <div className="grid gap-5 border-t border-border p-5 text-[15px]">
+              <div className="grid gap-5 border-t border-border p-5 text-body">
                 <Block title="You'll be able to">
                   <ul className="flex list-disc flex-col gap-1 pl-5">
                     {phase.objectives.map((item) => (
@@ -222,13 +228,16 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
                   <Block title="Resources">
                     <ul className="flex flex-col gap-2">
                       {phase.resources.map((resource) => (
-                        <li key={resource.title} className="rounded-xl bg-surface-muted p-3">
-                          <span className="flex flex-wrap items-center gap-2">
-                            <span className="font-medium">{resource.title}</span>
-                            <span className="rounded-md bg-surface px-1.5 py-0.5 text-xs text-ink-muted">{KIND_LABEL[resource.kind]}</span>
-                            {resource.free && <span className="rounded-md bg-primary-soft px-1.5 py-0.5 text-xs text-primary">Free</span>}
+                        <li key={resource.title} className="flex items-start justify-between gap-3 rounded-xl bg-surface-muted p-3">
+                          <span>
+                            <span className="flex flex-wrap items-center gap-2">
+                              <span className="font-medium">{resource.title}</span>
+                              <span className="rounded-md bg-surface px-1.5 py-0.5 text-small text-ink-muted">{KIND_LABEL[resource.kind]}</span>
+                              {resource.free && <span className="rounded-md bg-primary-soft px-1.5 py-0.5 text-small text-primary">Free</span>}
+                            </span>
+                            <span className="mt-1 block text-small text-ink-muted">{resource.why}</span>
                           </span>
-                          <span className="mt-1 block text-sm text-ink-muted">{resource.why}</span>
+                          <SearchLink title={resource.title} href={resourceSearchUrl(resource)} />
                         </li>
                       ))}
                     </ul>
@@ -246,8 +255,26 @@ function PhaseCard({ phase, index, startWeek }: { phase: PlanDocument['phases'][
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="text-xs font-medium tracking-wide text-ink-muted uppercase">{title}</h3>
+      <h3 className="text-small font-medium tracking-wide text-ink-muted uppercase">{title}</h3>
       <div className="mt-1.5 text-ink">{children}</div>
     </div>
+  )
+}
+
+/** Opens a web search for a resource in a new tab: the plan names resources but never invents their URLs. */
+function SearchLink({ title, href }: { title: string; href: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener"
+      className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2 text-small font-medium text-primary underline-offset-4 hover:underline"
+    >
+      Search
+      <span className="sr-only"> the web for {title} (opens in a new tab)</span>
+      <svg aria-hidden viewBox="0 0 16 16" className="size-3.5">
+        <path d="M6 3.5H3.5v9h9V10M9 3.5h3.5V7M12.5 3.5 7 9" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </a>
   )
 }

@@ -49,7 +49,7 @@ export function AppLayout() {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'flex min-h-11 items-center rounded-lg px-3 text-[15px] font-medium transition-colors',
+                    'flex min-h-11 items-center rounded-lg px-3 text-body font-medium transition-colors',
                     isActive ? 'bg-primary-soft text-primary' : 'text-ink-muted hover:bg-surface-muted hover:text-ink',
                   )
                 }
@@ -66,7 +66,7 @@ export function AppLayout() {
               title={me?.email}
               className="flex size-11 items-center justify-center rounded-full"
             >
-              <span aria-hidden className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-primary">
+              <span aria-hidden className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-small font-semibold text-primary">
                 {initial}
               </span>
             </Link>
@@ -95,7 +95,7 @@ export function AppLayout() {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors',
+                    'flex min-h-14 flex-col items-center justify-center gap-0.5 text-small font-medium transition-colors',
                     isActive ? 'text-primary' : 'text-ink-muted',
                   )
                 }

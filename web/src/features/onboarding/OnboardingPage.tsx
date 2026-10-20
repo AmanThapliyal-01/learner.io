@@ -41,7 +41,7 @@ export function OnboardingPage() {
     <div className="flex min-h-dvh flex-col px-4 py-6 sm:px-8">
       <header className="mx-auto flex w-full max-w-2xl items-center justify-between">
         <Logo />
-        <p className="text-sm text-ink-muted" aria-live="polite">
+        <p className="text-small text-ink-muted" aria-live="polite">
           Step {current + 1} of {STEPS.length}
         </p>
       </header>
@@ -65,7 +65,7 @@ export function OnboardingPage() {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             aria-labelledby="step-title"
           >
-            <h1 id="step-title" className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h1 id="step-title" className="font-display text-heading font-semibold tracking-tight">
               {STEPS[current].title}
             </h1>
             <p className="mt-2 max-w-xl text-ink-muted">{STEPS[current].subtitle}</p>

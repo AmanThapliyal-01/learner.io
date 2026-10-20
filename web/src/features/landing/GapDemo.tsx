@@ -34,16 +34,20 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
   const [hours, setHours] = useState(goal.hoursPerWeek)
   // The entrance plays once; after the first edit, bars follow the sliders without the stagger.
   const [live, setLive] = useState(false)
+  // While a bar is being dragged (or nudged with arrow keys) it follows the input with no lag.
+  const [tracking, setTracking] = useState(false)
 
   const pickGoal = (next: DemoGoal) => {
     setGoal(next)
     setLevels(next.skills.map((skill) => skill.start))
     setHours(next.hoursPerWeek)
     setLive(true)
+    setTracking(false)
   }
   const rate = (index: number, level: number) => {
     setLevels((current) => current.map((value, i) => (i === index ? level : value)))
     setLive(true)
+    setTracking(true)
   }
 
   const rows = goal.skills.map((skill, index) => ({
@@ -60,9 +64,9 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
   }
 
   return (
-    <div className="rounded-3xl border border-border bg-surface p-5 shadow-[0_30px_80px_-40px_rgba(20,60,50,0.45)] sm:p-7">
+    <div data-ui className="rounded-3xl bg-surface p-5 sm:p-7">
       <fieldset>
-        <legend className="text-sm text-ink-muted">Try it: pick a goal</legend>
+        <legend className="text-small text-ink-muted">Try it: pick a goal</legend>
         <div className="mt-2.5 flex flex-wrap gap-2">
           {DEMO_GOALS.map((option) => {
             const selected = option.id === goal.id
@@ -73,7 +77,7 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
                 aria-pressed={selected}
                 onClick={() => pickGoal(option)}
                 className={cn(
-                  'inline-flex min-h-11 items-center gap-1.5 px-3.5 text-sm font-medium',
+                  'inline-flex min-h-11 items-center gap-1.5 px-3.5 text-small font-medium',
                   choiceClass(selected),
                   selected ? 'text-primary' : 'text-ink',
                 )}
@@ -86,12 +90,13 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
         </div>
       </fieldset>
 
-      <p className="mt-6 text-sm font-medium text-ink">How well do you know each skill? Drag a bar to rate yourself.</p>
+      <p className="mt-6 text-small font-medium text-ink">How well do you know each skill? Drag a bar to rate yourself.</p>
       <SkillGap
         rows={rows}
         className="mt-4"
         delay={0.5}
         live={live}
+        tracking={tracking}
         renderControl={(row, index) => (
           <RangeInput
             overlay
@@ -109,8 +114,8 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
         <SkillGapLegend />
       </div>
 
-      <div className="mt-5 border-t border-border pt-4">
-        <div className="flex items-baseline justify-between gap-3 text-sm">
+      <div className="mt-6">
+        <div className="flex items-baseline justify-between gap-3 text-small">
           <label htmlFor={hoursId} className="font-medium text-ink">
             Hours a week
           </label>
@@ -136,14 +141,14 @@ export function GapDemo({ signedIn }: { signedIn: boolean }) {
             ) : (
               <>
                 About{' '}
-                <motion.strong key={estimate.weeks} initial={{ opacity: 0.4 }} animate={{ opacity: 1 }} className="font-display text-lg font-semibold">
+                <motion.strong key={estimate.weeks} initial={{ opacity: 0.4 }} animate={{ opacity: 1 }} className="font-display text-title font-semibold">
                   {plural(estimate.weeks, 'week')}
                 </motion.strong>
                 , instead of {estimate.fromZero} starting from zero.
               </>
             )}
           </p>
-          <p className="mt-1 text-xs text-ink-muted">Estimate. Your real plan comes from a short skill check.</p>
+          <p className="mt-1 text-small text-ink-muted">Estimate. Your real plan comes from a short skill check.</p>
         </div>
         <Button onClick={build} className="shrink-0">
           Build this plan
@@ -171,9 +176,9 @@ interface RangeInputProps {
 const overlayClass =
   'relative -mx-2.5 -mt-[23px] block h-9 w-[calc(100%+1.25rem)] cursor-grab appearance-none rounded-full bg-transparent active:cursor-grabbing ' +
   '[&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full ' +
-  '[&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:shadow-md ' +
+  '[&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:bg-surface ' +
   '[&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-primary ' +
-  '[&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:shadow-md [&::-moz-range-track]:bg-transparent ' +
+  '[&::-moz-range-thumb]:bg-surface [&::-moz-range-track]:bg-transparent ' +
   // Keyboard focus rings the thumb, not the whole row (which would cut through the label). `!` beats the global :focus-visible rule.
   'focus-visible:outline-none! focus-visible:[&::-webkit-slider-thumb]:ring-4 focus-visible:[&::-webkit-slider-thumb]:ring-primary/40 ' +
   'focus-visible:[&::-moz-range-thumb]:ring-4 focus-visible:[&::-moz-range-thumb]:ring-primary/40'

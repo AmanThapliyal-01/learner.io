@@ -70,8 +70,35 @@ def request(*user_messages: str) -> AstaRequest:
     return AstaRequest(messages=[ChatTurn(role="user", content=m) for m in user_messages])
 
 
-async def collect(m: AstaModels, req: AstaRequest | None = None):
-    return [event async for event in stream_reply(req or request("hi"), m)]
+async def collect(m: AstaModels, req: AstaRequest | None = None, *, with_progress: bool = False):
+    """The turn's events; the leading checklist event is left out unless a test is about it."""
+    events = [event async for event in stream_reply(req or request("hi"), m)]
+    return events if with_progress else [e for e in events if e.type != "progress"]
+
+
+async def test_each_turn_starts_with_the_goal_checklist():
+    draft = GoalDraft.model_validate({"motivation": "My team is adopting AI", "hours_per_week": 6})
+    events = await collect(models(draft, FakeChat(replies=[["What's the goal?"]])), with_progress=True)
+
+    assert events[0].type == "progress"
+    done = {item.label: item.done for item in events[0].progress or []}
+    assert done == {
+        "Goal": False, "Why now": True, "Hours a week": True, "Timeline": False,
+        "Learning style": False, "Budget": False, "Skills to check": False,
+    }
+
+
+async def test_failed_extraction_sends_no_checklist():
+    events = await collect(models(RuntimeError("bad json"), FakeChat(replies=[["Tell me more."]])), with_progress=True)
+
+    assert all(e.type != "progress" for e in events)
+
+
+async def test_complete_goal_checklist_is_all_done():
+    events = await collect(models(GoalDraft.model_validate(COMPLETE)), with_progress=True)
+
+    assert [e.type for e in events] == ["progress", "goal_summary", "done"]
+    assert all(item.done for item in events[0].progress or [])
 
 
 async def test_incomplete_goal_streams_asta_reply():

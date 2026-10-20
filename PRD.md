@@ -133,7 +133,7 @@ The planning agent is called **Anbu** (Tamil for "love" or "kindness"). Asta tal
 
 | Area | Requirement |
 |---|---|
-| Security | Secrets only in `.env` / user-secrets (never committed); HttpOnly + Secure + SameSite cookies; CSRF protection; the Python agent service accepts only internal calls with a shared service token; rate limits on chat and auth endpoints |
+| Security | Secrets only in gitignored `.env` files (never committed; not user-secrets, see README); HttpOnly + Secure + SameSite cookies; CSRF protection; the Python agent service accepts only internal calls with a shared service token; rate limits on chat and auth endpoints |
 | Performance | Chat first token < 1.5s (Groq); dashboard loads < 1s locally |
 | Reliability | Job queue with retries, timeout, and recovery of stuck jobs (`locked_at` lease) |
 | UX | Smooth transitions and animations throughout; eye-friendly palette; light + dark mode; accessible (WCAG AA contrast, keyboard navigation) |

@@ -42,9 +42,9 @@ export function ConfirmDialog({ open, title, children, confirmLabel, onConfirm, 
         event.preventDefault()
         if (!busy) onCancel()
       }}
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-6 text-ink shadow-xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px]"
+      className="motion-dialog m-auto w-[min(28rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-6 text-ink shadow-xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px]"
     >
-      <h2 id={titleId} className="font-display text-xl font-semibold">
+      <h2 id={titleId} className="font-display text-title font-semibold">
         {title}
       </h2>
       <div className="mt-2 text-ink-muted">{children}</div>

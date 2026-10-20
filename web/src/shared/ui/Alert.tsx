@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
+import { EASE_OUT, EXIT } from './motion'
 import { cn } from './cn'
 
 const tones = {
@@ -18,11 +19,11 @@ export function Alert({ tone = 'danger', children }: { tone?: keyof typeof tones
           role={tone === 'danger' ? 'alert' : 'status'}
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.2 }}
+          exit={{ opacity: 0, height: 0, transition: EXIT }}
+          transition={{ duration: 0.2, ease: EASE_OUT }}
           className="overflow-hidden"
         >
-          <div className={cn('rounded-xl border px-4 py-3 text-sm', tones[tone])}>{children}</div>
+          <div className={cn('rounded-xl border px-4 py-3 text-small', tones[tone])}>{children}</div>
         </motion.div>
       )}
     </AnimatePresence>

@@ -2,12 +2,13 @@ import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { formErrorFrom } from '../../shared/forms/errors'
-import { astaKeys, streamAstaReply, type AstaEvent, type GoalSummary } from './api'
+import { astaKeys, streamAstaReply, type AstaEvent, type ChecklistItem, type GoalSummary } from './api'
 
 export interface PendingTurn {
   userText: string
   replyText: string
   goalSummary: GoalSummary | null
+  progress: ChecklistItem[] | null
 }
 
 function errorMessage(event: Extract<AstaEvent, { type: 'error' }>) {
@@ -32,11 +33,13 @@ export function useAstaChat() {
   const send = useCallback(
     async (text: string): Promise<boolean> => {
       setError(undefined)
-      setPending({ userText: text, replyText: '', goalSummary: null })
+      setPending({ userText: text, replyText: '', goalSummary: null, progress: null })
       abort.current = new AbortController()
       try {
         for await (const event of streamAstaReply(text, abort.current.signal)) {
-          if (event.type === 'token') {
+          if (event.type === 'progress') {
+            setPending((turn) => turn && { ...turn, progress: event.progress })
+          } else if (event.type === 'token') {
             setPending((turn) => turn && { ...turn, replyText: turn.replyText + event.text })
           } else if (event.type === 'goal_summary') {
             setPending((turn) => turn && { ...turn, replyText: event.text, goalSummary: event.goalSummary })

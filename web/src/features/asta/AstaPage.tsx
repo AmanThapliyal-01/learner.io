@@ -8,6 +8,7 @@ import { useMe } from '../auth/api'
 import { clearPlanDraft, readPlanDraft } from '../landing/planDraft'
 import { useConfirmGoal, useConversation } from './api'
 import { Composer, type ComposerHandle } from './Composer'
+import { GoalChecklist } from './GoalChecklist'
 import { GoalSummaryCard } from './GoalSummaryCard'
 import { MessageBubble, TypingIndicator } from './MessageBubble'
 import { useAstaChat } from './useAstaChat'
@@ -86,19 +87,21 @@ export function AstaPage() {
   if (loadError) return <Alert>We couldn't load your conversation. Refresh to try again.</Alert>
 
   const firstName = me?.fullName?.split(' ')[0]
+  const progress = chat.pending?.progress ?? conversation?.progress
   const prefill = messages.length === 0 && !chat.pending ? draft : undefined
 
   return (
     <section aria-label="Chat with Asta" className="-mx-4 -mt-8 flex h-[calc(100dvh-4rem-3.5rem-env(safe-area-inset-bottom))] min-h-[24rem] flex-col overflow-hidden border-border bg-bg sm:mx-auto sm:mt-0 sm:h-[calc(100dvh-10rem)] sm:max-w-3xl sm:rounded-3xl sm:border">
       <header className="flex items-center justify-between gap-3 border-b border-border bg-surface px-5 py-3">
         <div>
-          <h1 className="font-display text-lg font-semibold">Asta</h1>
-          <p className="text-sm text-ink-muted">Your learning guide</p>
+          <h1 className="font-display text-title font-semibold">Asta</h1>
+          <p className="text-small text-ink-muted">Your learning guide</p>
         </div>
         <span className="sr-only" aria-live="polite">
           {chat.isStreaming ? 'Asta is replying' : announcement}
         </span>
       </header>
+      {chatting && progress && progress.length > 0 && <GoalChecklist items={progress} />}
 
       <div ref={log} onScroll={onLogScroll} className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
         <ol className="flex flex-col gap-5">
@@ -113,7 +116,7 @@ export function AstaPage() {
                     key={starter}
                     type="button"
                     onClick={() => send(starter)}
-                    className="min-h-11 rounded-xl border border-border-strong bg-surface px-3.5 text-left text-sm text-ink transition-colors hover:border-primary hover:bg-primary-soft"
+                    className="min-h-11 rounded-xl border border-border-strong bg-surface px-3.5 text-left text-small text-ink transition-colors hover:border-primary hover:bg-primary-soft"
                   >
                     {starter}
                   </button>
@@ -155,12 +158,12 @@ export function AstaPage() {
         {chatting ? (
           <div className="flex flex-col gap-3">
             <Alert>{chat.error ?? formErrorFrom(confirm.error)}</Alert>
-            {prefill && <p className="text-sm text-ink-muted">We drafted this from your demo. Edit anything, then send.</p>}
+            {prefill && <p className="text-small text-ink-muted">We drafted this from your demo. Edit anything, then send.</p>}
             <Composer ref={composer} disabled={chat.isStreaming} initialText={prefill} onSend={send} />
           </div>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3 py-1">
-            <p className="text-sm text-ink">
+            <p className="text-small text-ink">
               <span className="font-medium">Goal confirmed.</span>{' '}
               <span className="text-ink-muted">{NEXT_STEP[conversation?.stage ?? 'rating'].hint}</span>
             </p>

@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from 'motion/react'
+import { motion, useInView, useReducedMotion } from 'motion/react'
 
 import { reveal } from './reveal'
 
@@ -10,153 +10,155 @@ const STEPS = [
   { title: 'Get your plan', body: 'Phases, milestones and resources for the gap only, sized to your hours and budget.' },
 ]
 
-/** Step i is reached once the scroll progress passes i / steps; its stone fills over the next few percent. */
-const reachedAt = (index: number) => [index / STEPS.length, index / STEPS.length + 0.06]
+/** When stone i fills, once the section is in view. The trail reaches it at the same moment. */
+const FILL_START = 0.3
+const FILL_STEP = 0.45
+const fillDelay = (index: number) => FILL_START + index * FILL_STEP
 
 /**
- * "How it works" as a scroll story: the steps scroll past a sticky stepping-stone path (the gap-path illustration's
- * language: hatched stones are still ahead, solid ones are done). With reduced motion it's a plain list.
+ * "How it works" on one screen: a large stepping-stone path (the gap-path illustration's language: hatched stones
+ * are still ahead, solid ones are done) with each step set beside its stone. Order comes from the path, not numbers.
+ * As the section comes into view the stones fill in turn and the sprout grows; with reduced motion it starts drawn.
  */
 export function HowItWorks() {
-  const reduceMotion = useReducedMotion()
+  const reduceMotion = useReducedMotion() ?? false
+  const stage = useRef<HTMLDivElement>(null)
+  const inView = useInView(stage, { once: true, margin: '0px 0px -25% 0px' })
+  const drawn = reduceMotion || inView
 
   return (
-    <section id="how" aria-labelledby="how-title" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
-      <motion.h2 id="how-title" {...reveal} className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+    <section id="how" aria-labelledby="how-title" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6 lg:py-32">
+      <motion.h2 id="how-title" {...reveal} className="font-display text-heading font-semibold tracking-tight">
         How it works
       </motion.h2>
-      {reduceMotion ? <StaticSteps /> : <ScrollStory />}
+
+      <div ref={stage} className="mt-10 grid lg:mt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+        <div aria-hidden className="hidden lg:block">
+          <StonePath drawn={drawn} instant={reduceMotion} />
+        </div>
+
+        {/* Desktop: one row per stone, so each step sits level with it. Phones: a small stone per step on a rail. */}
+        <ol className="flex flex-col gap-8 lg:grid lg:h-[32rem] lg:grid-rows-4 lg:gap-0">
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="relative flex gap-5 lg:items-center">
+              <span aria-hidden className="relative flex w-12 shrink-0 items-start justify-center pt-0.5 lg:hidden">
+                {index < STEPS.length - 1 && (
+                  <span className="absolute top-8 -bottom-10 border-l-2 border-dotted border-border-strong" />
+                )}
+                <RailStone index={index} drawn={drawn} instant={reduceMotion} />
+              </span>
+              <div className="max-w-md">
+                <h3 className="font-display text-title font-semibold">{step.title}</h3>
+                <p className="mt-1 text-ink-muted">{step.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   )
 }
 
-function StaticSteps() {
-  return (
-    <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {STEPS.map((step, index) => (
-        <li key={step.title} className="flex flex-col gap-3">
-          <span className="flex size-9 items-center justify-center rounded-full bg-primary-soft font-semibold text-primary">{index + 1}</span>
-          <h3 className="text-lg font-semibold">{step.title}</h3>
-          <p className="text-ink-muted">{step.body}</p>
-        </li>
-      ))}
-    </ol>
-  )
+interface DrawProps {
+  /** The section has come into view (or motion is reduced): show the filled state. */
+  drawn: boolean
+  /** Skip the animation and show the end state at once. */
+  instant: boolean
 }
 
-function ScrollStory() {
-  const list = useRef<HTMLOListElement>(null)
-  // 0 when the first step reaches the lower third of the screen, 1 when the last one has.
-  const { scrollYProgress } = useScroll({ target: list, offset: ['start 0.7', 'end 0.7'] })
-
-  return (
-    <div className="mt-6 grid gap-x-16 lg:mt-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-      <div aria-hidden className="hidden lg:block">
-        <div className="sticky top-16 flex h-[calc(100dvh-4rem)] max-h-[44rem] items-center justify-center">
-          <StonePath progress={scrollYProgress} />
-        </div>
-      </div>
-
-      <ol ref={list} className="flex flex-col">
-        {STEPS.map((step, index) => (
-          <li key={step.title} className="relative flex gap-5 py-8 lg:min-h-[60dvh] lg:items-center lg:py-0">
-            {/* Small screens: a stone per step on a rail, filling as you scroll. */}
-            <span aria-hidden className="relative flex w-10 shrink-0 justify-center pt-1 lg:hidden">
-              {index < STEPS.length - 1 && <span className="absolute top-8 -bottom-10 w-0.5 rounded-full bg-border" />}
-              <RailStone progress={scrollYProgress} index={index} />
-            </span>
-            <div className="max-w-md">
-              <StepNumber progress={scrollYProgress} index={index} />
-              <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight">{step.title}</h3>
-              <p className="mt-2 text-lg text-ink-muted">{step.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
+function fillTransition(index: number, instant: boolean) {
+  return instant ? { duration: 0 } : { delay: fillDelay(index), duration: 0.35, ease: 'easeOut' as const }
 }
 
-function StepNumber({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const fill = useTransform(progress, reachedAt(index), [0, 1])
+function RailStone({ index, drawn, instant }: DrawProps & { index: number }) {
   return (
-    <span className="relative hidden size-9 items-center justify-center rounded-full bg-primary-soft font-semibold text-primary lg:flex">
-      <motion.span aria-hidden style={{ opacity: fill }} className="absolute inset-0 rounded-full bg-primary" />
-      <span className="sr-only">Step </span>
-      <span className="relative">{index + 1}</span>
-      <motion.span aria-hidden style={{ opacity: fill }} className="absolute inset-0 flex items-center justify-center text-on-primary">
-        {index + 1}
-      </motion.span>
-    </span>
-  )
-}
-
-function RailStone({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const fill = useTransform(progress, reachedAt(index), [0, 1])
-  return (
-    <svg viewBox="0 0 40 26" className="relative size-10 overflow-visible">
-      {/* A lighter hatch than the big path, so the step number on top stays readable. */}
-      <HatchPattern id={`rail-hatch-${index}`} lineClassName="stroke-primary/30" />
-      <ellipse cx="20" cy="13" rx="18" ry="11" fill={`url(#rail-hatch-${index})`} className="stroke-ink" strokeWidth="1.5" />
-      <motion.ellipse cx="20" cy="13" rx="18" ry="11" style={{ opacity: fill }} className="fill-primary stroke-ink" strokeWidth="1.5" />
-      <text x="20" y="17.5" textAnchor="middle" className="fill-ink text-[12px] font-semibold">
-        {index + 1}
-      </text>
-      <motion.text x="20" y="17.5" textAnchor="middle" style={{ opacity: fill }} className="fill-on-primary text-[12px] font-semibold">
-        {index + 1}
-      </motion.text>
+    <svg viewBox="0 0 48 30" className="relative w-12 overflow-visible">
+      <HatchPattern id={`rail-hatch-${index}`} />
+      <ellipse cx="24" cy="15" rx="22" ry="13" fill={`url(#rail-hatch-${index})`} className="stroke-ink" strokeWidth="2" />
+      <motion.ellipse
+        cx="24"
+        cy="15"
+        rx="22"
+        ry="13"
+        className="fill-primary stroke-ink"
+        strokeWidth="2"
+        initial={false}
+        animate={{ opacity: drawn ? 1 : 0 }}
+        transition={fillTransition(index, instant)}
+      />
     </svg>
   )
 }
 
-/** One stone per step, zig-zagging down to a sprout: the goal. */
+/**
+ * The path, drawn on a 480 × 512 grid: four rows of 128, one stone centred in each, zig-zagging to a sprout (the
+ * goal) beside the last stone. The step list uses the same four rows, so text and stones line up.
+ */
+const ROW = 128
 const STONES = [
-  { cx: 120, cy: 70, rx: 84, ry: 36 },
-  { cx: 250, cy: 190, rx: 76, ry: 33 },
-  { cx: 120, cy: 310, rx: 70, ry: 30 },
-  { cx: 240, cy: 425, rx: 64, ry: 27 },
+  { cx: 140, cy: ROW * 0.5, rx: 96, ry: 40 },
+  { cx: 318, cy: ROW * 1.5, rx: 90, ry: 37 },
+  { cx: 150, cy: ROW * 2.5, rx: 84, ry: 35 },
+  { cx: 300, cy: ROW * 3.5, rx: 78, ry: 33 },
 ]
-const TRAIL = 'M120 70C200 110 260 140 250 190S110 260 120 310S250 380 240 425S150 500 150 528'
+const TRAIL = 'M140 64C240 92 330 130 318 192S150 256 150 320S300 380 300 448S392 470 430 458'
 
-function StonePath({ progress }: { progress: MotionValue<number> }) {
-  const trail = useTransform(progress, [0, 1], [0, 1])
-  const grow = useTransform(progress, [0.92, 1], [0, 1])
+function StonePath({ drawn, instant }: DrawProps) {
+  const total = fillDelay(STONES.length - 1)
   return (
-    <svg viewBox="0 0 360 580" className="h-full max-h-[34rem] w-auto overflow-visible">
+    <svg viewBox="0 0 480 512" className="h-[32rem] w-full overflow-visible">
       <HatchPattern id="story-hatch" />
       <path d={TRAIL} fill="none" className="stroke-border-strong" strokeWidth="3" strokeLinecap="round" strokeDasharray="0.1 12" />
-      <motion.path d={TRAIL} fill="none" style={{ pathLength: trail }} className="stroke-primary" strokeWidth="4" strokeLinecap="round" />
+      <motion.path
+        d={TRAIL}
+        fill="none"
+        className="stroke-primary"
+        strokeWidth="4"
+        strokeLinecap="round"
+        initial={false}
+        animate={{ pathLength: drawn ? 1 : 0 }}
+        transition={instant ? { duration: 0 } : { delay: FILL_START, duration: total, ease: 'linear' }}
+      />
       {STONES.map((stone, index) => (
-        <Stone key={index} stone={stone} progress={progress} index={index} />
+        <motion.g
+          key={index}
+          initial={false}
+          animate={{ y: drawn ? -4 : 0 }}
+          transition={fillTransition(index, instant)}
+        >
+          <ellipse {...stone} fill="url(#story-hatch)" className="stroke-ink" strokeWidth="3" />
+          <motion.ellipse
+            {...stone}
+            className="fill-primary stroke-ink"
+            strokeWidth="3"
+            initial={false}
+            animate={{ opacity: drawn ? 1 : 0 }}
+            transition={fillTransition(index, instant)}
+          />
+        </motion.g>
       ))}
       {/* The goal: a sprout that grows once the last step is reached. */}
-      <ellipse cx="150" cy="540" rx="34" ry="9" className="fill-ink" />
-      <motion.g style={{ scale: grow, opacity: grow, originX: '150px', originY: '536px' }}>
-        <path d="M150 536C150 518 150 506 150 494" fill="none" className="stroke-ink" strokeWidth="3.5" strokeLinecap="round" />
-        <path d="M149 512C132 490 108 486 95 492C104 514 128 522 149 512Z" className="fill-primary-soft stroke-ink" strokeWidth="3" strokeLinejoin="round" />
-        <path d="M151 504C165 478 191 470 207 476C200 501 175 514 151 504Z" className="fill-primary stroke-ink" strokeWidth="3" strokeLinejoin="round" />
+      <ellipse cx="438" cy="462" rx="30" ry="8" className="fill-border-strong" />
+      <motion.g
+        style={{ originX: '438px', originY: '458px' }}
+        initial={false}
+        animate={{ scale: drawn ? 1 : 0, opacity: drawn ? 1 : 0 }}
+        transition={instant ? { duration: 0 } : { delay: total + 0.3, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <path d="M438 458C438 440 438 428 438 416" fill="none" className="stroke-ink" strokeWidth="3.5" strokeLinecap="round" />
+        <path d="M437 434C420 412 396 408 383 414C392 436 416 444 437 434Z" className="fill-primary-soft stroke-ink" strokeWidth="3" strokeLinejoin="round" />
+        <path d="M439 426C453 400 479 392 495 398C488 423 463 436 439 426Z" className="fill-primary stroke-ink" strokeWidth="3" strokeLinejoin="round" />
       </motion.g>
     </svg>
   )
 }
 
-function Stone({ stone, progress, index }: { stone: (typeof STONES)[number]; progress: MotionValue<number>; index: number }) {
-  const fill = useTransform(progress, reachedAt(index), [0, 1])
-  const lift = useTransform(fill, [0, 1], [0, -4])
-  return (
-    <motion.g style={{ y: lift }}>
-      <ellipse {...stone} fill="url(#story-hatch)" className="stroke-ink" strokeWidth="3" />
-      <motion.ellipse {...stone} style={{ opacity: fill }} className="fill-primary stroke-ink" strokeWidth="3" />
-    </motion.g>
-  )
-}
-
-function HatchPattern({ id, lineClassName = 'stroke-primary' }: { id: string; lineClassName?: string }) {
+function HatchPattern({ id }: { id: string }) {
   return (
     <defs>
       <pattern id={id} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
         <rect width="8" height="8" className="fill-surface" />
-        <line x1="0" y1="0" x2="0" y2="8" className={lineClassName} strokeWidth="2.5" />
+        <line x1="0" y1="0" x2="0" y2="8" className="stroke-primary" strokeWidth="2.5" />
       </pattern>
     </defs>
   )

@@ -1,13 +1,18 @@
-"""Service configuration, loaded from environment variables / agents/.env."""
+"""Service configuration: environment variables, then agents/.env, then the repo-root .env shared with the API."""
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_AGENTS_DIR = Path(__file__).resolve().parents[3]
+# Absolute paths, so the service finds them from any working directory. Later files win.
+ENV_FILES = (_AGENTS_DIR.parent / ".env", _AGENTS_DIR / ".env")
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=ENV_FILES, env_file_encoding="utf-8", extra="ignore")
 
     groq_api_key: SecretStr
     # Comma-separated Groq model IDs, in fallback order. Empty = use DEFAULT_MODEL_CHAIN.

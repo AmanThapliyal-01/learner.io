@@ -51,7 +51,11 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
 
         // Internal Python agents service (Asta, assessment, planner).
-        services.Configure<AgentServiceOptions>(configuration.GetSection(AgentServiceOptions.Section));
+        // Fail at startup, not as a 401 on the first Asta message, when the shared token is missing.
+        services.AddOptions<AgentServiceOptions>()
+            .Bind(configuration.GetSection(AgentServiceOptions.Section))
+            .Validate(o => !string.IsNullOrWhiteSpace(o.Token), "AgentService:Token is empty. In development, set AGENT_SERVICE_TOKEN in the repo-root .env (see .env.example).")
+            .ValidateOnStart();
         services.AddHttpClient<IAstaAgent, AstaAgentClient>(ConfigureAgentsClient);
         services.AddHttpClient<IAssessmentAgent, AssessmentAgentClient>(ConfigureAgentsClient);
 

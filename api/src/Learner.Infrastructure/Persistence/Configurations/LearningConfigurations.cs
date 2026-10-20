@@ -28,6 +28,7 @@ internal sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMe
         builder.ToTable("chat_messages", ModuleSchemas.Learning);
         builder.HasIndex(m => new { m.GoalId, m.CreatedAt });
         builder.Property(m => m.ToolPayload).HasColumnType(ColumnTypes.Jsonb);
+        builder.Property(m => m.Progress).HasColumnType(ColumnTypes.Jsonb);
     }
 }
 
