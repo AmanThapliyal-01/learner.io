@@ -35,7 +35,7 @@ export function HowItWorksVideo() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-primary underline-offset-4 hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 rounded-lg text-small font-medium text-primary underline-offset-4 hover:underline"
       >
         <svg aria-hidden viewBox="0 0 20 20" className="size-5">
           <circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" strokeWidth="1.5" />
@@ -57,7 +57,7 @@ export function HowItWorksVideo() {
         className="motion-dialog m-auto w-[min(56rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-3 text-ink shadow-xl backdrop:bg-black/60 backdrop:backdrop-blur-[2px] sm:p-4"
       >
         <div className="flex items-center justify-between gap-3 px-1 pb-3">
-          <h2 id={titleId} className="font-display text-lg font-semibold">
+          <h2 id={titleId} className="font-display text-title font-semibold">
             How learner.io works
           </h2>
           <button

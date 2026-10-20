@@ -38,7 +38,7 @@ export function WorkingCard({ title, body, agent = 'asta', steps, footnote }: Wo
         <AgentAvatar agent={agent} className="size-12" />
       </motion.div>
       <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="font-display text-heading font-semibold tracking-tight">{title}</h1>
         <p className="mt-2 text-balance text-ink-muted">{body}</p>
       </div>
       {steps ? (
@@ -57,7 +57,7 @@ export function WorkingCard({ title, body, agent = 'asta', steps, footnote }: Wo
           />
         </div>
       )}
-      {footnote && <p className="text-sm text-ink-muted">{footnote}</p>}
+      {footnote && <p className="text-small text-ink-muted">{footnote}</p>}
     </section>
   )
 }
@@ -89,7 +89,7 @@ function StepList({ steps }: { steps: WorkingStep[] }) {
             {step.label}
             <span className="sr-only">{step.state === 'done' ? ' (done)' : step.state === 'active' ? ' (in progress)' : ''}</span>
           </span>
-          {step.detail && <span className="text-sm text-ink-muted tabular-nums">{step.detail}</span>}
+          {step.detail && <span className="text-small text-ink-muted tabular-nums">{step.detail}</span>}
         </li>
       ))}
     </ol>

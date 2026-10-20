@@ -83,8 +83,8 @@ function AssessmentForm({ assessment }: { assessment: Assessment }) {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-ink-muted">Step 2 of 2</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Quick skill check</h1>
+        <p className="text-small font-medium text-ink-muted">Step 2 of 2</p>
+        <h1 className="mt-1 font-display text-heading font-semibold tracking-tight">Quick skill check</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           {total} questions. Answer from what you know; guessing only makes your plan less accurate.
           {assessment.skippedSkills.length > 0 && ` Skipped, since you haven't used them yet: ${assessment.skippedSkills.join(', ')}.`}
@@ -92,7 +92,7 @@ function AssessmentForm({ assessment }: { assessment: Assessment }) {
       </header>
 
       <div className="sticky top-16 z-[5] -mx-4 border-b border-border bg-bg/90 px-4 py-3 backdrop-blur-md sm:mx-0 sm:rounded-xl sm:border">
-        <div className="flex items-center justify-between gap-3 text-sm">
+        <div className="flex items-center justify-between gap-3 text-small">
           <span className="text-ink-muted" aria-live="polite">
             {answered} of {total} answered
           </span>
@@ -105,7 +105,7 @@ function AssessmentForm({ assessment }: { assessment: Assessment }) {
 
       {bySkill.map(([skill, questions]) => (
         <section key={skill} aria-label={skill} className="flex flex-col gap-4">
-          <h2 className="font-display text-xl font-semibold">{skill}</h2>
+          <h2 className="font-display text-title font-semibold">{skill}</h2>
           {questions.map((question) => (
             <QuestionCard
               key={question.id}
@@ -166,13 +166,13 @@ function QuestionCard({ question, number, answer, onAnswer }: QuestionCardProps)
                 <span
                   aria-hidden
                   className={cn(
-                    'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold',
+                    'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md text-small font-semibold',
                     selected ? 'bg-primary text-on-primary' : 'bg-surface-muted text-ink-muted',
                   )}
                 >
                   {LETTERS[index]}
                 </span>
-                <span className="text-[15px] text-ink">{option}</span>
+                <span className="text-body text-ink">{option}</span>
               </label>
             )
           })}

@@ -12,7 +12,7 @@ export function GoalChecklist({ items }: { items: ChecklistItem[] }) {
 
   return (
     <section aria-label="Goal so far" className="border-b border-border bg-surface px-5 py-2.5">
-      <p className="text-sm text-ink-muted">
+      <p className="text-small text-ink-muted">
         <span className="font-medium text-ink">
           Goal so far: {done} of {items.length}
         </span>
@@ -24,7 +24,7 @@ export function GoalChecklist({ items }: { items: ChecklistItem[] }) {
           <li
             key={item.label}
             className={cn(
-              'flex items-center gap-1 rounded-lg px-2 py-0.5 text-sm',
+              'flex items-center gap-1 rounded-lg px-2 py-0.5 text-small',
               item.done ? 'bg-primary-soft text-primary' : 'border border-dashed border-border-strong text-ink-muted',
             )}
           >

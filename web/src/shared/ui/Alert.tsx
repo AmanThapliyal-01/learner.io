@@ -23,7 +23,7 @@ export function Alert({ tone = 'danger', children }: { tone?: keyof typeof tones
           transition={{ duration: 0.2, ease: EASE_OUT }}
           className="overflow-hidden"
         >
-          <div className={cn('rounded-xl border px-4 py-3 text-sm', tones[tone])}>{children}</div>
+          <div className={cn('rounded-xl border px-4 py-3 text-small', tones[tone])}>{children}</div>
         </motion.div>
       )}
     </AnimatePresence>

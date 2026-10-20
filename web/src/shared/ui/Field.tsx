@@ -3,7 +3,7 @@ import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttribu
 import { cn } from './cn'
 
 export const inputClass =
-  'w-full rounded-xl border border-border-strong bg-surface px-3.5 text-[15px] text-ink ' +
+  'w-full rounded-xl border border-border-strong bg-surface px-3.5 text-body text-ink ' +
   'placeholder:text-ink-muted transition-[border-color,box-shadow] duration-150 ' +
   'focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 ' +
   'aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/15'
@@ -27,7 +27,7 @@ export function FieldShell({ label, hint, error, optional, children, trailing }:
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm font-medium text-ink">
+        <label htmlFor={id} className="text-small font-medium text-ink">
           {label}
           {optional && <span className="ml-1.5 font-normal text-ink-muted">(optional)</span>}
         </label>
@@ -35,12 +35,12 @@ export function FieldShell({ label, hint, error, optional, children, trailing }:
       </div>
       {children({ id, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
       {error ? (
-        <p id={errorId} className="text-sm text-danger">
+        <p id={errorId} className="text-small text-danger">
           {error}
         </p>
       ) : (
         hint && (
-          <p id={hintId} className="text-sm text-ink-muted">
+          <p id={hintId} className="text-small text-ink-muted">
             {hint}
           </p>
         )
@@ -81,7 +81,7 @@ export function TextArea({
       hint={hint}
       error={error}
       optional={optional}
-      trailing={maxLength && <span className="text-xs tabular-nums text-ink-muted">{length}/{maxLength}</span>}
+      trailing={maxLength && <span className="text-small tabular-nums text-ink-muted">{length}/{maxLength}</span>}
     >
       {(aria) => (
         <textarea

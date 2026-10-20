@@ -2,7 +2,6 @@ import { motion } from 'motion/react'
 
 import { ButtonLink } from '../../shared/ui/Button'
 import { buttonClass } from '../../shared/ui/buttonStyles'
-import { Illustration } from '../../shared/ui/Illustration'
 import { Logo } from '../../shared/ui/Logo'
 import { useMe } from '../auth/api'
 import { GapDemo } from './GapDemo'
@@ -21,7 +20,7 @@ export function LandingPage() {
       <header className="sticky top-0 z-10 border-b border-transparent bg-bg/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
           <Logo />
-          <nav aria-label="Sections" className="hidden items-center gap-1 text-[15px] text-ink-muted md:flex">
+          <nav aria-label="Sections" className="hidden items-center gap-1 text-body text-ink-muted md:flex">
             <a href="#how" className="rounded-lg px-3 py-2 hover:text-ink">How it works</a>
             <a href="#agents" className="rounded-lg px-3 py-2 hover:text-ink">Meet Asta & Anbu</a>
           </nav>
@@ -39,13 +38,23 @@ export function LandingPage() {
       </header>
 
       <main>
-        {/* Hero */}
-        <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pt-24 lg:pb-28">
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: 'easeOut' }}>
-            <h1 className="font-display text-5xl leading-[1.04] font-semibold tracking-tight text-balance sm:text-6xl">
-              Skip what you know. <span className="text-primary">Learn what you don't.</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg text-ink-muted text-pretty">
+        {/* Hero: the line runs the full width, two lines at every size; the live demo answers it. */}
+        <section className="mx-auto grid max-w-6xl gap-x-12 gap-y-10 px-4 pt-12 pb-20 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:pt-16 lg:pb-28">
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="font-display text-display font-bold lg:col-span-2"
+          >
+            <span className="block">Skip what you know.</span>
+            <span className="block text-primary">Learn what you don't.</span>
+          </motion.h1>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: 'easeOut' }}
+          >
+            <p className="max-w-xl text-ink-muted text-pretty sm:text-title">
               Every roadmap online assumes you're starting from zero. learner.io checks where you actually stand, then
               builds a plan around the gap, for the role or skill you want.
             </p>
@@ -75,9 +84,10 @@ export function LandingPage() {
         {/* Contrast */}
         <section className="border-y border-border bg-surface">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:items-start">
-            <motion.h2 {...reveal} className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-              The same 40 steps for everyone is why most roadmaps get abandoned.
-            </motion.h2>
+            <motion.div {...reveal}>
+              <h2 className="font-display text-heading font-semibold tracking-tight text-balance">Why most roadmaps get abandoned</h2>
+              <p className="mt-4 text-title text-ink-muted">They give everyone the same 40 steps.</p>
+            </motion.div>
             <div className="grid gap-4 sm:grid-cols-2">
               <Comparison
                 title="A generic roadmap"
@@ -98,10 +108,7 @@ export function LandingPage() {
 
         {/* Final call to action */}
         <section className="mx-auto max-w-6xl px-4 py-24 text-center sm:px-6">
-          <motion.div {...reveal} className="mx-auto mb-12 max-w-4xl overflow-hidden rounded-3xl border border-border">
-            <Illustration name="gapPath" className="w-full" />
-          </motion.div>
-          <motion.h2 {...reveal} className="mx-auto max-w-2xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+          <motion.h2 {...reveal} className="mx-auto max-w-2xl font-display text-heading font-semibold tracking-tight text-balance">
             Your next skill, minus the parts you already know.
           </motion.h2>
           <motion.div {...reveal} className="mt-8">
@@ -113,7 +120,7 @@ export function LandingPage() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-ink-muted sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-small text-ink-muted sm:px-6">
           <Logo />
           <p>© {YEAR} learner.io</p>
         </div>

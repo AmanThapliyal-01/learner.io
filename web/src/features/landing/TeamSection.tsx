@@ -21,10 +21,10 @@ export function TeamSection() {
     <section id="agents" aria-labelledby="agents-title" className="scroll-mt-20 bg-primary-soft">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
         <motion.div {...reveal} className="max-w-2xl">
-          <h2 id="agents-title" className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 id="agents-title" className="font-display text-heading font-semibold tracking-tight">
             Meet Asta & Anbu.
           </h2>
-          <p className="mt-4 text-lg text-ink-muted">
+          <p className="mt-4 text-title text-ink-muted">
             Two agents, one handoff. Asta talks with you until your goal is clear. Anbu takes it from there and builds
             your plan in the background.
           </p>
@@ -36,7 +36,7 @@ export function TeamSection() {
             <button
               type="button"
               onClick={() => setPaused((value) => !value)}
-              className="flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+              className="flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-small font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink"
             >
               <svg aria-hidden viewBox="0 0 16 16" className="size-4">
                 {paused ? <path d="M5 3.5v9l7-4.5-7-4.5Z" fill="currentColor" /> : <path d="M5 3.5v9M11 3.5v9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
@@ -72,10 +72,10 @@ function AgentCard({ agent, children }: { agent: AgentName; children: ReactNode 
       <header className="flex items-center gap-3">
         <AgentAvatar agent={agent} className="size-11" />
         <div>
-          <h3 id={`agent-${agent}`} className="font-display text-xl font-semibold">
+          <h3 id={`agent-${agent}`} className="font-display text-title font-semibold">
             {name}
           </h3>
-          <p className="text-sm text-ink-muted">{role}</p>
+          <p className="text-small text-ink-muted">{role}</p>
         </div>
       </header>
       <div className="mt-6 flex-1">{children}</div>
@@ -104,7 +104,7 @@ function Bubble({ from, children }: { from: 'you' | 'asta'; children: ReactNode 
 /** A goal card drifting from Asta to Anbu, on a slow loop. Decorative; the paragraph above says the same thing. */
 function Handoff({ still }: { still: boolean }) {
   const chip = (
-    <span className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm whitespace-nowrap text-ink shadow-sm">
+    <span className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-small whitespace-nowrap text-ink shadow-sm">
       <span className="gap-stripes h-2 w-5 rounded-full" />
       Goal: AI engineer
     </span>
@@ -112,7 +112,7 @@ function Handoff({ still }: { still: boolean }) {
 
   return (
     <div aria-hidden className="flex flex-1 items-center gap-3 sm:gap-4">
-      <span className="flex shrink-0 items-center gap-2 text-sm font-medium text-ink">
+      <span className="flex shrink-0 items-center gap-2 text-small font-medium text-ink">
         <AgentAvatar agent="asta" className="size-8" />
         <span className="hidden sm:inline">{AGENTS.asta.name}</span>
       </span>
@@ -131,7 +131,7 @@ function Handoff({ still }: { still: boolean }) {
           </motion.span>
         )}
       </div>
-      <span className="flex shrink-0 items-center gap-2 text-sm font-medium text-ink">
+      <span className="flex shrink-0 items-center gap-2 text-small font-medium text-ink">
         <span className="hidden sm:inline">{AGENTS.anbu.name}</span>
         <AgentAvatar agent="anbu" className="size-8" />
       </span>

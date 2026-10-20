@@ -16,17 +16,17 @@ export function ProfilePage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
       <header>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Profile</h1>
+        <h1 className="font-display text-heading font-semibold tracking-tight">Profile</h1>
         <p className="mt-2 text-ink-muted">Asta uses this to suggest what to learn and to skip what you already know.</p>
       </header>
       <section aria-labelledby="basic-heading" className="rounded-2xl border border-border bg-surface p-6">
-        <h2 id="basic-heading" className="mb-5 text-lg font-semibold">
+        <h2 id="basic-heading" className="mb-5 text-title font-semibold">
           Basic info
         </h2>
         <BasicInfoForm profile={profile} submitLabel="Save basic info" confirmSaved />
       </section>
       <section aria-labelledby="details-heading" className="rounded-2xl border border-border bg-surface p-6">
-        <h2 id="details-heading" className="mb-5 text-lg font-semibold">
+        <h2 id="details-heading" className="mb-5 text-title font-semibold">
           Experience and skills
         </h2>
         <ProfileDetailsForm profile={profile} submitLabel="Save details" confirmSaved />

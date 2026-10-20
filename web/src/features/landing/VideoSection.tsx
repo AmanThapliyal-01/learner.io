@@ -27,7 +27,7 @@ export function VideoSection() {
   return (
     <section id="video" aria-labelledby="video-title" className="mx-auto max-w-5xl scroll-mt-20 px-4 pb-24 sm:px-6">
       <motion.div {...reveal} className="text-center">
-        <h2 id="video-title" className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h2 id="video-title" className="font-display text-heading font-semibold tracking-tight">
           See it in 25 seconds
         </h2>
       </motion.div>
@@ -67,7 +67,7 @@ export function VideoSection() {
           </button>
         )}
       </motion.div>
-      <p id="video-summary" className="mx-auto mt-4 max-w-2xl text-center text-sm text-ink-muted text-pretty">
+      <p id="video-summary" className="mx-auto mt-4 max-w-2xl text-center text-small text-ink-muted text-pretty">
         Narrated, with captions. It shows a goal set with Asta, a quick self-rating and skill check, and a plan that
         skips SQL and focuses on the gap.
       </p>

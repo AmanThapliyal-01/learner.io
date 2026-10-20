@@ -6,7 +6,7 @@ import { ChoiceCheck } from './Choice'
  */
 export function SavedNote() {
   return (
-    <p role="status" className="flex items-center gap-1.5 text-sm font-medium text-success">
+    <p role="status" className="flex items-center gap-1.5 text-small font-medium text-success">
       <ChoiceCheck className="text-success" />
       Saved
     </p>

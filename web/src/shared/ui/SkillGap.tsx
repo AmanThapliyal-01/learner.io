@@ -45,11 +45,11 @@ export function SkillGap({ rows, className, delay = 0, live, tracking, renderCon
             <span className="sr-only">
               {`${row.skill}: you're at level ${row.current} of ${LEVELS}, your goal needs ${row.target}. ${row.note}.`}
             </span>
-            <div aria-hidden className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
+            <div aria-hidden className="mb-1.5 flex items-baseline justify-between gap-3 text-small">
               <span className="font-medium text-ink">{row.skill}</span>
               <span
                 className={cn(
-                  'rounded-md px-2 py-0.5 text-xs font-medium',
+                  'rounded-md px-2 py-0.5 text-small font-medium',
                   covered ? 'bg-surface-muted text-ink-muted' : 'bg-primary-soft text-primary',
                 )}
               >
@@ -93,7 +93,7 @@ export function SkillGap({ rows, className, delay = 0, live, tracking, renderCon
 
 export function SkillGapLegend() {
   return (
-    <div aria-hidden className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
+    <div aria-hidden className="flex flex-wrap items-center gap-x-4 gap-y-1 text-small text-ink-muted">
       <span className="flex items-center gap-1.5">
         <span className="h-2 w-4 rounded-full bg-primary" /> You know
       </span>

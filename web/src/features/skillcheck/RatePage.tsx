@@ -33,8 +33,8 @@ export function RatePage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header>
-        <p className="text-sm font-medium text-ink-muted">Step 1 of 2 · {form.goalTitle}</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">How well do you know each skill?</h1>
+        <p className="text-small font-medium text-ink-muted">Step 1 of 2 · {form.goalTitle}</p>
+        <h1 className="mt-1 font-display text-heading font-semibold tracking-tight">How well do you know each skill?</h1>
         <p className="mt-2 max-w-xl text-ink-muted">
           Be honest: a short check comes next, pitched at the level you choose. Skills you've never used are skipped.
         </p>
@@ -72,8 +72,8 @@ export function RatePage() {
                         onChange={() => setRatings((current) => ({ ...current, [skill.skill]: level.value }))}
                         className="sr-only"
                       />
-                      <span className={cn('text-sm font-medium', selected ? 'text-primary' : 'text-ink')}>{level.label}</span>
-                      <span className="text-xs text-ink-muted">{level.hint}</span>
+                      <span className={cn('text-small font-medium', selected ? 'text-primary' : 'text-ink')}>{level.label}</span>
+                      <span className="text-small text-ink-muted">{level.hint}</span>
                     </label>
                   )
                 })}
@@ -85,7 +85,7 @@ export function RatePage() {
 
       <Alert>{formErrorFrom(save.error)}</Alert>
       <div className="flex flex-wrap items-center justify-end gap-3">
-        {unrated > 0 && <p className="text-sm text-ink-muted">{unrated} left to rate</p>}
+        {unrated > 0 && <p className="text-small text-ink-muted">{unrated} left to rate</p>}
         <Button size="lg" disabled={unrated > 0} loading={save.isPending} onClick={submit}>
           Continue to the skill check
         </Button>

@@ -91,6 +91,29 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/*
+ * Type scale: five roles, used everywhere instead of Tailwind's default sizes (text-sm, text-xl, ...).
+ *   display  the one big line on a marketing page (hero), Bricolage bold
+ *   heading  page titles and landing section titles, Bricolage
+ *   title    card, step and phase titles; lead paragraphs
+ *   body     running text, inputs, buttons (16px keeps iOS from zooming into fields)
+ *   small    labels, hints, metadata; nothing meant to be read goes smaller
+ * Display and heading scale with the viewport so a headline keeps to two lines at phone and desktop widths.
+ */
+@theme {
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.45;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.4;
+  --text-heading: clamp(1.75rem, 1.35rem + 1.6vw, 2.75rem);
+  --text-heading--line-height: 1.08;
+  --text-display: clamp(2rem, 0.5rem + 6.4vw, 6rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.025em;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;

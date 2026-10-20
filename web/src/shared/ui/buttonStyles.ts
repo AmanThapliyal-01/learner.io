@@ -17,8 +17,8 @@ const variants: Record<Variant, string> = {
 
 // 44px minimum hit target on every size.
 const sizes: Record<Size, string> = {
-  md: 'min-h-11 px-4 text-[15px]',
-  lg: 'min-h-12 px-6 text-base',
+  md: 'min-h-11 px-4 text-body',
+  lg: 'min-h-12 px-6 text-body',
 }
 
 export interface StyleProps {
