@@ -17,7 +17,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-dvh overflow-x-clip">
-      <header className="sticky top-0 z-10 border-b border-transparent bg-bg/80 backdrop-blur-md">
+      <header className="sticky top-0 z-10 bg-bg/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
           <Logo />
           <nav aria-label="Sections" className="hidden items-center gap-1 text-body text-ink-muted md:flex">
@@ -82,7 +82,7 @@ export function LandingPage() {
         <VideoSection />
 
         {/* Contrast */}
-        <section className="border-y border-border bg-surface">
+        <section className="bg-surface">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:items-start">
             <motion.div {...reveal}>
               <h2 className="font-display text-heading font-semibold tracking-tight text-balance">Why most roadmaps get abandoned</h2>
@@ -119,7 +119,7 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border">
+      <footer className="bg-surface-muted">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-small text-ink-muted sm:px-6">
           <Logo />
           <p>© {YEAR} learner.io</p>
@@ -136,9 +136,13 @@ function Comparison({ title, points, muted }: { title: string; points: string[];
       <ul className="mt-4 flex flex-col gap-3">
         {points.map((point) => (
           <li key={point} className="flex gap-3">
-            <span aria-hidden className={muted ? 'mt-0.5 text-ink-muted' : 'mt-0.5 text-primary'}>
-              {muted ? '–' : '✓'}
-            </span>
+            {muted ? (
+              <span aria-hidden className="mt-0.5 text-ink-muted">–</span>
+            ) : (
+              <svg aria-hidden viewBox="0 0 16 16" className="mt-1 size-4 shrink-0 text-primary">
+                <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
             <span className={muted ? 'text-ink-muted' : 'text-ink'}>{point}</span>
           </li>
         ))}

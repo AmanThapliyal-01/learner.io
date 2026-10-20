@@ -49,7 +49,7 @@ export function TeamSection() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <AgentCard agent="asta">
-            <div className="flex flex-col gap-3" aria-label="Example conversation with Asta" role="group">
+            <div data-ui className="flex flex-col gap-3" aria-label="Example conversation with Asta" role="group">
               <Bubble from="you">I want to get into AI but I'm a backend dev and don't know where to start.</Bubble>
               <Bubble from="asta">Good starting point. How many hours a week can you give this, and do you want to build AI features or train models?</Bubble>
               <Bubble from="you">About 6 hours. Building features.</Bubble>
@@ -68,7 +68,7 @@ export function TeamSection() {
 function AgentCard({ agent, children }: { agent: AgentName; children: ReactNode }) {
   const { name, role } = AGENTS[agent]
   return (
-    <motion.article {...reveal} aria-labelledby={`agent-${agent}`} className="flex flex-col rounded-3xl border border-border bg-bg p-5 sm:p-7">
+    <motion.article {...reveal} aria-labelledby={`agent-${agent}`} className="flex flex-col rounded-3xl bg-surface p-5 sm:p-7">
       <header className="flex items-center gap-3">
         <AgentAvatar agent={agent} className="size-11" />
         <div>
@@ -90,7 +90,7 @@ function Bubble({ from, children }: { from: 'you' | 'asta'; children: ReactNode 
       <p
         className={
           isAsta
-            ? 'max-w-[85%] rounded-2xl rounded-bl-md bg-surface px-4 py-3 text-ink shadow-sm'
+            ? 'max-w-[85%] rounded-2xl rounded-bl-md bg-surface-muted px-4 py-3 text-ink'
             : 'max-w-[85%] rounded-2xl rounded-br-md bg-primary px-4 py-3 text-on-primary'
         }
       >
@@ -104,7 +104,7 @@ function Bubble({ from, children }: { from: 'you' | 'asta'; children: ReactNode 
 /** A goal card drifting from Asta to Anbu, on a slow loop. Decorative; the paragraph above says the same thing. */
 function Handoff({ still }: { still: boolean }) {
   const chip = (
-    <span className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-small whitespace-nowrap text-ink shadow-sm">
+    <span className="flex items-center gap-2 rounded-xl bg-surface px-3 py-2 text-small whitespace-nowrap text-ink">
       <span className="gap-stripes h-2 w-5 rounded-full" />
       Goal: AI engineer
     </span>
@@ -155,7 +155,7 @@ function AnbuPreview({ still }: { still: boolean }) {
   }, [animate])
 
   return (
-    <ol ref={box} aria-label="Example of Anbu building a plan" className="flex flex-col gap-2">
+    <ol ref={box} data-ui aria-label="Example of Anbu building a plan" className="flex flex-col gap-2">
       {ANBU_STEPS.map((step, index) => {
         const state = index < current ? 'done' : index === current ? 'active' : 'waiting'
         return (
@@ -163,7 +163,7 @@ function AnbuPreview({ still }: { still: boolean }) {
             key={step}
             className={cn(
               'flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors duration-300',
-              state === 'active' ? 'bg-surface shadow-sm' : 'bg-transparent',
+              state === 'active' ? 'bg-surface-muted' : 'bg-transparent',
             )}
           >
             <StepMark state={state} />

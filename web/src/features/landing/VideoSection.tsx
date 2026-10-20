@@ -32,7 +32,7 @@ export function VideoSection() {
         </h2>
       </motion.div>
 
-      <motion.div {...reveal} className="relative mt-10 aspect-video overflow-hidden rounded-3xl border border-border bg-surface-muted shadow-[0_30px_80px_-40px_rgba(20,60,50,0.45)]">
+      <motion.div {...reveal} className="relative mt-10 aspect-video overflow-hidden rounded-3xl bg-surface-muted">
         {playing ? (
           <video
             src={VIDEO}
@@ -55,7 +55,7 @@ export function VideoSection() {
           >
             <img src={POSTER} alt="" width={1280} height={720} loading="lazy" decoding="async" className="size-full object-cover" />
             <span className="absolute inset-0 flex items-center justify-center">
-              <span className="flex items-center gap-3 rounded-full bg-surface py-3 pr-6 pl-3 text-ink shadow-lg transition-transform group-hover:scale-[1.03] group-active:scale-[0.98]">
+              <span className="flex items-center gap-3 rounded-full bg-surface py-3 pr-6 pl-3 text-ink transition-transform group-hover:scale-[1.03] group-active:scale-[0.98]">
                 <span className="flex size-11 items-center justify-center rounded-full bg-primary text-on-primary">
                   <svg aria-hidden viewBox="0 0 20 20" className="ml-0.5 size-5">
                     <path d="M6 4.5v11l9-5.5-9-5.5Z" fill="currentColor" />
